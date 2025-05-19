@@ -1,6 +1,11 @@
+import Logo from '../../img/Logo Praiar.png';
+
 function Header() {
-    return <h1 className="header">Praiar</h1>
-  }
-  
-export default Header
-  
+  return(
+    <>
+      <img src={Logo} alt="" />
+    </>
+  )
+}
+
+export default Header;
