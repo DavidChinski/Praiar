@@ -1,10 +1,10 @@
 import Header from './components/Header/Header'
-
+import Footer from './components/Footer/Footer'
 function App() {
   return (
     <>
       <Header />
-      <h2>Bro Bebzcuk piensa que va a convencer a hebraica de usar su proyecto</h2>
+      <Footer />
     </>
   )
 }

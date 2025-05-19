@@ -1,0 +1,65 @@
+.footer {
+background-color: #003049;
+color: #ffffff;
+padding: 2rem 1rem;
+font-family: Arial, sans-serif;
+}
+
+.footer__container {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+gap: 2rem;
+max-width: 1200px;
+margin: auto;
+}
+
+.footer__section {
+flex: 1 1 200px;
+}
+
+.footer__logo {
+width: 80px;
+margin-bottom: 0.5rem;
+}
+
+.footer__slogan {
+font-size: 0.95rem;
+}
+
+.footer__section h4 {
+margin-bottom: 0.5rem;
+font-size: 1.1rem;
+}
+
+.footer__section ul {
+list-style: none;
+padding: 0;
+}
+
+.footer__section li {
+margin-bottom: 0.3rem;
+}
+
+.footer__section a {
+color: #ffffff;
+text-decoration: none;
+}
+
+.footer__section a:hover {
+text-decoration: underline;
+}
+
+.footer__social img {
+width: 24px;
+margin-right: 0.5rem;
+vertical-align: middle;
+}
+
+.footer__bottom {
+border-top: 1px solid rgba(255, 255, 255, 0.2);
+text-align: center;
+margin-top: 2rem;
+padding-top: 1rem;
+font-size: 0.85rem;
+}
