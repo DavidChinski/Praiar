@@ -1,16 +1,10 @@
-// db.js
-const { Pool } = require('node:pg');
-require('dotenv').config();
+import supabase from './src/supabaseClient.js'
 
-const pool = new Pool({
-  connectionString: process.env.SUPABASE_URI,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+export async function getUsers() {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
 
-async function query(text, params) {
-  // ... tu función query ...
+  if (error) throw error
+  return data
 }
-
-module.exports = { query };
