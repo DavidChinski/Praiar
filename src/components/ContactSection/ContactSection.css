@@ -1,0 +1,67 @@
+.contact-section {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: sans-serif;
+  }
+  
+  .team {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px 0;
+  }
+  
+  .member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .icon.profile {
+    width: 50px;
+    height: 50px;
+    background-color: #009cce;
+    border-radius: 50%;
+    margin-bottom: 5px;
+  }
+  
+  .linkedin {
+    width: 24px;
+    height: 24px;
+    background-color: #0077b5;
+    margin-top: 5px;
+    border-radius: 4px;
+  }
+  
+  .contact-methods {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 40px;
+  }
+  
+  .promo-img {
+    width: 150px;
+    height: 100px;
+    background-color: #eee; /* Reemplazar con imagen */
+  }
+  
+  .socials {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 1px solid #aaa;
+    padding-left: 20px;
+  }
+  
+  .social {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+  
+  .x { background-color: black; }
+  .instagram { background-color: #e4405f; }
+  .linkedin { background-color: #0077b5; }
+  

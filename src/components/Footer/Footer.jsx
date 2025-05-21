@@ -1,4 +1,5 @@
 import Logo from "../../img/Logo Praiar.png";
+import { Link } from 'react-router-dom';
 import "./Footer.css";
 
 function Footer() {
@@ -6,35 +7,32 @@ function Footer() {
     <>
       <footer className="footer">
         <div className="footer__container">
-          <div className="footer__section logo">
-            <img
-              src="<!-- TODO: insert logo URL -->"
-              alt="Praiar logo"
-              className="footer__logo"
-            />
-            <p className="footer__slogan">
-              Empezá el verano <br /> <strong>realmente Praiando</strong>
-            </p>
-          </div>
-
+          <Link to="/">
+            <div className="footer__section logo">
+              <img src={Logo} alt="Logo Praiar" className="logo" />
+                <p className="footer__slogan">
+                  Empezá el verano <br /> <strong>realmente Praiando</strong>
+                </p>
+            </div>
+          </Link>
           <div className="footer__section links">
             <div>
               <h4>Enlaces</h4>
               <ul>
                 <li>
-                  <a href="#">Inicio</a>
+                  <Link to="/">Inicio</Link>
                 </li>
                 <li>
-                  <a href="#">Reservar</a>
+                  <Link to="/">Reservar</Link>
                 </li>
                 <li>
-                  <a href="#">Balnearios</a>
+                  <Link to="/">Balnearios</Link>
                 </li>
                 <li>
-                  <a href="#">Beneficios</a>
+                  <Link to="/beneficios">Beneficios</Link>
                 </li>
                 <li>
-                  <a href="#">Contacto</a>
+                  <Link to="/contactos">Contactos</Link>
                 </li>
               </ul>
             </div>
