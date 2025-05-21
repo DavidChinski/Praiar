@@ -12,7 +12,9 @@ function RegistrarComponent() {
                 <form className="login-form">
                 <label>Email</label>
                 <input type="email" placeholder="Ingrese su email" />
-                <label>Contraseña</label>
+                <label>Nueva Contraseña</label>
+                <input type="password" placeholder="Ingrese su contraseña" />
+                <label>Repetir Contraseña</label>
                 <input type="password" placeholder="Ingrese su contraseña" />
 
                 <div className="login-buttons">
