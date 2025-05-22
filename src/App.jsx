@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Contactos from "./pages/Contactos";
 import Beneficios from "./pages/Beneficios";
-import Descuentos from "./pages/Descuentos";
+import CiudadesPag from "./pages/CiudadesPag";
 import LoginPage from "./pages/LoginPage";
 import RegistrarPage from "./pages/RegistrarPage";
 
@@ -16,7 +16,7 @@ function App() {
           <Route path="/" element={<Home />} /> 
           <Route path="/contactos" element={<Contactos />} /> 
           <Route path="/beneficios" element={<Beneficios />} /> 
-          <Route path="/descuentos" element={<Descuentos />} /> 
+          <Route path="/ciudades" element={<CiudadesPag />} /> 
           <Route path="/login" element={<LoginPage />} /> 
           <Route path="/registrar" element={<RegistrarPage />} /> 
         </Routes>
