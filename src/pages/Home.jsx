@@ -1,12 +1,13 @@
 import Header from '../components/Header/Header'
 import Footer from '../components/Footer/Footer'
+import Ciudades from '../components/Ciudades/Ciudades'
 import React from "react";
 
 function Home() {
   return (
     <>
       <Header />
-      <h1>home</h1>
+      <Ciudades />
       <Footer />
     </>
   )

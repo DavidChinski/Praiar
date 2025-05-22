@@ -11,15 +11,23 @@ function Header() {
           <span className="brand">Praiar</span>
         </div>
       </Link>
+
       <nav className="nav">
         <Link to="/descuentos">Descuentos</Link>
         <Link to="/beneficios">Beneficios</Link>
         <Link to="/contactos">Contáctanos</Link>
       </nav>
+      
       <div className="auth-buttons">
-        <button className="login"><Link to="/login">Iniciar Sesión</Link></button>
-        <button className="registrar"><Link to="/registrar">Crear una cuenta</Link></button>
+        <button className="login">
+          <Link to="/login">Iniciar Sesión</Link>
+        </button>
+        <button className="registrar">
+          <Link to="/registrar">Crear una cuenta</Link>
+        </button>
       </div>
+
+      
     </header>
   );
 }
