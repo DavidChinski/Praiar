@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Logo from '../../img/Logo Praiar.png';
+import Logo from '../../img/LogoPraiarSinNombre.png';
 import './Header.css';
 
 function Header() {

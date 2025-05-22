@@ -1,6 +1,6 @@
-import Header from "../components/Header/Header";
-import Footer from '../components/Footer/Footer'
-import ContactSection from '../components/ContactSection/ContactSection'
+import Header from "../components/Header/";
+import Footer from '../components/Footer/'
+import ContactSection from '../components/ContactSection/'
 import React from "react";
 
 function Contactos() {

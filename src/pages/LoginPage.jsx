@@ -1,7 +1,7 @@
-import Header from '../components/Header/Header'
-import Footer from '../components/Footer/Footer'
+import Header from '../components/Header/'
+import Footer from '../components/Footer/'
 import React from "react";
-import LoginComponent from '../components/LoginComponent/LoginComponent'
+import LoginComponent from '../components/LoginComponent/'
 
 function LoginPage() {
   return (
