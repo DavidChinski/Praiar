@@ -1,6 +1,6 @@
-import Header from '../components/Header/Header'
-import Footer from '../components/Footer/Footer'
-import Ciudades from '../components/Ciudades/Ciudades'
+import Header from '../components/Header/'
+import Footer from '../components/Footer/'
+import Ciudades from '../components/Ciudades/'
 import React, { useEffect, useState } from "react";
 import BusquedaHome from '../components/BusquedaHome';
 

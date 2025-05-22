@@ -7,14 +7,12 @@ function Footer() {
     <>
       <footer className="footer">
         <div className="footer__container">
-          <Link to="/">
-            <div className="footer__section logo">
-              <img src={Logo} alt="Logo Praiar" className="logo" />
-                <p className="footer__slogan">
-                  Empezá el verano <br /> <strong>realmente Praiando</strong>
-                </p>
-            </div>
-          </Link>
+          <div className="footer__section logo__section">
+            <img src={Logo} alt="Logo Praiar" className="logo" />
+              <p className="footer__slogan">
+                Empezá el verano <br /> <strong>realmente Praiando</strong>
+              </p>
+          </div>
           <div className="footer__section links">
             <div>
               <h4>Enlaces</h4>
