@@ -1,4 +1,3 @@
-// src/pages/Ciudades.jsx
 import { useEffect, useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../img/mar-del-plata.png';
@@ -35,9 +34,8 @@ function Ciudades() {
       );
 
       // Ordenar por cantidad de balnearios descendente
-      ciudadesConCantidad.sort((a, b) => b.cantidadBalnearios - a.cantidadBalnearios);
-      const top10Ciudades = ciudadesConCantidad.slice(0, 10);
-      setCiudades(top10Ciudades);
+      
+      setCiudades(ciudadesConCantidad);
     }
 
     fetchCiudadesConBalnearios();

@@ -57,7 +57,7 @@ function LoginComponent() {
 
         <div className="extra-buttons">
           <button className="secondary">Regístrate</button>
-          <button className="secondary">Inicia como Bañeario</button>
+          <button className="secondary">Inicia como Balneario</button>
         </div>
       </div>
     </div>
