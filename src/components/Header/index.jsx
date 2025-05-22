@@ -1,8 +1,26 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Logo from '../../img/LogoPraiarSinNombre.png';
 import './Header.css';
 
 function Header() {
+  const [cliente, setCliente] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const session = localStorage.getItem('cliente');
+    if (session) {
+      setCliente(JSON.parse(session));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('cliente');
+    setCliente(null);
+    navigate('/');
+    window.location.reload(); 
+  };
+
   return (
     <header className="header">
       <Link to="/">
@@ -13,21 +31,28 @@ function Header() {
       </Link>
 
       <nav className="nav">
-        <Link to="/descuentos">Descuentos</Link>
+        <Link to="/ciudades">Ciudades</Link>
         <Link to="/beneficios">Beneficios</Link>
         <Link to="/contactos">Contáctanos</Link>
       </nav>
-      
-      <div className="auth-buttons">
-        <button className="login">
-          <Link to="/login">Iniciar Sesión</Link>
-        </button>
-        <button className="registrar">
-          <Link to="/registrar">Crear una cuenta</Link>
-        </button>
-      </div>
 
-      
+      <div className="auth-buttons">
+        {cliente ? (
+          <>
+            <span className="welcome">Hola, {cliente.nombre || cliente.mail}!</span>
+            <button className="logout" onClick={handleLogout}>Cerrar sesión</button>
+          </>
+        ) : (
+          <>
+            <button className="login">
+              <Link to="/login">Iniciar Sesión</Link>
+            </button>
+            <button className="registrar">
+              <Link to="/registrar">Crear una cuenta</Link>
+            </button>
+          </>
+        )}
+      </div>
     </header>
   );
 }

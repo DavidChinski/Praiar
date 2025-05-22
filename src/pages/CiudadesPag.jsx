@@ -6,7 +6,7 @@ function Descuentos() {
   return (
     <>
       <Header />
-      <h1>Descuentos</h1>
+      <h1>Todas las ciudades Costeras</h1>
       <Footer />
     </>
   )
