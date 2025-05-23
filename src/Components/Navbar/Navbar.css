@@ -1,130 +1,159 @@
 /* --------- Header principal --------- */
 .header {
-    background-color: #fef8e8;
-    width: 100%;
-  }
-  
-  /* Contenedor interno que centra y limita a 1920px */
-  .header-container {
-    max-width: 1920px;
-    margin: 0 auto;
-    padding: 0.8rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: 'Arial', sans-serif;
-    flex-wrap: wrap;
-    gap: 1rem;
-    box-sizing: border-box;
-  }
-  
-  /* --------- Logo y marca --------- */
-  .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-  
-  .logo {
-    height: 40px;
-  }
-  
-  .brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #004b75;
-    font-family: "El Messiri", sans-serif;
-  }
-  
-  /* --------- Navegación principal --------- */
-  .nav {
-    display: flex;
-    gap: 2rem;
-  }
-  
-  .nav a {
-    text-decoration: none;
-    color: black;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-  }
-  
-  .nav a:hover {
-    color: #004b75;
-  }
-  
-  /* --------- Botones de autenticación --------- */
-  .auth-buttons {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .auth-buttons button {
-    background-color: #4bb3c1;
-    border: none;
-    border-radius: 8px;
-    padding: 0.4rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .auth-buttons button:hover {
-    background-color: #379aa7;
-  }
-  
-  .auth-buttons button a {
-    text-decoration: none;
-    color: black;
-    font-weight: 500;
-  }
-  
-  /* --------- Botón hamburguesa --------- */
+  background-color: #fef8e8;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Contenedor principal */
+.header-container {
+  max-width: 1920px;
+  margin: 0;
+  padding: 1.4rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Arial', sans-serif;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+/* --------- Logo y marca --------- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo {
+  height: 40px;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #004b75;
+  font-family: "El Messiri", sans-serif;
+}
+
+/* --------- Menú general --------- */
+.menu {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* --------- Navegación --------- */
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav a:hover {
+  color: #004b75;
+}
+
+/* --------- Botones de autenticación --------- */
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.auth-buttons button {
+  background-color: #4bb3c1;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-buttons button:hover {
+  background-color: #379aa7;
+}
+
+.auth-buttons button a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+/* --------- Botón hamburguesa --------- */
+.hamburger {
+  display: none;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: #004b75;
+}
+
+.hamburger:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* --------- Responsive --------- */
+@media (max-width: 768px) {
   .hamburger {
-    display: none;
-    font-size: 1.8rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #004b75;
+    display: block;
+    margin-left: auto;
   }
-  
-  /* --------- Menú contenedor general --------- */
+
+  /* Menú contenedor que aparece debajo del header */
   .menu {
     display: flex;
-    gap: 2rem;
-    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  /* --------- Responsive (móviles) --------- */
-  @media (max-width: 768px) {
-    .hamburger {
-      display: block;
-      margin-left: auto;
-    }
-  
-    .menu {
-      display: none;
-      flex-direction: column;
-      width: 100%;
-      padding-top: 1rem;
-    }
-  
-    .menu.open {
-      display: flex;
-    }
-  
-    .nav,
-    .auth-buttons {
-      flex-direction: column;
-      width: 100%;
-      gap: 0.5rem;
-    }
-  
-    .nav a,
-    .auth-buttons button {
-      width: 100%;
-      text-align: left;
-    }
+
+  .menu.open {
+    padding-top: 1rem;
+    max-height: 300px; /* lo suficiente para mostrar contenido */
+    opacity: 1;
+    transform: translateY(0);
   }
-  
+
+  .nav {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 50%;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 50%;
+    align-items: flex-end;
+  }
+
+  .auth-buttons button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
+  .header-container {
+    padding: 0.4rem 1rem; /* MÁS BAJO en pantallas chicas */
+  }
+}
