@@ -7,6 +7,7 @@ import Beneficios from "./pages/Beneficios";
 import CiudadesPag from "./pages/CiudadesPag";
 import LoginPage from "./pages/LoginPage";
 import RegistrarPage from "./pages/RegistrarPage";
+import BalneariosPag from "./pages/BalneariosPag";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/ciudades" element={<CiudadesPag />} /> 
           <Route path="/login" element={<LoginPage />} /> 
           <Route path="/registrar" element={<RegistrarPage />} /> 
+          <Route path="/balnearios/:id" element={<BalneariosPag />} />
         </Routes>
       </div>
     </Router>

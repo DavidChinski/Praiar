@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../img/mar-del-plata.png';
 import './Ciudades.css';
-import { useNavigate } from 'react-router-dom';
 
-function Ciudades() {
+function CiudadesTodas() {
   const [ciudades, setCiudades] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchCiudadesConBalnearios() {
@@ -37,9 +35,7 @@ function Ciudades() {
 
       // Ordenar por cantidad de balnearios descendente
       
-      ciudadesConCantidad.sort((a, b) => b.cantidadBalnearios - a.cantidadBalnearios);
-      const top10Ciudades = ciudadesConCantidad.slice(0, 10);
-      setCiudades(top10Ciudades);
+      setCiudades(ciudadesConCantidad);
     }
 
     fetchCiudadesConBalnearios();
@@ -56,7 +52,7 @@ function Ciudades() {
             <div className="card-content">
               <h3>{ciudad.nombre}</h3>
               <p>{ciudad.cantidadBalnearios} balneario(s)</p>
-              <button onClick={() => navigate(`/balnearios/${ciudad.id_ciudad}`)}>Ver balnearios</button>
+              <button>Ver balnearios</button>
             </div>
           </div>
         ))}
@@ -65,4 +61,4 @@ function Ciudades() {
   );
 }
 
-export default Ciudades;
+export default CiudadesTodas;

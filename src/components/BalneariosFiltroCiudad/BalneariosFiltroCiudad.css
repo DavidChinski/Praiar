@@ -1,0 +1,58 @@
+.balnearios-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.balneario-card {
+  border: 2px solid #0077b6;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 300px;
+  font-family: sans-serif;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.balneario-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.card-info h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.card-info .direccion {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.card-info .direccion i {
+  color: #0077b6;
+  margin-right: 6px;
+}
+
+.card-info button {
+  background-color: #caf0f8;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #0077b6;
+  transition: background-color 0.3s;
+}
+
+.card-info button:hover {
+  background-color: #90e0ef;
+}

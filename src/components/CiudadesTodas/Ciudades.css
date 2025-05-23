@@ -1,0 +1,63 @@
+/* src/pages/Ciudades.css */
+.ciudades-container {
+    padding: 2rem;
+  }
+  
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .ciudad-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .ciudad-card:hover {
+    transform: scale(1.03);
+  }
+  
+  .ciudad-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .card-content {
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    color: white;
+    padding: 1rem;
+    width: 100%;
+  }
+  
+  .card-content h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  .card-content p {
+    margin: 0.3rem 0;
+  }
+  
+  .card-content button {
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+  
+  .card-content button:hover {
+    background-color: #0097a7;
+  }
+  
