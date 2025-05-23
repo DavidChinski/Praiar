@@ -9,10 +9,15 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* Espaciador que ocupa el lugar del header en el flujo */
+.header-spacer {
+  height: 96px; /* misma altura que el header en pantallas grandes */
+}
+
 /* Contenedor principal */
 .header-container {
   max-width: 1920px;
-  margin: 0;
+  margin: 0 auto;
   padding: 1.4rem 2rem;
   display: flex;
   align-items: center;
@@ -63,7 +68,7 @@
 }
 
 .nav a:hover {
-  color: #004b75;
+  color: #004C62;
 }
 
 /* --------- Botones de autenticación --------- */
@@ -73,7 +78,7 @@
 }
 
 .auth-buttons button {
-  background-color: #4bb3c1;
+  background-color: #54B1CB;
   border: none;
   border-radius: 8px;
   padding: 0.4rem 1rem;
@@ -82,7 +87,7 @@
 }
 
 .auth-buttons button:hover {
-  background-color: #379aa7;
+  background-color: #004C62;
 }
 
 .auth-buttons button a {
@@ -107,7 +112,6 @@
   box-shadow: none;
 }
 
-
 /* --------- Responsive --------- */
 @media (max-width: 768px) {
   .hamburger {
@@ -115,7 +119,6 @@
     margin-left: auto;
   }
 
-  /* Menú contenedor que aparece debajo del header */
   .menu {
     display: flex;
     flex-direction: row;
@@ -131,7 +134,7 @@
 
   .menu.open {
     padding-top: 1rem;
-    max-height: 300px; /* lo suficiente para mostrar contenido */
+    max-height: 300px;
     opacity: 1;
     transform: translateY(0);
   }
@@ -153,7 +156,12 @@
     padding: 0.3rem 0.6rem;
     font-size: 0.85rem;
   }
+
   .header-container {
-    padding: 0.4rem 1rem; /* MÁS BAJO en pantallas chicas */
+    padding: 0.6rem 1rem;
+  }
+
+  .header-spacer {
+    height: 80px; /* menor altura en pantallas pequeñas */
   }
 }
