@@ -9,10 +9,7 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Espaciador que ocupa el lugar del header en el flujo */
-.header-spacer {
-  height: 96px; /* misma altura que el header en pantallas grandes */
-}
+
 
 /* Contenedor principal */
 .header-container {

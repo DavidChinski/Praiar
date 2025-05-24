@@ -1,11 +1,163 @@
-import './BusquedaHome.css'
+import { useEffect, useState } from 'react';
+import { supabase } from '../../supabaseClient.js';
+import './BusquedaHome.css';
+import { DateRange } from 'react-date-range';
+import { format } from 'date-fns';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import Logo from '../../assets/ImagenBusquedaHome.png';
+import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
+import LocalizacionBusquedaHome from '../../assets/LocalizacionBusquedaHome.png';
+import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
+import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
 
 function BusquedaHome() {
+  const [ciudades, setCiudades] = useState([]);
+  const [balnearios, setBalnearios] = useState([]);
+  const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
+  const [rangoFechas, setRangoFechas] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection'
+    }
+  ]);
+  const [showCalendario, setShowCalendario] = useState(false);
 
-return (
-  <>
-    <h1>Busqueda de filtros</h1>
-  </>
-)
+  function handleCiudadChange(event) {
+    const idCiudad = event.target.value;
+    setCiudadSeleccionada(idCiudad !== '' ? idCiudad : null);
+  }
+
+  useEffect(() => {
+    async function fetchCiudades() {
+      const { data, error } = await supabase
+        .from('ciudades')
+        .select('id_ciudad, nombre');
+
+      if (error) {
+        console.error('Error al obtener ciudades:', error.message);
+        return;
+      }
+
+      setCiudades(data);
+    }
+
+    fetchCiudades();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBalnearios() {
+      if (!ciudadSeleccionada) {
+        setBalnearios([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('ciudades_x_balnearios')
+        .select('id_balneario(id_balneario, nombre)')
+        .eq('id_ciudad', ciudadSeleccionada);
+
+      if (error) {
+        console.error('Error al obtener balnearios:', error.message);
+        setBalnearios([]);
+        return;
+      }
+
+      const balneariosMapeados = data.map(item => ({
+        id_balneario: item.id_balneario.id_balneario,
+        nombre: item.id_balneario.nombre,
+      }));
+
+      setBalnearios(balneariosMapeados);
+    }
+
+    fetchBalnearios();
+  }, [ciudadSeleccionada]);
+
+  return (
+    <div className="busqueda-home">
+      <div className="hero">
+        <img src={Logo} alt="Playa" className="hero-background" />
+        <div className="overlay">
+          <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
+          <div className="busqueda-form">
+            {/* Localidades */}
+            <div className="input-group">
+              <img src={LocalizacionBusquedaHome} className="icon" alt="Localización" />
+              <div className="input-wrapper">
+                <label htmlFor="localidad">Localidades</label>
+                <select
+                  id="localidad"
+                  onChange={handleCiudadChange}
+                  value={ciudadSeleccionada || ''}
+                >
+                  <option value="">Ingresar la localidad</option>
+                  {ciudades.map((ciudad) => (
+                    <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
+                      {ciudad.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Balnearios */}
+            <div className="input-group">
+              <img src={BalneariosBusquedaHome} className="icon" alt="Balnearios" />
+              <div className="input-wrapper">
+                <label htmlFor="balneario">Balnearios</label>
+                <select id="balneario" disabled={!ciudadSeleccionada}>
+                  <option value="">Ingresar el balneario</option>
+                  {balnearios.map((balneario) => (
+                    <option key={balneario.id_balneario} value={balneario.id_balneario}>
+                      {balneario.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Fecha con calendario */}
+            <div className="input-group date-group">
+              <img
+                src={FechaBusquedaHome}
+                className="icon"
+                alt="Fecha"
+                onClick={() => setShowCalendario(!showCalendario)}
+                style={{ cursor: 'pointer' }}
+              />
+              <div className="input-wrapper">
+                <label>Fecha</label>
+                <div className="date-summary">
+                  {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
+                </div>
+                {showCalendario && (
+                  <div className="calendario-container" style={{ position: 'absolute', zIndex: 999 }}>
+                    <DateRange
+                      editableDateInputs={true}
+                      onChange={item => setRangoFechas([item.selection])}
+                      moveRangeOnFirstSelection={false}
+                      ranges={rangoFechas}
+                      months={1}
+                      direction="horizontal"
+                      rangeColors={["#004080"]}
+                      minDate={new Date()}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botón buscar */}
+            <button className="search-button">
+              <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
-export default BusquedaHome
+
+export default BusquedaHome;
