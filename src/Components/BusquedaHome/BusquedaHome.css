@@ -10,21 +10,36 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
-/* Overlay con texto y formulario */
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 46, 93, 0.45); /* azul oscuro con opacidad */
+  background-color: transparent; /* eliminá el fondo azul acá */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  z-index: 2; /* debe ir encima del .hero-darken */
 }
+
+.hero-darken {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 63, 94, 0.7); /* #003F5E al 70% */
+  z-index: 1;
+}
+
 
 .hero-title {
   color: white;
@@ -61,29 +76,44 @@
   font-size: 0.9rem;
 }
 
-.input-wrapper label {
-  font-weight: bold;
+.input-wrapper {
   margin-bottom: 0.3rem;
-  color: #004080;
+  color: #005984; /* #005A84 con 70% de opacidad */
+}
+
+.subtitulo{
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 /* Inputs y selects */
 select,
 input[type="text"] {
   padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
+  border: 1px solid #005984;
+  border-radius: 15px;
   font-size: 0.9rem;
   width: 180px;
   appearance: none;
   background-color: white;
-  color:#004080
+  color:#005A84
+}
+
+select {
+  transition: all 0.3s ease;
+}
+
+select:hover,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 89, 132, 0.3);
+  transform: scale(1.02);
 }
 
 /* Iconos */
-.icon {
-  width: 32px;
-  height: 32px;
+.icon, .iconFecha {
+  width: 40px;
+  height: auto;
 }
 
 /* Fechas */
@@ -103,6 +133,18 @@ input[type="text"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-button:hover, .iconFecha:hover {
+  background-color: #00527c;
+  transform: scale(1.05);
+}
+
+input[type="text"]:focus,
+.search-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 89, 132, 0.3);
 }
 
 .search-icon {
@@ -110,8 +152,9 @@ input[type="text"] {
   height: 28px;
 }
 
+
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 895px) {
   .busqueda-form {
     flex-direction: column;
     align-items: stretch;

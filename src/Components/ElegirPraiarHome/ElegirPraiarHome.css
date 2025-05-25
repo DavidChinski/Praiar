@@ -1,0 +1,36 @@
+.why-praiar {
+  text-align: center;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem; /* Reducido de 2rem a 1rem */
+  flex-wrap: wrap;
+}
+
+.feature {
+  max-width: 105px;
+  text-align: center;
+}
+
+.feature img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 0.5rem; /* Espaciado sutil entre imagen y texto */
+}
+
+.feature p {
+  font-size: 0.95rem;
+  line-height: 1.2;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+h2 {
+  font-family: "El Messiri", sans-serif;
+  margin-bottom: 0.5rem; /* Reduce espacio entre título y contenido */
+  font-size: 40px;
+}

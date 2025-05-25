@@ -21,7 +21,6 @@
   justify-content: space-between;
   font-family: 'Arial', sans-serif;
   flex-wrap: wrap;
-  gap: 1rem;
   box-sizing: border-box;
 }
 
@@ -31,14 +30,16 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
+  padding-left: 60%;
 }
 
 .logo {
-  height: 40px;
+  height: 60px;
+  width: auto;
 }
 
 .brand {
-  font-size: 1.5rem;
+  font-size: 2.4rem;
   font-weight: bold;
   color: #004b75;
   font-family: "El Messiri", sans-serif;
@@ -110,7 +111,7 @@
 }
 
 /* --------- Responsive --------- */
-@media (max-width: 768px) {
+@media (max-width: 1005px) {
   .hamburger {
     display: block;
     margin-left: auto;
@@ -156,6 +157,7 @@
 
   .header-container {
     padding: 0.6rem 1rem;
+    gap: 0
   }
 
   .header-spacer {

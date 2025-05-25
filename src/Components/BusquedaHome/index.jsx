@@ -79,6 +79,7 @@ function BusquedaHome() {
     <div className="busqueda-home">
       <div className="hero">
         <img src={Logo} alt="Playa" className="hero-background" />
+        <div className="hero-darken"></div>
         <div className="overlay">
           <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
           <div className="busqueda-form">
@@ -86,7 +87,7 @@ function BusquedaHome() {
             <div className="input-group">
               <img src={LocalizacionBusquedaHome} className="icon" alt="Localización" />
               <div className="input-wrapper">
-                <label htmlFor="localidad">Localidades</label>
+                <label htmlFor="localidad" className='subtitulo'>Localidades</label>
                 <select
                   id="localidad"
                   onChange={handleCiudadChange}
@@ -106,7 +107,7 @@ function BusquedaHome() {
             <div className="input-group">
               <img src={BalneariosBusquedaHome} className="icon" alt="Balnearios" />
               <div className="input-wrapper">
-                <label htmlFor="balneario">Balnearios</label>
+                <label htmlFor="balneario" className='subtitulo'>Balnearios</label>
                 <select id="balneario" disabled={!ciudadSeleccionada}>
                   <option value="">Ingresar el balneario</option>
                   {balnearios.map((balneario) => (
@@ -122,13 +123,13 @@ function BusquedaHome() {
             <div className="input-group date-group">
               <img
                 src={FechaBusquedaHome}
-                className="icon"
+                className="iconFecha"
                 alt="Fecha"
                 onClick={() => setShowCalendario(!showCalendario)}
                 style={{ cursor: 'pointer' }}
               />
               <div className="input-wrapper">
-                <label>Fecha</label>
+                <label className='subtitulo'>Fecha</label>
                 <div className="date-summary">
                   {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
                 </div>

@@ -14,7 +14,7 @@ function Navbar() {
     <>
       <header className="header">
         <div className="header-container">
-          <Link to="/">
+          <Link to="/" className='logo-link'>
             <div className="logo-container">
               <img src={Logo} alt="Logo Praiar" className="logo" />
               <span className="brand">Praiar</span>
