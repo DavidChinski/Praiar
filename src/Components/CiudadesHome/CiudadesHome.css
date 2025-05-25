@@ -1,29 +1,28 @@
 .ciudades-container {
-  padding: 2rem 4vw;
-  max-width: 1200px;
+  padding: 2rem 6vw; /* más margen lateral */
+  max-width: 960px;   /* más estrecho */
   margin: 0 auto;
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* más chicas */
   gap: 2rem;
   justify-items: center;
-  
 }
 
 .ciudad-card {
   position: relative;
   width: 100%;
-  max-width: 400px;
-  height: 250px;
+  max-width: 320px; /* antes 400px */
+  height: 220px; /* opcional: un poco más baja */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   background-color: white;
   font-family: Arial, sans-serif;
-  
 }
+
 
 .ciudad-card img {
   width: 100%;
@@ -76,11 +75,46 @@
 }
 
 .card-content button:hover {
-  background-color: #006480;
+  background-color: #003F5E;
 }
 
 h2{
     font-family: "El Messiri", sans-serif;
     color: #000;
     font-size: 50px;
+}
+
+.ver-mas-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; /* sin fondo detrás de la esfera */
+  box-shadow: none; /* sin sombra para que se vea solo la bola */
+}
+
+.ver-mas-circular {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #007b99;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 2rem;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.ver-mas-circular:hover,
+.ver-mas-circular:focus,
+.ver-mas-circular:active {
+  background-color: #003F5E; /* entorno */
+  color: #002537; /* flecha */
+  transform: scale(1.05);
+}
+
+.flecha-circular {
+  font-size: 2rem;
+  line-height: 1;
 }

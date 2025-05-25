@@ -1,5 +1,6 @@
 // src/pages/Ciudades.jsx
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'; 
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
 import './CiudadesHome.css';
@@ -36,7 +37,7 @@ function CiudadesHome() {
 
       // Ordenar por cantidad de balnearios descendente
       ciudadesConCantidad.sort((a, b) => b.cantidadBalnearios - a.cantidadBalnearios);
-      const top10Ciudades = ciudadesConCantidad.slice(0, 10);
+      const top10Ciudades = ciudadesConCantidad.slice(0, 8);
       setCiudades(top10Ciudades);
     }
 
@@ -58,6 +59,13 @@ function CiudadesHome() {
             </div>
           </div>
         ))}
+
+        {/* Tarjeta de "Ver más ciudades" */}
+        <div className="ciudad-card ver-mas-card">
+          <Link to="/ciudades" className="ver-mas-circular" aria-label="Ver más ciudades">
+            <span className="flecha-circular">➜</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
