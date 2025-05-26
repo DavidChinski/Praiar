@@ -40,16 +40,14 @@
   z-index: 1;
 }
 
-
 .hero-title {
   color: white;
   font-size: 3rem;
   font-weight: 500;
-  margin-bottom: 2rem;
+  margin-bottom: 2rem !important;
   text-align: center;
   font-family: "El Messiri";
 }
-
 
 /* Contenedor del formulario */
 .busqueda-form {
@@ -59,8 +57,9 @@
   padding: 1.5rem 2rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   align-items: center;
-  gap: 1.5rem;
   flex-wrap: wrap;
+  justify-content: space-between;
+  width: 1000px;
 }
 
 /* Grupo de inputs */
@@ -68,35 +67,38 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  max-height: 70px;
 }
 
 .input-wrapper {
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
-}
-
-.input-wrapper {
   margin-bottom: 0.3rem;
   color: #005984; /* #005A84 con 70% de opacidad */
 }
 
-.subtitulo{
+.subtitulo {
   font-weight: bold;
   font-size: 1.2rem;
 }
 
 /* Inputs y selects */
 select,
-input[type="text"] {
-  padding: 0.5rem 1rem;
+input[type="text"],
+.date-summary {
+  padding: 0.5rem 20px;
   border: 1px solid #005984;
   border-radius: 15px;
   font-size: 0.9rem;
-  width: 180px;
+  max-width: 220px;
   appearance: none;
   background-color: white;
-  color:#005A84
+  color: #005A84;
+  line-height: normal;
+  height: 38px;
+  display: flex;
+  align-items: center;
 }
 
 select {
@@ -152,7 +154,6 @@ input[type="text"]:focus,
   height: 28px;
 }
 
-
 /* Responsive */
 @media (max-width: 895px) {
   .busqueda-form {
@@ -161,11 +162,16 @@ input[type="text"]:focus,
   }
 
   select,
-  input[type="text"] {
+  input[type="text"],
+  .date-summary {
     width: 100%;
   }
 
   .search-button {
     width: 100%;
   }
+}
+
+* {
+  box-sizing: border-box;
 }
