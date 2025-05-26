@@ -4,12 +4,9 @@ import LoginComponent from '../components/LoginComponent/'
 
 function Login() {
   return (
-    <>
-        <Layout />
-          <LoginComponent />
-        <Layout />
-    </>
-    
+      <Layout >
+        <LoginComponent />
+      </Layout>
   );
 }
 
