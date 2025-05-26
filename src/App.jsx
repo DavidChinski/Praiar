@@ -8,7 +8,7 @@ import Contactanos from "./Pages/Contactanos";
 function App() {
   return (
     <Router>
-      <div>
+      <div class="layout">
         <Routes>
           <Route path="/" element={<Home />} /> 
           <Route path="/ciudades" element={<Ciudades />} /> 

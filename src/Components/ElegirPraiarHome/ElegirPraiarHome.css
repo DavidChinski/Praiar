@@ -16,14 +16,13 @@
 }
 
 .feature img {
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  margin-bottom: 0.5rem; /* Espaciado sutil entre imagen y texto */
 }
 
 .feature p {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   line-height: 1.2;
   margin: 0;
   word-wrap: break-word;
