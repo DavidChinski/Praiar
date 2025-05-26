@@ -1,0 +1,90 @@
+.hero-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Altura reducida */
+  overflow: hidden;
+}
+
+/* Fondo de la imagen */
+.hero-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* Capa oscura por encima de la imagen */
+.hero-darken {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 63, 94, 0.7);
+  z-index: 1;
+}
+
+/* Contenido centrado encima de la capa oscura */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.hero-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: 500;
+  margin-bottom: 0; /* Quitamos el espacio */
+  text-align: center;
+  font-family: "El Messiri", sans-serif;
+}
+
+.hero-subtitle {
+  color: white;
+  font-size: 1.5rem;
+  margin-top: 0; /* Por si acaso */
+  text-align: center;
+  font-family: "El Messiri", sans-serif;
+}
+
+.flecha-abajo {
+  margin-top: 1.5rem;
+  font-size: 2rem;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  animation: bounce 2s infinite;
+  transition: transform 0.3s;
+  outline: none;
+}
+
+.flecha-abajo:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.flecha-abajo:hover {
+  transform: scale(1.2);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}

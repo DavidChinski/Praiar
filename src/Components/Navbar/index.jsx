@@ -1,9 +1,11 @@
 import './Navbar.css';
-import { Link } from 'react-router-dom';
+import { useLocation , Link } from 'react-router-dom';
 import { useState } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
 
 function Navbar() {
+  const location = useLocation();
+  const isCiudades = location.pathname === '/ciudades';
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -27,7 +29,7 @@ function Navbar() {
             <nav className="nav">
               <Link to="/ciudades">Ciudades</Link>
               <Link to="/beneficios">Beneficios</Link>
-              <Link to="/contactos">Contáctanos</Link>
+              <Link to="/nosotros">Contáctanos</Link>
             </nav>
 
             <div className="auth-buttons">
@@ -43,7 +45,7 @@ function Navbar() {
       </header>
 
       {/* Espacio reservado para que el contenido no se tape */}
-      <div className="header-spacer"></div>
+      <div className={`header-spacer ${isCiudades ? 'spacer-ciudades' : 'spacer-general'}`} />
     </>
   );
 }

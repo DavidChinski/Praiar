@@ -30,7 +30,6 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  padding-left: 60%;
 }
 
 .logo {
@@ -109,6 +108,30 @@
   outline: none;
   box-shadow: none;
 }
+
+.header-spacer {
+  width: 100%;
+}
+
+.spacer-ciudades {
+  height: 70px;
+}
+
+.spacer-general {
+  height: 80px;
+}
+
+/* Responsive si querés que cambie en móviles también */
+@media (max-width: 1005px) {
+  .spacer-ciudades {
+    height: 20px;
+  }
+
+  .spacer-general {
+    height: 60px;
+  }
+}
+
 
 /* --------- Responsive --------- */
 @media (max-width: 1005px) {

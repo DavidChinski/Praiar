@@ -1,21 +1,18 @@
-import Navbar from '../Components/Navbar/';
-import Footer from '../Components/Footer/';
-import React from "react";
+// src/Pages/Home.jsx
+import Layout from '../Layout/';
 import BusquedaHome from '../Components/BusquedaHome';
-import CiudadesHome from '../Components/CiudadesHome/';
+import Ciudades from '../Components/Ciudades';
 import ElegirPraiarHome from '../Components/ElegirPraiarHome/';
 import OpcionBalneariosHome from '../Components/OpcionBalneariosHome/';
 
 function Home() {
   return (
-    <>
-      <Navbar />
-      <BusquedaHome/>
+    <Layout>
+      <BusquedaHome />
       <ElegirPraiarHome /> 
       <OpcionBalneariosHome />
-      <CiudadesHome />
-      <Footer />
-    </>
+      <Ciudades />
+    </Layout>
   );
 }
 

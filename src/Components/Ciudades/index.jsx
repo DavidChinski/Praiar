@@ -1,12 +1,13 @@
-// src/pages/Ciudades.jsx
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { useLocation, Link } from 'react-router-dom'; 
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
-import './CiudadesHome.css';
+import './Ciudades.css';
 
-function CiudadesHome() {
+function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
+  const location = useLocation();
+  const isPaginaCiudades = location.pathname === "/ciudades";
 
   useEffect(() => {
     async function fetchCiudadesConBalnearios() {
@@ -37,13 +38,14 @@ function CiudadesHome() {
 
       // Ordenar por cantidad de balnearios descendente
       ciudadesConCantidad.sort((a, b) => b.cantidadBalnearios - a.cantidadBalnearios);
-      const top10Ciudades = ciudadesConCantidad.slice(0, 8);
-      setCiudades(top10Ciudades);
+
+      // Mostrar solo top 8 si no está en /ciudades
+      const ciudadesAMostrar = isPaginaCiudades ? ciudadesConCantidad : ciudadesConCantidad.slice(0, 8);
+      setCiudades(ciudadesAMostrar);
     }
 
     fetchCiudadesConBalnearios();
-  }, []);
-
+  }, [isPaginaCiudades]);
 
   return (
     <div className="ciudades-container">
@@ -60,15 +62,17 @@ function CiudadesHome() {
           </div>
         ))}
 
-        {/* Tarjeta de "Ver más ciudades" */}
-        <div className="ciudad-card ver-mas-card">
-          <Link to="/ciudades" className="ver-mas-circular" aria-label="Ver más ciudades">
-            <span className="flecha-circular">➜</span>
-          </Link>
-        </div>
+        {/* Tarjeta de "Ver más ciudades" SOLO si NO está en /ciudades */}
+        {!isPaginaCiudades && (
+          <div className="ciudad-card ver-mas-card">
+            <Link to="/ciudades" className="ver-mas-circular" aria-label="Ver más ciudades">
+              <span className="flecha-circular">➜</span>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default CiudadesHome;
+export default Ciudades;

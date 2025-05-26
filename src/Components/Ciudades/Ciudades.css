@@ -1,5 +1,5 @@
 .ciudades-container {
-  padding: 2rem 6vw; /* más margen lateral */
+  padding: 0.5rem 6vw; /* más margen lateral */
   max-width: 960px;   /* más estrecho */
   margin: 0 auto;
 }
