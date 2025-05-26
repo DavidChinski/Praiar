@@ -3,7 +3,8 @@ import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
 import './Ciudades.css';
-
+import Mapa from '../../assets/LocalizacionBusquedaHome.png'
+import Estrella from '../../assets/Estrella.png'
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
   const location = useLocation();
@@ -52,15 +53,37 @@ function Ciudades() {
       <h2>Ciudades</h2>
       <div className="card-grid">
         {ciudades.map((ciudad) => (
-          <div key={ciudad.id_ciudad} className="ciudad-card">
+          <div key={ciudad.id_ciudad} className={`ciudad-card ${isPaginaCiudades ? 'card-detalle' : ''}`}>
             <img src={Logo} alt={ciudad.nombre} />
-            <div className="card-content">
-              <h3>{ciudad.nombre}</h3>
-              <p>{ciudad.cantidadBalnearios} balnearios</p>
-              <button>Ver balnearios</button>
-            </div>
+            
+            {isPaginaCiudades ? (
+              <div className="detalle-card">
+                <div className="info-contenido">
+                  <div className="info-izquierda">
+                    <h3>{ciudad.nombre}</h3>
+                    <p className="mapa">
+                      <img src={Mapa} alt="mapa" className="iconoCard" />
+                      Ver Mapa
+                    </p>
+                    <p className="estrella">
+                      <img src={Estrella} alt="estrella" className="iconoCard" />
+                      {ciudad.cantidadBalnearios} Balnearios
+                    </p>
+                  </div>
+                  <button className="mirar-btn">Mirar<br />catalogo</button>
+                </div>
+              </div>
+            ) : (
+              <div className="card-content">
+                <h3>{ciudad.nombre}</h3>
+                <p>{ciudad.cantidadBalnearios} balnearios</p>
+                <button>Ver balnearios</button>
+              </div>
+            )}
           </div>
         ))}
+
+
 
         {/* Tarjeta de "Ver más ciudades" SOLO si NO está en /ciudades */}
         {!isPaginaCiudades && (

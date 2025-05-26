@@ -118,3 +118,83 @@ h2{
   font-size: 2rem;
   line-height: 1;
 }
+
+.card-detalle img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  filter: none; /* sin oscurecer */
+}
+
+.card-detalle {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  height: auto;
+  border-radius: 5px;
+  border: 3px solid #002537;
+  padding: 5px;  /* <--- espacio entre contenido y borde */
+}
+
+
+.card-detalle img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  filter: none;
+}
+
+.detalle-card {
+  font-family: Arial, sans-serif;
+}
+
+.info-contenido {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.info-izquierda h3 {
+  font-family: "El Messiri", sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.info-izquierda p {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+  color: #000;
+}
+
+.iconoCard {
+  width: 25px !important;
+  height: auto;
+  margin-right: 6px;
+}
+
+.mirar-btn {
+  position: absolute; /* 🔸 NUEVO */
+  bottom: 20px;        /* 🔸 distancia del borde inferior */
+  right: 12px;         /* 🔸 distancia del borde derecho */
+  background-color: #c9ebf2;
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+
+.mirar-btn:hover {
+  background-color: #b3dbe4;
+}
