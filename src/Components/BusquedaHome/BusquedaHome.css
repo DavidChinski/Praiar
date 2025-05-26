@@ -44,7 +44,7 @@
   color: white;
   font-size: 3rem;
   font-weight: 500;
-  margin-bottom: 2rem !important;
+  margin-bottom: 2rem;
   text-align: center;
   font-family: "El Messiri";
 }
@@ -58,8 +58,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   align-items: center;
   flex-wrap: wrap;
-  justify-content: space-between;
-  width: 1000px;
+  gap:1.5rem;
 }
 
 /* Grupo de inputs */
@@ -67,7 +66,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  max-height: 70px;
 }
 
 .input-wrapper {
@@ -85,20 +83,15 @@
 
 /* Inputs y selects */
 select,
-input[type="text"],
-.date-summary {
-  padding: 0.5rem 20px;
+input[type="text"] {
+  padding: 0.5rem 1rem;
   border: 1px solid #005984;
   border-radius: 15px;
   font-size: 0.9rem;
-  max-width: 220px;
+  max-width: 180px;
   appearance: none;
   background-color: white;
   color: #005A84;
-  line-height: normal;
-  height: 38px;
-  display: flex;
-  align-items: center;
 }
 
 select {
@@ -172,6 +165,3 @@ input[type="text"]:focus,
   }
 }
 
-* {
-  box-sizing: border-box;
-}

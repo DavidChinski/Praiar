@@ -1,5 +1,5 @@
 .login-background {
-    background-image: url('../../img/fondoLogin.png'); /* reemplazalo con tu imagen */
+    background-image: url('../../assets/fondoLogin.png'); /* reemplazalo con tu imagen */
     background-size: cover;
     background-position: center;
     height: 100vh;
