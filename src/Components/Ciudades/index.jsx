@@ -5,8 +5,10 @@ import Logo from '../../assets/mar-del-plata.png';
 import './Ciudades.css';
 import Mapa from '../../assets/LocalizacionBusquedaHome.png'
 import Estrella from '../../assets/Estrella.png'
+
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
+  const [ciudadConMapa, setCiudadConMapa] = useState(null); // ciudad activa para mostrar el mapa
   const location = useLocation();
   const isPaginaCiudades = location.pathname === "/ciudades";
 
@@ -37,16 +39,21 @@ function Ciudades() {
         })
       );
 
-      // Ordenar por cantidad de balnearios descendente
       ciudadesConCantidad.sort((a, b) => b.cantidadBalnearios - a.cantidadBalnearios);
-
-      // Mostrar solo top 8 si no está en /ciudades
       const ciudadesAMostrar = isPaginaCiudades ? ciudadesConCantidad : ciudadesConCantidad.slice(0, 8);
       setCiudades(ciudadesAMostrar);
     }
 
     fetchCiudadesConBalnearios();
   }, [isPaginaCiudades]);
+
+  const abrirMapa = (nombreCiudad) => {
+    setCiudadConMapa(nombreCiudad);
+  };
+
+  const cerrarMapa = () => {
+    setCiudadConMapa(null);
+  };
 
   return (
     <div className="ciudades-container">
@@ -61,7 +68,11 @@ function Ciudades() {
                 <div className="info-contenido">
                   <div className="info-izquierda">
                     <h3>{ciudad.nombre}</h3>
-                    <p className="mapa">
+                    <p
+                      className="mapa"
+                      onClick={() => abrirMapa(ciudad.nombre)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <img src={Mapa} alt="mapa" className="iconoCard" />
                       Ver Mapa
                     </p>
@@ -70,7 +81,7 @@ function Ciudades() {
                       {ciudad.cantidadBalnearios} Balnearios
                     </p>
                   </div>
-                  <button className="mirar-btn">Mirar<br />catalogo</button>
+                  <button className="mirar-btn">Mirar<br />catálogo</button>
                 </div>
               </div>
             ) : (
@@ -83,9 +94,6 @@ function Ciudades() {
           </div>
         ))}
 
-
-
-        {/* Tarjeta de "Ver más ciudades" SOLO si NO está en /ciudades */}
         {!isPaginaCiudades && (
           <div className="ciudad-card ver-mas-card">
             <Link to="/ciudades" className="ver-mas-circular" aria-label="Ver más ciudades">
@@ -94,6 +102,25 @@ function Ciudades() {
           </div>
         )}
       </div>
+
+      {/* Modal de Mapa */}
+      {ciudadConMapa && (
+        <div className="modal-mapa-overlay">
+          <div className="modal-mapa-contenido">
+            <button className="cerrar-mapa-btn" onClick={cerrarMapa}>✕</button>
+            <h3>{ciudadConMapa}</h3>
+            <iframe
+              title={`Mapa de ${ciudadConMapa}`}
+              width="100%"
+              height="400"
+              style={{ border: 0, borderRadius: '12px' }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://www.google.com/maps?q=${encodeURIComponent(ciudadConMapa)}&output=embed`}
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

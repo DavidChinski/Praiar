@@ -198,3 +198,47 @@ h2{
 .mirar-btn:hover {
   background-color: #b3dbe4;
 }
+
+.modal-mapa-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-mapa-contenido {
+  background-color: white;
+  padding: 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  position: relative;
+}
+.modal-mapa-contenido h3 {
+  color: #002537;
+  margin-bottom: 12px;
+}
+
+.cerrar-mapa-btn {
+  position: absolute;
+  top: env(safe-area-inset-top, 10px);
+  right: env(safe-area-inset-right, 14px);
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #002537;
+}
+
+
+.cerrar-mapa-btn:focus, .mirar-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
