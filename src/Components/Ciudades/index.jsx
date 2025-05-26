@@ -4,7 +4,7 @@ import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
 import './Ciudades.css';
 import Mapa from '../../assets/LocalizacionBusquedaHome.png'
-import Estrella from '../../assets/Estrella.png'
+import Carpa from '../../assets/Carpa.png'
 
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
@@ -77,7 +77,7 @@ function Ciudades() {
                       Ver Mapa
                     </p>
                     <p className="estrella">
-                      <img src={Estrella} alt="estrella" className="iconoCard" />
+                      <img src={Carpa} alt="estrella" className="iconoCard" />
                       {ciudad.cantidadBalnearios} Balnearios
                     </p>
                   </div>
