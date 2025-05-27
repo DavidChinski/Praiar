@@ -30,7 +30,7 @@
 .subtitulo {
   font-weight: bold;
   font-size: 20px;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-bottom: 4px;
   color: #003F5E;
 }
@@ -64,9 +64,13 @@ button {
   font-weight: bold;
   color: #003F5E;
   transition: background-color 0.3s;
+  
 }
-
-button:hover {
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+.secondary:hover {
   background-color: #B0DBE7;
   
 }
@@ -80,7 +84,7 @@ button:hover {
   font-size: 14px;
 }
 
-hr {
+.linea {
   height: 1px;
   background-color: #333; /* Más oscuro */
   width: 80%; /* Más largo */
@@ -96,9 +100,9 @@ hr {
 
 .login-icons img {
   width: 36px;
-  height: auto;
+  height: 36px;
   cursor: pointer;
-  border: 1px solid black; /* Borde negro fino */
+  border: 0.5px solid black; /* Borde negro fino */
   border-radius: 50%;
   padding: 4px;
   background-color: white;
@@ -106,12 +110,12 @@ hr {
 
 .extra-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 20px;
+  gap: 30px;
 }
 
 .secondary {
   background-color: #B0DBE7;
   color: #003F5E;
-  border: 1px solid #B0DBE7;
 }

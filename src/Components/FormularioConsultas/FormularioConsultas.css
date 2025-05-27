@@ -1,0 +1,75 @@
+.form-container {
+    padding: 0.5rem 6vw;
+    max-width: 960px;
+    margin: 0 auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+label {
+  font-weight: bold;
+  color: #004080;
+  text-align: left;
+}
+
+.inputConsultas {
+  padding: 8px;
+  border: 1px solid #72bcd4;
+  border-radius: 6px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.inputConsultas:focus {
+  border-color: #2c90aa;
+  box-shadow: 0 0 5px #b4e0ec;
+}
+
+.enviar {
+  background-color: #2c90aa;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.enviar:hover {
+  background-color: #1b6c85;
+}
+
+.mensaje {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: green;
+}
+
+hr {
+  margin-top: 5px;
+  width: 20%;
+  border: 0.5px solid #ccc;
+}
+
+textarea:focus {
+    border-color: #2c90aa;
+    box-shadow: 0 0 5px #b4e0ec;
+  }
+
+  textarea {
+    padding: 10px;
+    border: 1px solid #72bcd4;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    resize: none;
+    font-family: Arial, Helvetica, sans-serif;
+  }

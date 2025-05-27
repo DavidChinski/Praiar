@@ -5,6 +5,7 @@ import Ciudades from '../Components/Ciudades';
 import ElegirPraiarHome from '../Components/ElegirPraiarHome/';
 import OpcionBalneariosHome from '../Components/OpcionBalneariosHome/';
 import { useEffect, useState } from 'react';
+import FormularioConsultas from '../Components/FormularioConsultas/';
 
 function Home() {
   const [user, setUser] = useState(null);
@@ -26,7 +27,13 @@ function Home() {
       <BusquedaHome />
       <ElegirPraiarHome /> 
       <OpcionBalneariosHome />
-      <Ciudades />
+
+      {/* Aquí condicionamos qué componente mostrar */}
+      {user && user.esPropietario ? (
+        <FormularioConsultas />
+      ) : (
+        <Ciudades />
+      )}
     </Layout>
   );
 }

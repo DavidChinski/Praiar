@@ -2,9 +2,9 @@
 import './LoginComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
-import appleIcon from '../../assets/apple.svg';
+import appleIcon from '../../assets/apple.jpg';
 import facebookIcon from '../../assets/facebook.png';
-import googleIcon from '../../assets/google.jfif';
+import googleIcon from '../../assets/google.png';
 
 function LoginComponent() {
   const [email, setEmail] = useState('');
@@ -42,12 +42,12 @@ function LoginComponent() {
           {errorMsg && <p className="error">{errorMsg}</p>}
 
           <div className="login-buttons">
-            <button type="submit">Inicia Sesión</button>
+            <button type="submit" className="secondary">Inicia Sesión</button>
             <button type="button" className="link-btn">¿Olvidaste tu contraseña?</button>
           </div>
         </form>
 
-        <hr />
+        <hr className='linea'/>
         <p>O usa alguna de estas opciones</p>
         <div className="login-icons">
           <img src={appleIcon} alt="Apple login" />

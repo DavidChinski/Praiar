@@ -73,7 +73,7 @@ function Navbar() {
                   <button className="login">
                     <Link to="/perfil">Mi Cuenta</Link>
                   </button>
-                  <button className="registrar" onClick={handleLogout} style={{ color: 'black' }}>
+                  <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
                     Cerrar sesión
                   </button>
                 </>
