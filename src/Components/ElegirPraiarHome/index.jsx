@@ -11,15 +11,15 @@ function ElegirPraiarHome() {
         <div className="feature">
           <img src={ElegirPraiarReloj} alt="Ícono de reloj" />
           <p>
-            Ahorrá tiempo<br />
-            con una reserva<br />
+            Ahorrá tiempo
+            con una reserva
             rápida y segura
           </p>
         </div>
         <div className="feature">
           <img src={ElegirPraiarCarpa} alt="Ícono de carpa" />
           <p>
-            Elegí tu carpa<br />
+            Elegí tu carpa
             o sombrilla favorita<br />
             para <i><strong>Praiar</strong></i> en la playa
           </p>

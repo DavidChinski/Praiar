@@ -1,5 +1,7 @@
 .opcion-container {
-  padding: 2rem;
+  padding: 0.5rem 6vw;
+  max-width: 960px;
+  margin: 0 auto;
   text-align: center;
 }
 

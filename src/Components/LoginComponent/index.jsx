@@ -24,7 +24,7 @@ function LoginComponent() {
     if (error || !data) {
       setErrorMsg('Email o contraseña incorrectos');
     } else {
-      localStorage.setItem('cliente', JSON.stringify(data));
+      localStorage.setItem('usuario', JSON.stringify(data));
       window.location.href = '/';
     }
   };
@@ -34,9 +34,9 @@ function LoginComponent() {
       <div className="login-container">
         <h2>Inicia Sesión</h2>
         <form className="login-form" onSubmit={handleLogin}>
-          <label>Email</label>
+          <label className='subtitulo'>Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ingrese su email" />
-          <label>Contraseña</label>
+          <label className='subtitulo'>Contraseña</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Ingrese su contraseña" />
 
           {errorMsg && <p className="error">{errorMsg}</p>}

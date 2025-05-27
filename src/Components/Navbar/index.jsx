@@ -1,15 +1,31 @@
 import './Navbar.css';
-import { useLocation , Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
 
 function Navbar() {
   const location = useLocation();
   const isCiudades = location.pathname === '/ciudades';
   const [menuOpen, setMenuOpen] = useState(false);
+  const [usuario, setUsuario] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('usuario');
+    if (storedUser) {
+      setUsuario(JSON.parse(storedUser));
+    }
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('usuario');
+    setUsuario(null);
+    navigate('/');
+    window.location.reload();
   };
 
   return (
@@ -27,24 +43,55 @@ function Navbar() {
 
           <div className={`menu ${menuOpen ? 'open' : ''}`}>
             <nav className="nav">
-              <Link to="/ciudades">Ciudades</Link>
-              <Link to="/beneficios">Beneficios</Link>
-              <Link to="/nosotros">Contáctanos</Link>
+              {!usuario && (
+                <>
+                  <Link to="/ciudades">Ciudades</Link>
+                  <Link to="/beneficios">Beneficios</Link>
+                  <Link to="/nosotros">Contáctanos</Link>
+                </>
+              )}
+
+              {usuario && usuario.esPropietario && (
+                <>
+                  <Link to="/tusbalnearios">Tus Balnearios</Link>
+                  <Link to="/nosotros">Contactos</Link>
+                </>
+              )}
+
+              {usuario && !usuario.esPropietario && (
+                <>
+                  <Link to="/tusreservas">Tus Reservas</Link>
+                  <Link to="/ciudades">Ciudades</Link>
+                  <Link to="/nosotros">Contactos</Link>
+                </>
+              )}
             </nav>
 
             <div className="auth-buttons">
-              <button className="login">
-                <Link to="/login">Iniciar Sesión</Link>
-              </button>
-              <button className="registrar">
-                <Link to="/registrar">Crear una cuenta</Link>
-              </button>
+              {usuario ? (
+                <>
+                  <button className="login">
+                    <Link to="/perfil">Mi Cuenta</Link>
+                  </button>
+                  <button className="registrar" onClick={handleLogout} style={{ color: 'black' }}>
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="login">
+                    <Link to="/login">Iniciar Sesión</Link>
+                  </button>
+                  <button className="registrar">
+                    <Link to="/registrar">Crear una cuenta</Link>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Espacio reservado para que el contenido no se tape */}
       <div className={`header-spacer ${isCiudades ? 'spacer-ciudades' : 'spacer-general'}`} />
     </>
   );

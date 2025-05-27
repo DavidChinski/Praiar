@@ -1,0 +1,86 @@
+.balnearios-container {
+  padding: 0.5rem 6vw;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.card-grid-balnearios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* cards alargadas */
+  gap: 2rem;
+  justify-items: center;
+}
+
+.balneario-card {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* más ancha */
+  height: 150px; /* más horizontal */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: row;
+}
+
+.balneario-card img {
+  width: 40%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(70%);
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.card-content-balnearios {
+  position: relative;
+  padding: 20px;
+  width: 60%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(to right, rgba(0, 64, 128, 0.8), rgba(0, 64, 128, 0.6));
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.card-content-balnearios h3 {
+  font-family: "El Messiri", sans-serif;
+  font-size: 1.8rem;
+  margin: 0 0 8px;
+  font-weight: 400;
+  color: white;
+}
+
+.card-content-balnearios p {
+  font-size: 1rem;
+  margin: 0 0 12px;
+  color: #d1e9ff;
+}
+
+/* Botón usando tu estilo original para .mirar-btn */
+.mirar-btn {
+  position: absolute; /* para posicionar en card */
+  bottom: 20px;
+  right: 12px;
+  background-color: #c9ebf2;
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.mirar-btn:hover {
+  background-color: #b3dbe4;
+}
+
+
