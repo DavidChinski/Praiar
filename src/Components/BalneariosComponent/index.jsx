@@ -45,9 +45,6 @@ function BalneariosComponent() {
       {balnearios.length === 0 ? (
         <>
           <p>No tienes balnearios registrados.</p>
-          <Link to="/agregar-balneario">
-            <button>Agregar nuevo balneario</button>
-          </Link>
         </>
       ) : (
         <>

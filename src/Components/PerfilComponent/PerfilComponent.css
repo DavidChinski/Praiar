@@ -1,0 +1,27 @@
+.perfil-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.perfil-datos p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+
+.btn-logout {
+  margin-top: 2rem;
+  padding: 0.5rem 1.2rem;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background-color: #e74c3c;
+}

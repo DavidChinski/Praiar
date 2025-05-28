@@ -75,8 +75,8 @@
 }
 
 .auth-buttons button {
-  background-color: #b5e6f4;
-  border: none;
+  border: 2px solid #B0DBE7;
+  background-color: #fef8e8;
   border-radius: 8px;
   padding: 0.4rem 1rem;
   cursor: pointer;
@@ -85,7 +85,8 @@
 }
 
 .auth-buttons button:hover {
-  background-color: #003F5E;
+  background-color: #fcfaf4;
+  border: 2px solid #b9d4e4
 }
 
 .auth-buttons button a {
