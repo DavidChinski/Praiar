@@ -53,7 +53,7 @@ function BalneariosComponent() {
         <>
           <div className="card-grid-balnearios">
             {balnearios.map((balneario) => (
-              <div key={balneario.id} className="balneario-card">
+              <div key={balneario.id_balneario} className="balneario-card">
                 <img
                   src={balneario.imagen || "https://via.placeholder.com/240x150"}
                   alt={balneario.nombre}
@@ -61,7 +61,7 @@ function BalneariosComponent() {
                 <div className="card-content-balnearios">
                   <h3>{balneario.nombre}</h3>
                   <p>{balneario.direccion}</p>
-                  <Link to={`/balneario/${balneario.id}`}>
+                  <Link to={`/balneario/${balneario.id_balneario}`}>
                     <button className="mirar-btn">Ver balneario</button>
                   </Link>
                 </div>

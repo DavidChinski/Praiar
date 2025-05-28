@@ -7,6 +7,7 @@ import Contactanos from "./Pages/Contactanos";
 import Login from "./Pages/Login";
 import TusBalnearios from "./Pages/TusBalnearios";
 import TusReservas from "./Pages/TusReservas";
+import VistaBalneario from "./Pages/VistaBalneario";
 function App() {
   return (
     <Router>
@@ -18,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} /> 
           <Route path="/tusbalnearios" element={<TusBalnearios />} /> 
           <Route path="/tusreservas" element={<TusReservas />} /> 
+          <Route path="/balneario/:id" element={<VistaBalneario />} />
         </Routes>
       </div>
     </Router>
