@@ -83,7 +83,8 @@
 
 /* Inputs y selects */
 select,
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   padding: 0.5rem 1rem;
   border: 1px solid #005984;
   border-radius: 15px;

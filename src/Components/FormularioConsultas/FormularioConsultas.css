@@ -34,15 +34,6 @@ form.formulario {
   justify-content: space-between;
 }
 
-/* COLUMNAS */
-.columna-izquierda,
-.columna-derecha {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-width: 280px;
-}
 
 /* ETIQUETAS */
 label {

@@ -11,7 +11,7 @@
   background-color: white;
   padding: 2rem 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none !important;
   max-width: 500px;
   width: 100%;
   font-family: Arial, sans-serif;
@@ -93,4 +93,14 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Quitar flechas en Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* COLUMNAS */
+.columna-izquierda
+{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 280px;
 }
