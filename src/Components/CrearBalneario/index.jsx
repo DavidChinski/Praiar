@@ -70,97 +70,58 @@ function CrearBalneario() {
   };
 
   return (
-    <div className="form-wrapper">
-      <div className="form-container">
-        <h2 className="titulo">Agregar nuevo Balneario</h2>
-        <form onSubmit={handleSubmit} className="formulario">
+    <div className="form-consultas">
+  <div className="form-layout">
+    <div className="form-container-consultas">
+      <h2 className="titulo">Agregar nuevo Balneario</h2>
+
+      <form onSubmit={handleSubmit} className="formulario">
+        {/* Columna izquierda */}
+        <div className="columna-izquierda">
           <label htmlFor="nombre">Nombre</label>
-          <input
-            id="nombre"
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
+          <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
 
           <label htmlFor="direccion">Dirección</label>
-          <input
-            id="direccion"
-            type="text"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
-            required
-          />
+          <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
 
           <label htmlFor="telefono">Teléfono</label>
-          <input
-            id="telefono"
-            type="number"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            required
-          />
+          <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
 
           <label htmlFor="imagenUrl">Imagen URL</label>
-          <input
-            id="imagenUrl"
-            type="text"
-            value={imagenUrl}
-            onChange={(e) => setImagenUrl(e.target.value)}
-          />
+          <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
+        </div>
+
+        {/* Columna derecha */}
+        <div className="columna-derecha">
+          <h3>Configuración de carpas</h3>
           <div className="carpa-grid">
             <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
-            <input
-              id="cantidadCarpas"
-              type="number"
-              value={cantidadCarpas}
-              onChange={(e) => setCantidadCarpas(parseInt(e.target.value))}
-              required
-            />
+            <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value))} required />
 
-            <label htmlFor="sillas">Cantidad de sillas por carpa</label>
-            <input
-              id="sillas"
-              type="number"
-              value={cantSillas}
-              onChange={(e) => setCantSillas(parseInt(e.target.value))}
-              required
-            />
+            <label htmlFor="sillas">Cantidad de sillas</label>
+            <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value))} required />
 
-            <label htmlFor="mesas">Cantidad de mesas por carpa</label>
-            <input
-              id="mesas"
-              type="number"
-              value={cantMesas}
-              onChange={(e) => setCantMesas(parseInt(e.target.value))}
-              required
-            />
+            <label htmlFor="mesas">Cantidad de mesas</label>
+            <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value))} required />
 
-            <label htmlFor="reposeras">Cantidad de reposeras por carpa</label>
-            <input
-              id="reposeras"
-              type="number"
-              value={cantReposeras}
-              onChange={(e) => setCantReposeras(parseInt(e.target.value))}
-              required
-            />
+            <label htmlFor="reposeras">Cantidad de reposeras</label>
+            <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value))} required />
 
             <label htmlFor="capacidad">Capacidad por carpa</label>
-            <input
-              id="capacidad"
-              type="number"
-              value={capacidad}
-              onChange={(e) => setCapacidad(parseInt(e.target.value))}
-              required
-            />
+            <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value))} required />
           </div>
-          <button className="enviar" type="submit">Enviar</button>
 
-          {mensaje && <p className="mensaje">{mensaje}</p>}
-        </form>
-        <hr />
-      </div>
+          {/* Botón dentro de la columna derecha */}
+          <button className="enviar" type="submit">Enviar</button>
+        </div>
+      </form>
+
+      {/* Mensaje de éxito */}
+      {mensaje && <p className="mensaje">{mensaje}</p>}
     </div>
+  </div>
+</div>
+
   );
 }
 

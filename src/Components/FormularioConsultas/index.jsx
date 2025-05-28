@@ -44,8 +44,8 @@ function FormularioConsultas() {
   };
 
   return (
-    <div className="form-wrapper">
-      <div className="form-container">
+    <div className="form-consultas">
+      <div className="form-container-consultas">
         <h2 className="titulo">Formulario de Consultas</h2>
         <form onSubmit={handleSubmit} className="formulario">
           <label htmlFor="nombre">Nombre</label>
@@ -60,7 +60,7 @@ function FormularioConsultas() {
           <label htmlFor="mail">Email</label>
           <input
             id="mail"
-            type="email"
+            type="text"
             className="inputConsultas"
             value={mail}
             readOnly
@@ -79,8 +79,9 @@ function FormularioConsultas() {
 
           {mensaje && <p className="mensaje">{mensaje}</p>}
         </form>
+        <hr />
       </div>
-      <hr />
+      
     </div>
   );
 }

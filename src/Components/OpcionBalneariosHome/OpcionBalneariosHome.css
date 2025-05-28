@@ -1,5 +1,5 @@
 .opcion-container {
-  padding: 0.5rem 6vw;
+  padding: 2rem 1rem;
   max-width: 960px;
   margin: 0 auto;
   text-align: center;
@@ -9,6 +9,7 @@
   font-size: 40px;
   margin-bottom: 2rem;
   font-family: "El Messiri";
+  color: #000000 !important
 }
 
 .contenido {
