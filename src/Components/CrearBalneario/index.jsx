@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import "./CrearBalneario.css";
 
@@ -14,114 +14,153 @@ function CrearBalneario() {
   const [cantReposeras, setCantReposeras] = useState(2);
   const [capacidad, setCapacidad] = useState(4);
 
+  const [ciudades, setCiudades] = useState([]);
+  const [ciudadSeleccionada, setCiudadSeleccionada] = useState("");
+
   const [mensaje, setMensaje] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) {
-      setMensaje("Usuario no identificado.");
-      return;
+  useEffect(() => {
+    async function fetchCiudades() {
+      const { data, error } = await supabase.from("ciudades").select("id_ciudad, nombre");
+      if (error) {
+        console.error("Error al obtener ciudades:", error.message);
+      } else {
+        setCiudades(data);
+      }
     }
+    fetchCiudades();
+  }, []);
 
-    // Insertar balneario
-    const { data, error } = await supabase
-      .from("balnearios")
-      .insert([
-        {
-          nombre,
-          direccion,
-          telefono,
-          imagen: imagenUrl,
-          id_usuario: usuario.id_usuario,
-        },
-      ])
-      .select();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (error) {
-      console.error("Error al agregar balneario:", error.message);
-      setMensaje("Error al guardar. Intente nuevamente.");
-      return;
-    }
+  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    const nuevoBalnearioId = data[0].id_balneario;
+  if (userError || !userData?.user) {
+    console.error("No se pudo obtener el usuario autenticado");
+    setMensaje("Sesión no válida.");
+    return;
+  }
 
-    // Crear carpas
-    const carpas = Array.from({ length: cantidadCarpas }, (_, i) => ({
-      id_balneario: nuevoBalnearioId,
-      posicion: i + 1,
-      reservado: false,
-      cant_sillas: cantSillas,
-      cant_mesas: cantMesas,
-      cant_reposeras: cantReposeras,
-      capacidad: capacidad,
-    }));
+  const idUsuario = userData.user.id;
 
-    const { error: errorCarpas } = await supabase.from("ubicaciones").insert(carpas);
+  if (!ciudadSeleccionada) {
+    setMensaje("Debe seleccionar una ciudad.");
+    return;
+  }
 
-    if (errorCarpas) {
-      console.error("Error al agregar carpas:", errorCarpas.message);
-      setMensaje("Balneario creado, pero ocurrió un error al crear las carpas.");
-      return;
-    }
+  const { data, error } = await supabase
+    .from("balnearios")
+    .insert([
+      {
+        nombre,
+        direccion,
+        telefono,
+        imagen: imagenUrl,
+        id_usuario: idUsuario,
+        id_ciudad: ciudadSeleccionada,
+      },
+    ])
+    .select();
 
-    window.location.href = "/tusbalnearios";
-  };
+  if (error) {
+    console.error("Error al agregar balneario:", error.message);
+    setMensaje("Error al guardar. Intente nuevamente.");
+    return;
+  }
+
+  const nuevoBalnearioId = data[0].id_balneario;
+
+  const carpas = Array.from({ length: cantidadCarpas }, (_, i) => ({
+    id_balneario: nuevoBalnearioId,
+    posicion: i + 1,
+    reservado: false,
+    cant_sillas: cantSillas,
+    cant_mesas: cantMesas,
+    cant_reposeras: cantReposeras,
+    capacidad: capacidad,
+    id_usuario: idUsuario, // importante: viene de supabase.auth
+  }));
+
+  console.log("Insertando carpas con:", carpas);
+
+  const { error: errorCarpas } = await supabase.from("ubicaciones").insert(carpas);
+
+  if (errorCarpas) {
+    console.error("Error al agregar carpas:", errorCarpas.message);
+    setMensaje("Balneario creado, pero ocurrió un error al crear las carpas.");
+    return;
+  }
+
+  window.location.href = "/tusbalnearios";
+};
+
 
   return (
     <div className="form-consultas">
-  <div className="form-layout">
-    <div className="form-container-consultas">
-      <h2 className="titulo">Agregar nuevo Balneario</h2>
+      <div className="form-layout">
+        <div className="form-container-consultas">
+          <h2 className="titulo">Agregar nuevo Balneario</h2>
 
-      <form onSubmit={handleSubmit} className="formulario">
-        {/* Columna izquierda */}
-        <div className="columna-izquierda">
-          <label htmlFor="nombre">Nombre</label>
-          <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          <form onSubmit={handleSubmit} className="formulario">
+            {/* Columna izquierda */}
+            <div className="columna-izquierda">
+              <label htmlFor="nombre">Nombre</label>
+              <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
 
-          <label htmlFor="direccion">Dirección</label>
-          <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
+              <label htmlFor="direccion">Dirección</label>
+              <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
 
-          <label htmlFor="telefono">Teléfono</label>
-          <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
+              <label htmlFor="telefono">Teléfono</label>
+              <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
 
-          <label htmlFor="imagenUrl">Imagen URL</label>
-          <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
+              <label htmlFor="imagenUrl">Imagen URL</label>
+              <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
+
+              <label htmlFor="ciudad">Ciudad</label>
+              <select
+                id="ciudad"
+                value={ciudadSeleccionada}
+                onChange={(e) => setCiudadSeleccionada(e.target.value)}
+                required
+              >
+                <option value="">Seleccione una ciudad</option>
+                {ciudades.map((ciudad) => (
+                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
+                    {ciudad.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Columna derecha */}
+            <div className="columna-derecha">
+              <h3>Configuración de carpas</h3>
+              <div className="carpa-grid">
+                <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
+                <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value))} required />
+
+                <label htmlFor="sillas">Cantidad de sillas</label>
+                <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value))} required />
+
+                <label htmlFor="mesas">Cantidad de mesas</label>
+                <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value))} required />
+
+                <label htmlFor="reposeras">Cantidad de reposeras</label>
+                <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value))} required />
+
+                <label htmlFor="capacidad">Capacidad por carpa</label>
+                <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value))} required />
+              </div>
+
+              <button className="enviar" type="submit">Enviar</button>
+            </div>
+          </form>
+
+          {mensaje && <p className="mensaje">{mensaje}</p>}
         </div>
-
-        {/* Columna derecha */}
-        <div className="columna-derecha">
-          <h3>Configuración de carpas</h3>
-          <div className="carpa-grid">
-            <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
-            <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value))} required />
-
-            <label htmlFor="sillas">Cantidad de sillas</label>
-            <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value))} required />
-
-            <label htmlFor="mesas">Cantidad de mesas</label>
-            <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value))} required />
-
-            <label htmlFor="reposeras">Cantidad de reposeras</label>
-            <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value))} required />
-
-            <label htmlFor="capacidad">Capacidad por carpa</label>
-            <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value))} required />
-          </div>
-
-          {/* Botón dentro de la columna derecha */}
-          <button className="enviar" type="submit">Enviar</button>
-        </div>
-      </form>
-
-      {/* Mensaje de éxito */}
-      {mensaje && <p className="mensaje">{mensaje}</p>}
+      </div>
     </div>
-  </div>
-</div>
-
   );
 }
 

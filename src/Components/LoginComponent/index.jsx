@@ -1,4 +1,3 @@
-// src/components/Login/LoginComponent.jsx
 import './LoginComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
@@ -13,20 +12,44 @@ function LoginComponent() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
 
-    const { data, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('mail', email)
-      .eq('contraseña', password)
-      .single();
+    // Paso 1: Login con email/contraseña
+    const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (error || !data) {
+    if (loginError) {
+      console.error("Error de login:", loginError.message);
       setErrorMsg('Email o contraseña incorrectos');
-    } else {
-      localStorage.setItem('usuario', JSON.stringify(data));
-      window.location.href = '/';
+      return;
     }
+
+    const userId = authData.user.id; // UID del usuario autenticado
+
+    // Paso 2: Buscar al usuario en la tabla 'usuarios'
+    const { data: usuario, error: fetchError } = await supabase
+    .from('usuarios')
+    .select('*')
+    .eq('auth_id', userId)
+    .limit(1)
+    .maybeSingle(); // <-- clave
+
+
+    if (fetchError) {
+      console.error("Error al buscar en la tabla usuarios:", fetchError.message);
+      setErrorMsg('No se pudo obtener el perfil del usuario');
+      return;
+    }
+
+    console.log("Usuario logueado:", usuario);
+
+    // (Opcional) Guardar datos en localStorage o context si querés usarlos después
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+    // Redireccionar al home u otra parte
+    window.location.href = "/";
   };
 
   return (

@@ -26,7 +26,7 @@ function Ciudades() {
       const ciudadesConCantidad = await Promise.all(
         ciudadesData.map(async (ciudad) => {
           const { count, error: countError } = await supabase
-            .from('ciudades_x_balnearios')
+            .from('balnearios')
             .select('*', { count: 'exact', head: true })
             .eq('id_ciudad', ciudad.id_ciudad);
 
@@ -46,6 +46,7 @@ function Ciudades() {
 
     fetchCiudadesConBalnearios();
   }, [isPaginaCiudades]);
+
 
   const abrirMapa = (nombreCiudad) => {
     setCiudadConMapa(nombreCiudad);

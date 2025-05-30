@@ -8,10 +8,11 @@ import { useNavigate } from 'react-router-dom';
 
 function RegistrarComponent() {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
-    mail: '',
+    email: '', // cambiado de mail → email
     dni: '',
     telefono: '',
     contraseña: '',
@@ -34,41 +35,44 @@ function RegistrarComponent() {
     setErrorMsg('');
     setSuccessMsg('');
 
-    const { mail } = formData;
+    const { email, contraseña, ...perfilData } = formData;
 
-    const { data: existingUser } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('mail', mail)
-      .single();
+    // Paso 1: Crear cuenta en Supabase Auth
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email: email,
+      password: contraseña,
+    });
 
-    if (existingUser) {
-      setErrorMsg('Este correo ya está registrado.');
+    if (signUpError) {
+      setErrorMsg('Error al registrar usuario: ' + signUpError.message);
       return;
     }
 
-    const { data, error } = await supabase
+    const userId = authData?.user?.id;
+
+    // Paso 2: Guardar perfil en la tabla 'usuarios'
+    const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
-      .insert([formData])
+      .insert([{
+        nombre: perfilData.nombre,
+        apellido: perfilData.apellido,
+        telefono: perfilData.telefono,
+        dni: perfilData.dni,
+        esPropietario: perfilData.esPropietario,
+        auth_id: userId
+      }])
       .select()
       .single();
 
-    if (error) {
-      setErrorMsg('Error al registrar. Intenta nuevamente.');
-    } else {
-      localStorage.setItem('usuario', JSON.stringify(data));
-      setSuccessMsg('Usuario registrado correctamente.');
-      setFormData({
-        nombre: '',
-        apellido: '',
-        mail: '',
-        dni: '',
-        telefono: '',
-        contraseña: '',
-        esPropietario: false,
-      });
-      navigate('/');
+    if (insertError) {
+      setErrorMsg('Error al guardar los datos del usuario.');
+      return;
     }
+
+    // Paso 3: Guardar en localStorage y redirigir
+    localStorage.setItem('usuario', JSON.stringify(perfil));
+    setSuccessMsg('Usuario registrado correctamente.');
+    navigate('/');
   };
 
   return (
@@ -91,11 +95,11 @@ function RegistrarComponent() {
             <div className="input-row">
               <div className="form-group">
                 <label className='subtitulo'>Email</label>
-                <input type="email" name="mail" value={formData.mail} onChange={handleChange} required />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                <label className='subtitulo'>DNI</label>
-                <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
+                <label className='subtitulo'>Contraseña</label>
+                <input type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} required />
               </div>
             </div>
 
@@ -105,8 +109,8 @@ function RegistrarComponent() {
                 <input type="number" name="telefono" value={formData.telefono} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                <label className='subtitulo'>Contraseña</label>
-                <input type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} required />
+                <label className='subtitulo'>DNI</label>
+                <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
               </div>
             </div>
 
@@ -122,7 +126,6 @@ function RegistrarComponent() {
                 onChange={handleChange}
               />
             </div>
-
 
             {errorMsg && <p className="error">{errorMsg}</p>}
             {successMsg && <p className="success">{successMsg}</p>}

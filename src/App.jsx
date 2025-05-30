@@ -13,7 +13,7 @@ import VistaBalneario from "./Pages/VistaBalneario";
 function App() {
   return (
     <Router>
-      <div class="layout">
+      <div className="layout">
         <Routes>
           <Route path="/" element={<Home />} /> 
           <Route path="/ciudades" element={<Ciudades />} /> 

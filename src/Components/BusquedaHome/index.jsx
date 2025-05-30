@@ -26,7 +26,7 @@ function BusquedaHome() {
 
   function handleCiudadChange(event) {
     const idCiudad = event.target.value;
-    setCiudadSeleccionada(idCiudad !== '' ? idCiudad : null);
+    setCiudadSeleccionada(idCiudad !== '' ? parseInt(idCiudad) : null);
   }
 
   useEffect(() => {
@@ -47,33 +47,27 @@ function BusquedaHome() {
   }, []);
 
   useEffect(() => {
-    async function fetchBalnearios() {
-      if (!ciudadSeleccionada) {
-        setBalnearios([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('ciudades_x_balnearios')
-        .select('id_balneario(id_balneario, nombre)')
-        .eq('id_ciudad', ciudadSeleccionada);
-
-      if (error) {
-        console.error('Error al obtener balnearios:', error.message);
-        setBalnearios([]);
-        return;
-      }
-
-      const balneariosMapeados = data.map(item => ({
-        id_balneario: item.id_balneario.id_balneario,
-        nombre: item.id_balneario.nombre,
-      }));
-
-      setBalnearios(balneariosMapeados);
+  async function fetchBalnearios() {
+    if (!ciudadSeleccionada) {
+      setBalnearios([]);
+      return;
     }
+    const { data, error } = await supabase
+      .from('balnearios')
+      .select('id_balneario, nombre')
+      .eq('id_ciudad', ciudadSeleccionada);
 
-    fetchBalnearios();
-  }, [ciudadSeleccionada]);
+    if (error) {
+      console.error('Error al obtener balnearios:', error.message);
+      setBalnearios([]);
+      return;
+    }
+    setBalnearios(data);
+  }
+
+  fetchBalnearios();
+}, [ciudadSeleccionada]);
+
 
   return (
     <div className="busqueda-home">
