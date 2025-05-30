@@ -24,9 +24,11 @@ h1 {
 
 .icono {
   width: 130px; /* 100px * 1.3 */
-  height: auto;
+  height: 130px;
   border-radius: 50%;
   background-color: #0592b2;
+  background-position: center;
+  background-size: cover;
 }
 
 .nombre {
@@ -38,4 +40,16 @@ h1 {
 .linkedin {
   width: 52px; /* 40px * 1.3 */
   height: 52px;
+}
+
+#benezra{
+  background-image: url('../../assets/LucasImagen.jpg');
+}
+
+#brodsky{
+  background-image: url("../../assets/EliasImagen.jpg");
+}
+
+#chinski{
+  background-image: url("../../assets/DavidImagen.jpg");
 }

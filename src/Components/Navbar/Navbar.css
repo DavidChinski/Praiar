@@ -62,10 +62,29 @@
   color: black;
   font-size: 1.3rem;
   transition: color 0.3s ease;
+  text-decoration: none;
+  position: relative;
+  padding: 2px 5px;
 }
 
 .nav a:hover {
-  color: #004C62;
+  color: #008ab2;
+}
+
+.nav a::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #008ab2;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav a:hover::after {
+  width: 95%;
+  left: 2.5%;
 }
 
 /* --------- Botones de autenticación --------- */

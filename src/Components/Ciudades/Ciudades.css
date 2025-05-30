@@ -13,7 +13,7 @@
 
 .ciudad-card {
   position: relative;
-  width: 100%;
+  width: 100%; 
   max-width: 320px; /* antes 400px */
   height: 220px; /* opcional: un poco más baja */
   border-radius: 12px;
@@ -23,6 +23,10 @@
   font-family: Arial, sans-serif;
 }
 
+.imgCiudad{
+ margin: -2%;
+ width: 105% !important;
+}
 
 .ciudad-card img {
   width: 100%;
@@ -119,13 +123,6 @@ h2{
   line-height: 1;
 }
 
-.card-detalle img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  filter: none; /* sin oscurecer */
-}
-
 .card-detalle {
   display: flex;
   flex-direction: column;
@@ -133,8 +130,8 @@ h2{
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   height: auto;
   border-radius: 5px;
-  border: 3px solid #002537;
-  padding: 5px;  /* <--- espacio entre contenido y borde */
+  border: 3px solid #005A84;
+  padding: 1.5%;  /* <--- espacio entre contenido y borde */
 }
 
 
