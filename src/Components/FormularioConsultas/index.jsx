@@ -47,38 +47,46 @@ function FormularioConsultas() {
     <div className="form-consultas">
       <div className="form-container-consultas">
         <h2 className="titulo">Formulario de Consultas</h2>
-        <form onSubmit={handleSubmit} className="formulario">
-          <label htmlFor="nombre">Nombre</label>
-          <input
-            id="nombre"
-            type="text"
-            className="inputConsultas"
-            value={nombre}
-            readOnly
-          />
+        <form onSubmit={handleSubmit} className="formularioConsulta">
+          <div className="grupoCampo">
+            <label className="labelConsulta" htmlFor="nombre">Nombre</label>
+            <input
+              id="nombre"
+              type="text"
+              className="inputConsultas"
+              value={nombre}
+              placeholder="Ingrese su Nombre"
+              readOnly
+            />
+          </div>
 
-          <label htmlFor="mail">Email</label>
-          <input
-            id="mail"
-            type="text"
-            className="inputConsultas"
-            value={mail}
-            readOnly
-          />
+          <div className="grupoCampo">
+            <label className="labelConsulta" htmlFor="mail">Mail</label>
+            <input
+              id="mail"
+              type="text"
+              className="inputConsultas"
+              value={mail}
+              placeholder="Ingrese su Mail"
+              readOnly
+            />
+          </div>
 
-          <label htmlFor="problema">Problema</label>
-          <textarea
-            id="problema"
-            placeholder="Describe tu problema"
-            value={problema}
-            onChange={(e) => setProblema(e.target.value)}
-            required
-          ></textarea>
+          <div className="grupoCampo" style={{ gridColumn: "1 / -1" }}>
+            <label className="labelConsulta" htmlFor="problema">Problema/consulta</label>
+            <textarea
+              id="problema"
+              placeholder="Ingrese su Consulta"
+              value={problema}
+              onChange={(e) => setProblema(e.target.value)}
+              required
+            ></textarea>
+          </div>
 
-          <button className="enviar" type="submit">Enviar</button>
-
+          <button className="enviarConsulta" type="submit">Enviar</button>
           {mensaje && <p className="mensaje">{mensaje}</p>}
         </form>
+
         <hr />
       </div>
       

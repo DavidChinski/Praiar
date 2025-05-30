@@ -1,20 +1,8 @@
-/* CONTENEDOR GENERAL */
-.form-consultas {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1rem;
-  min-height: 100vh;
-}
-
 /* CONTENEDOR INTERNO */
 .form-container-consultas {
-  background-color: white;
   padding: 2rem 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 1000px;
-  width: 100%;
   font-family: Arial, sans-serif;
 }
 
@@ -22,30 +10,45 @@
 .titulo {
   font-size: 1.8rem;
   color: #000;
-  text-align: center;
+  text-align: left; /* Cambiado de center a left */
   margin-bottom: 2rem;
 }
 
-/* FORMULARIO */
-form.formulario {
+
+/* CENTRAR TODO EL CONTENIDO */
+.form-consultas {
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 6vw; /* más margen lateral */
+  max-width: 960px;   /* más estrecho */
+  margin: 0 auto;
+  text-align: center; /* Centra texto dentro del formulario */
 }
 
+/* FORMULARIO Y CAMPOS EN COLUMNA CENTRADA */
+form.formularioConsulta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
 /* ETIQUETAS */
-label {
+.labelConsulta {
   font-weight: bold;
   color: #004080;
-  font-size: 0.95rem;
+  font-size: 1.3rem;
 }
 
-/* INPUTS */
-input {
-  padding: 10px;
-  border: 1px solid #005984;
+/* INPUTS y TEXTAREA */
+.inputConsultas,
+textarea {
+  padding: 12px;
+  border: 2px solid #005984;
   border-radius: 10px;
   font-size: 1rem;
   width: 100%;
@@ -53,7 +56,12 @@ input {
   outline: none;
   background-color: white;
   color: #333;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  min-height: 120px;
+  resize: none;
 }
 
 input:focus {
@@ -61,38 +69,23 @@ input:focus {
   box-shadow: 0 0 5px #005984;
 }
 
-/* GRUPO CARPAS */
-.carpa-grid {
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  padding: 1rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
 
-.carpa-grid label {
-  font-weight: bold;
-  margin-bottom: 0.2rem;
-}
-
-/* BOTÓN */
-.enviar {
-  background-color: #2c90aa;
-  color: white;
+/* BOTÓN MÁS CHICO Y CENTRADO */
+.enviarConsulta {
+  background-color: #b2dfe8;
+  color: #000;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
   font-weight: bold;
-  padding: 12px 20px;
-  align-self: flex-end;
-  margin-top: auto;
+  padding: 8px 16px;
+  cursor: pointer;
   transition: background-color 0.3s ease;
+  align-self: center;
 }
 
-.enviar:hover {
-  background-color: #005984;
+.enviarConsulta:hover {
+  background-color: #9ad0dd;
 }
 
 /* MENSAJE */
@@ -115,14 +108,14 @@ input[type="number"] {
 }
 
 /* RESPONSIVE */
-form.formulario {
+form.formularioConsulta {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 }
 
 @media (max-width: 768px) {
-  form.formulario {
+  form.formularioConsulta {
     grid-template-columns: 1fr;
   }
 }
@@ -130,4 +123,20 @@ form.formulario {
 
 #telefono{
   max-width: 180px;
+}
+
+/* GRUPO DE CAMPO CON LABEL + INPUT/TEXTAREA */
+.grupoCampo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* etiqueta alineada a la izquierda dentro del grupo */
+  gap: 0.3rem;
+}
+
+/* HR MÁS CORTO Y CENTRADO */
+.form-container-consultas hr {
+  width: 40%;
+  margin: 2rem auto 0 auto;
+  border: 1px solid #ccc;
 }
