@@ -2,7 +2,9 @@
   background-image: url('../../assets/fondoLogin.png');
   background-size: cover;
   background-position: center;
-  height: 100vh;
+  padding-top: 80px;
+  min-height: 100vh;
+  padding-block-end: 70px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,6 +44,7 @@
   border-radius: 10px;
   font-size: 14px;
   color: #333;
+  max-width: none;
   background-color: white;
 }
 
@@ -85,10 +88,11 @@ button:focus {
 }
 
 .linea {
-  height: 1px;
-  background-color: #333; /* Más oscuro */
-  width: 80%; /* Más largo */
-  margin: 20px auto;
+  height: 1.5px;
+  background-color: #ccc;
+  width: 360px;           /* Ajustás el largo que querés */
+  align-self: center;    /* La centra verticalmente */
+  border: none;
 }
 
 .login-icons {

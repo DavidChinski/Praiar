@@ -96,16 +96,6 @@ input:focus {
   text-align: center;
 }
 
-/* ELIMINAR FLECHAS INPUT TIPO NÚMERO */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
 
 /* RESPONSIVE */
 form.formularioConsulta {
@@ -120,10 +110,6 @@ form.formularioConsulta {
   }
 }
 
-
-#telefono{
-  max-width: 180px;
-}
 
 /* GRUPO DE CAMPO CON LABEL + INPUT/TEXTAREA */
 .grupoCampo {
@@ -140,3 +126,4 @@ form.formularioConsulta {
   margin: 2rem auto 0 auto;
   border: 1px solid #ccc;
 }
+

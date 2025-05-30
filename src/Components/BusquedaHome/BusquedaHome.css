@@ -84,7 +84,9 @@
 /* Inputs y selects */
 select,
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="email"],
+input[type="password"] {
   padding: 0.5rem 1rem;
   border: 1px solid #005984;
   border-radius: 15px;

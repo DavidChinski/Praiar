@@ -1,55 +1,78 @@
-.login-background {
+.registrar-background {
   background-image: url('../../assets/fondoLogin.png');
   background-size: cover;
   background-position: center;
-  height: 100vh;
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 80px;
+  min-height: 100vh;
+  padding-block-end: 70px;
+}
+
+p{
+  font-family: "El Messiri";
+}
+.split {
+  display: flex;
+  flex-direction: row;
+  max-width: 900px;
+  width: 90%;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+.registrar-left {
+  flex: 1;
+  padding: 30px;
+  text-align: left;
+}
+
+.registrar-right {
+  flex: 0.8;
+  background-color: #fff;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.login-container {
-  background-color: white;
-  padding: 40px;
-  border-radius: 20px;
-  max-width: 480px; /* MÁS ANCHO */
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  font-family: 'Arial', sans-serif;
+.divider {
+  width: 1.5px;
+  background-color: #ccc;
+  height: 360px;           /* Ajustás el largo que querés */
+  align-self: center;    /* La centra verticalmente */
 }
 
-.login-form {
+.registrar-form {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: left;
 }
 
 .subtitulo {
   font-weight: bold;
   font-size: 20px;
-  margin-top: 5px;
-  margin-bottom: 4px;
+  margin: 5px 0 4px;
   color: #003F5E;
 }
 
-.login-form input {
+.registrar-form input {
   width: 100%;
   padding: 12px;
   border: 2px solid #003F5E;
   border-radius: 10px;
   font-size: 14px;
-  color: #333;
+  color: #ccc;
   background-color: white;
 }
 
-.login-form input::placeholder {
-  color: #aaa;
-}
-
-.login-buttons {
+.registrar-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
@@ -64,45 +87,24 @@ button {
   font-weight: bold;
   color: #003F5E;
   transition: background-color 0.3s;
-  
 }
-button:focus {
-  outline: none;
-  box-shadow: none;
-}
+
 .secondary:hover {
-  background-color: #B0DBE7;
-  
+  background-color: #A0CAD8;
 }
 
-.link-btn {
-  background-color: transparent;
-  border: none;
-  color: #0077aa;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.linea {
-  height: 1px;
-  background-color: #333; /* Más oscuro */
-  width: 80%; /* Más largo */
-  margin: 20px auto;
-}
-
-.login-icons {
+.registrar-icons {
   display: flex;
   justify-content: center;
   gap: 25px;
   margin: 20px 0;
 }
 
-.login-icons img {
+.registrar-icons img {
   width: 36px;
   height: 36px;
   cursor: pointer;
-  border: 0.5px solid black; /* Borde negro fino */
+  border: 0.5px solid black;
   border-radius: 50%;
   padding: 4px;
   background-color: white;
@@ -110,12 +112,60 @@ button:focus {
 
 .extra-buttons {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 20px;
-  gap: 30px;
 }
 
-.secondary {
-  background-color: #B0DBE7;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.input-row .form-group {
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 1005px) {
+  .split {
+    flex-direction: column;
+  }
+
+  .divider {
+    height: 1.5px;
+    width: 360px;
+  }
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-direction: row;
+}
+
+/* Estilo checkbox más grande */
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #003F5E; /* Color de check en navegadores modernos */
+  cursor: pointer;
+  margin: 0;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
   color: #003F5E;
+  user-select: none;
 }

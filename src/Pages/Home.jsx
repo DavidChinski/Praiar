@@ -19,11 +19,6 @@ function Home() {
 
   return (
     <Layout>
-      {user && (
-        <div className="bienvenida-usuario">
-          <h2>¡Bienvenido, {user.nombre || 'Usuario'}!</h2>  {/*quitar despues de terminar de configurar*/}
-        </div>
-      )}
       <BusquedaHome />
       <ElegirPraiarHome /> 
       <OpcionBalneariosHome />

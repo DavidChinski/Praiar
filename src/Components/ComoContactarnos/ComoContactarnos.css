@@ -24,9 +24,10 @@
 }
 
 .contacto-separador {
-  width: 1px;
+  width: 1.5px;
   height: 130px; /* 100px * 1.3 */
   background-color: #aaa;
+  border: none;
 }
 
 .contacto-redes {

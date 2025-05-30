@@ -6,7 +6,6 @@ import facebookIcon from '../../assets/facebook.png';
 import googleIcon from '../../assets/google.png';
 import { useNavigate } from 'react-router-dom';
 
-
 function RegistrarComponent() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -37,8 +36,7 @@ function RegistrarComponent() {
 
     const { mail } = formData;
 
-    // Verificar si el usuario ya existe
-    const { data: existingUser, error: existingError } = await supabase
+    const { data: existingUser } = await supabase
       .from('usuarios')
       .select('*')
       .eq('mail', mail)
@@ -49,83 +47,104 @@ function RegistrarComponent() {
       return;
     }
 
-    // Insertar nuevo usuario
     const { data, error } = await supabase
-    .from('usuarios')
-    .insert([formData])
-    .select()
-    .single();
+      .from('usuarios')
+      .insert([formData])
+      .select()
+      .single();
 
     if (error) {
-    setErrorMsg('Error al registrar. Intenta nuevamente.');
+      setErrorMsg('Error al registrar. Intenta nuevamente.');
     } else {
-    // Guardar usuario en localStorage
-    localStorage.setItem('usuario', JSON.stringify(data));
-
-    setSuccessMsg('Usuario registrado correctamente.');
-    setFormData({
-      nombre: '',
-      apellido: '',
-      mail: '',
-      dni: '',
-      telefono: '',
-      contraseña: '',
-      esPropietario: false,
-    });
-
-    navigate('/'); // Redirigir al home
-
-
+      localStorage.setItem('usuario', JSON.stringify(data));
+      setSuccessMsg('Usuario registrado correctamente.');
+      setFormData({
+        nombre: '',
+        apellido: '',
+        mail: '',
+        dni: '',
+        telefono: '',
+        contraseña: '',
+        esPropietario: false,
+      });
+      navigate('/');
     }
   };
 
   return (
-    <div className="login-background">
-      <div className="login-container">
-        <h2>Regístrate</h2>
-        <form className="login-form" onSubmit={handleRegister}>
-          <label className='subtitulo'>Nombre</label>
-          <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
+    <div className="registrar-background">
+      <div className="split">
+        <div className="registrar-left">
+          <h2>Regístrate</h2>
+          <form className="registrar-form" onSubmit={handleRegister}>
+            <div className="input-row">
+              <div className="form-group">
+                <label className='subtitulo'>Nombre</label>
+                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label className='subtitulo'>Apellido</label>
+                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} required />
+              </div>
+            </div>
 
-          <label className='subtitulo'>Apellido</label>
-          <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} required />
+            <div className="input-row">
+              <div className="form-group">
+                <label className='subtitulo'>Email</label>
+                <input type="email" name="mail" value={formData.mail} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label className='subtitulo'>DNI</label>
+                <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
+              </div>
+            </div>
 
-          <label className='subtitulo'>Email</label>
-          <input type="email" name="mail" value={formData.mail} onChange={handleChange} required />
+            <div className="input-row">
+              <div className="form-group">
+                <label className='subtitulo'>Teléfono</label>
+                <input type="number" name="telefono" value={formData.telefono} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label className='subtitulo'>Contraseña</label>
+                <input type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} required />
+              </div>
+            </div>
 
-          <label className='subtitulo'>DNI</label>
-          <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
+            <div className="form-group checkbox-group">
+              <label htmlFor="esPropietario" className="checkbox-label subtitulo">
+                ¿Eres propietario?
+              </label>
+              <input
+                type="checkbox"
+                name="esPropietario"
+                id="esPropietario"
+                checked={formData.esPropietario}
+                onChange={handleChange}
+              />
+            </div>
 
-          <label className='subtitulo'>Teléfono</label>
-          <input type="number" name="telefono" value={formData.telefono} onChange={handleChange} required />
 
-          <label className='subtitulo'>Contraseña</label>
-          <input type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} required />
+            {errorMsg && <p className="error">{errorMsg}</p>}
+            {successMsg && <p className="success">{successMsg}</p>}
 
-          <label className='subtitulo'>
-            <input type="checkbox" name="esPropietario" checked={formData.esPropietario} onChange={handleChange} />
-            ¿Eres propietario?
-          </label>
-
-          {errorMsg && <p className="error">{errorMsg}</p>}
-          {successMsg && <p className="success">{successMsg}</p>}
-
-          <div className="login-buttons">
-            <button type="submit" className="secondary">Registrarse</button>
-          </div>
-        </form>
-
-        <hr className='linea' />
-        <p>O usa alguna de estas opciones</p>
-        <div className="login-icons">
-          <img src={appleIcon} alt="Apple login" />
-          <img src={facebookIcon} alt="Facebook login" />
-          <img src={googleIcon} alt="Google login" />
+            <div className="registrar-buttons">
+              <button type="submit" className="secondary">Registrarse</button>
+            </div>
+          </form>
         </div>
 
-        <div className="extra-buttons">
-          <button className="secondary" onClick={() => window.location.href = '/login'}>¿Ya tienes cuenta? Inicia sesión</button>
-          <button className="secondary">Inicia como Balneario</button>
+        <div className="divider" />
+
+        <div className="registrar-right">
+          <p>O usa alguna de estas opciones</p>
+          <div className="registrar-icons">
+            <img src={appleIcon} alt="Apple registrar" />
+            <img src={facebookIcon} alt="Facebook registrar" />
+            <img src={googleIcon} alt="Google registrar" />
+          </div>
+          <div className="extra-buttons">
+            <button className="secondary" onClick={() => window.location.href = '/login'}>¿Ya tienes cuenta?</button>
+          </div>
         </div>
       </div>
     </div>

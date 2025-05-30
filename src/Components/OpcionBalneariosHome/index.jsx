@@ -14,7 +14,7 @@ function OpcionBalneariosHome() {
           <p>
             <strong>Praiar</strong> es el lugar donde tu balneario <strong>importa</strong>.
             Gestiónalo de una manera fácil, rápida y única en un solo lugar.{" "}
-            <Link to="/registrarBalneario" className="link-registrar">Registrate ahora</Link>.
+            <Link to="/registrar" className="link-registrar">Registrate ahora</Link>.
           </p>
         </div>
       </div>

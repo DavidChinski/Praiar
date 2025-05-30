@@ -25,7 +25,6 @@ function FormularioConsultas() {
       setMensaje("Usuario no identificado.");
       return;
     }
-
     const { error } = await supabase.from("consultas").insert([
       {
         nombre_usuario: usuario.nombre,
@@ -83,7 +82,10 @@ function FormularioConsultas() {
             ></textarea>
           </div>
 
-          <button className="enviarConsulta" type="submit">Enviar</button>
+          <div className="grupoCampo centered" style={{ gridColumn: "1 / -1" }}>
+            <button className="enviarConsulta" type="submit">Enviar</button>
+          </div>
+
           {mensaje && <p className="mensaje">{mensaje}</p>}
         </form>
 
