@@ -7,30 +7,39 @@ function FormularioConsultas() {
   const [mail, setMail] = useState("");
   const [problema, setProblema] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [usuario, setUsuario] = useState(null); // guardar objeto completo
 
   useEffect(() => {
-    // Al cargar el componente, obtener datos del usuario desde localStorage
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (usuario) {
-      setNombre(usuario.nombre);
-      setMail(usuario.mail);
-    }
+    const fetchUserData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const localUser = JSON.parse(localStorage.getItem("usuario"));
+        setUsuario(user); // contiene el user.id (UUID)
+        setNombre(localUser?.nombre || "");
+        setMail(localUser?.email || "");
+      } else {
+        setMensaje("Usuario no autenticado.");
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario) {
-      setMensaje("Usuario no identificado.");
+      setMensaje("Usuario no autenticado.");
       return;
     }
+
     const { error } = await supabase.from("consultas").insert([
       {
-        nombre_usuario: usuario.nombre,
-        mail_usuario: usuario.mail,
+        nombre_usuario: nombre,
+        mail_usuario: mail,
         problema,
-        id_usuario: usuario.id_usuario,
+        id_usuario: usuario.id, // este es el UUID
       },
     ]);
 
@@ -38,7 +47,7 @@ function FormularioConsultas() {
       console.error("Error al agregar consulta:", error.message);
       setMensaje("Error al guardar. Intente nuevamente.");
     } else {
-      window.location.href = "/tusbalnearios";
+      window.location.href = "/";
     }
   };
 
@@ -91,7 +100,6 @@ function FormularioConsultas() {
 
         <hr />
       </div>
-      
     </div>
   );
 }
