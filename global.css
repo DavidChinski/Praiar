@@ -1,0 +1,24 @@
+/* Aplica a todas las páginas */
+body {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+.main-container {
+display: grid;
+grid-template-columns: 1fr min(1200px, 90vw) 1fr;
+min-height: 100vh;
+}
+
+.content {
+grid-column: 2;
+padding: 2rem; /* Ajusta el valor según la separación deseada */
+background: #fff;
+box-sizing: border-box;<!-- Ejemplo de uso en una página -->
+<div class="main-container">
+  <div class="content">
+    <!-- Tu contenido aquí -->
+  </div>
+</div>
+}

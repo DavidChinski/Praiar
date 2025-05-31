@@ -3,11 +3,64 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
 
+function NavLinks({ usuario }) {
+  if (!usuario) {
+    return (
+      <>
+        <Link to="/ciudades">Ciudades</Link>
+        <Link to="/beneficios">Beneficios</Link>
+        <Link to="/nosotros">Contáctanos</Link>
+      </>
+    );
+  }
+  if (usuario.esPropietario) {
+    return (
+      <>
+        <Link to="/tusbalnearios">Tus Balnearios</Link>
+        <Link to="/nosotros">Contactos</Link>
+      </>
+    );
+  }
+  return (
+    <>
+      <Link to="/tusreservas">Tus Reservas</Link>
+      <Link to="/ciudades">Ciudades</Link>
+      <Link to="/nosotros">Contactos</Link>
+    </>
+  );
+}
+
+function AuthButtons({ usuario, handleLogout }) {
+  if (usuario) {
+    return (
+      <>
+        <button className="login">
+          <Link to="/perfil">Mi Cuenta</Link>
+        </button>
+        <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
+          Cerrar sesión
+        </button>
+      </>
+    );
+  }
+  return (
+    <>
+      <button className="login">
+        <Link to="/login">Iniciar Sesión</Link>
+      </button>
+      <button className="registrar">
+        <Link to="/registrar">Crear una cuenta</Link>
+      </button>
+    </>
+  );
+}
+
 function Navbar() {
   const location = useLocation();
   const isCiudades = location.pathname === '/ciudades';
   const [menuOpen, setMenuOpen] = useState(false);
   const [usuario, setUsuario] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1005);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,8 +70,21 @@ function Navbar() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1005);
+      if (window.innerWidth > 1005 && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [menuOpen]);
+
   const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+    if (isMobile) {
+      setMenuOpen((open) => !open);
+    }
   };
 
   const handleLogout = () => {
@@ -39,57 +105,27 @@ function Navbar() {
             </div>
           </Link>
 
+          <nav className="nav">
+            <NavLinks usuario={usuario} />
+          </nav>
+
+          <div className="auth-buttons">
+            <AuthButtons usuario={usuario} handleLogout={handleLogout} />
+          </div>
+
           <button className="hamburger" onClick={toggleMenu}>☰</button>
-
-          <div className={`menu ${menuOpen ? 'open' : ''}`}>
-            <nav className="nav">
-              {!usuario && (
-                <>
-                  <Link to="/ciudades">Ciudades</Link>
-                  <Link to="/beneficios">Beneficios</Link>
-                  <Link to="/nosotros">Contáctanos</Link>
-                </>
-              )}
-
-              {usuario && usuario.esPropietario && (
-                <>
-                  <Link to="/tusbalnearios">Tus Balnearios</Link>
-                  <Link to="/nosotros">Contactos</Link>
-                </>
-              )}
-
-              {usuario && !usuario.esPropietario && (
-                <>
-                  <Link to="/tusreservas">Tus Reservas</Link>
-                  <Link to="/ciudades">Ciudades</Link>
-                  <Link to="/nosotros">Contactos</Link>
-                </>
-              )}
+        </div>
+        {/* Menú móvil solo se renderiza si isMobile */}
+        {isMobile && (
+          <div className={`menu${menuOpen ? ' open' : ''}`}>
+            <nav className="nav-mobile">
+              <NavLinks usuario={usuario} />
             </nav>
-
-            <div className="auth-buttons">
-              {usuario ? (
-                <>
-                  <button className="login">
-                    <Link to="/perfil">Mi Cuenta</Link>
-                  </button>
-                  <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
-                    Cerrar sesión
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className="login">
-                    <Link to="/login">Iniciar Sesión</Link>
-                  </button>
-                  <button className="registrar">
-                    <Link to="/registrar">Crear una cuenta</Link>
-                  </button>
-                </>
-              )}
+            <div className="auth-buttons-mobile">
+              <AuthButtons usuario={usuario} handleLogout={handleLogout} />
             </div>
           </div>
-        </div>
+        )}
       </header>
 
       <div className={`header-spacer ${isCiudades ? 'spacer-ciudades' : 'spacer-general'}`} />

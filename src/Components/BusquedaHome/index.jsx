@@ -84,6 +84,7 @@ function BusquedaHome() {
                 <label htmlFor="localidad" className='subtitulo'>Localidades</label>
                 <select
                   id="localidad"
+                  className="input-estandar"
                   onChange={handleCiudadChange}
                   value={ciudadSeleccionada || ''}
                 >
@@ -102,7 +103,11 @@ function BusquedaHome() {
               <img src={BalneariosBusquedaHome} className="icon" alt="Balnearios" />
               <div className="input-wrapper">
                 <label htmlFor="balneario" className='subtitulo'>Balnearios</label>
-                <select id="balneario" disabled={!ciudadSeleccionada}>
+                <select
+                  id="balneario"
+                  className="input-estandar"
+                  disabled={!ciudadSeleccionada}
+                >
                   <option value="">Ingresar el balneario</option>
                   {balnearios.map((balneario) => (
                     <option key={balneario.id_balneario} value={balneario.id_balneario}>
@@ -124,7 +129,7 @@ function BusquedaHome() {
               />
               <div className="input-wrapper">
                 <label className='subtitulo'>Fecha</label>
-                <div className="date-summary">
+                <div className="date-summary input-estandar">
                   {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
                 </div>
                 {showCalendario && (
