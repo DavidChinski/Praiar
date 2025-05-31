@@ -95,19 +95,22 @@ button {
 
 .registrar-icons {
   display: flex;
-  justify-content: center;
-  gap: 25px;
+  justify-content: space-around;
   margin: 20px 0;
+  width: 70%;
 }
 
-.registrar-icons img {
+.registrar-icons div {
   width: 36px;
   height: 36px;
   cursor: pointer;
-  border: 0.5px solid black;
   border-radius: 50%;
   padding: 4px;
   background-color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
 }
 
 .extra-buttons {

@@ -141,9 +141,9 @@ function RegistrarComponent() {
         <div className="registrar-right">
           <p>O usa alguna de estas opciones</p>
           <div className="registrar-icons">
-            <img src={appleIcon} alt="Apple registrar" />
-            <img src={facebookIcon} alt="Facebook registrar" />
-            <img src={googleIcon} alt="Google registrar" />
+            <div id="icon-google" title="Google"></div>
+            <div id="icon-facebook" title="Facebook"></div>
+            <div id="icon-apple" title="Apple"></div>
           </div>
           <div className="extra-buttons">
             <button className="secondary" onClick={() => window.location.href = '/login'}>¿Ya tienes cuenta?</button>

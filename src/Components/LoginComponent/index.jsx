@@ -1,9 +1,7 @@
 import './LoginComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
-import appleIcon from '../../assets/apple.jpg';
-import facebookIcon from '../../assets/facebook.png';
-import googleIcon from '../../assets/google.png';
+
 
 function LoginComponent() {
   const [email, setEmail] = useState('');
@@ -73,9 +71,9 @@ function LoginComponent() {
         <hr className='linea'/>
         <p>O usa alguna de estas opciones</p>
         <div className="login-icons">
-          <img src={appleIcon} alt="Apple login" />
-          <img src={facebookIcon} alt="Facebook login" />
-          <img src={googleIcon} alt="Google login" />
+          <div id="icon-google" title="Google"></div>
+          <div id="icon-facebook" title="Facebook"></div>
+          <div id="icon-apple" title="Apple"></div>
         </div>
 
         <div className="extra-buttons">
