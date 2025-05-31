@@ -2,13 +2,12 @@ import './RegistrarComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
 import { useNavigate } from 'react-router-dom';
-import OjoAbierto from '../../assets/OjoAbierto.png'
-import OjoCerrado from '../../assets/OjoCerrado.png'
+import OjoAbierto from '../../assets/OjoAbierto.png';
+import OjoCerrado from '../../assets/OjoCerrado.png';
 
 function RegistrarComponent() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -25,9 +24,9 @@ function RegistrarComponent() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -39,7 +38,7 @@ function RegistrarComponent() {
     const { email, contraseña, ...perfilData } = formData;
 
     // Paso 1: Crear cuenta en Supabase Auth
-    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+    const { error: signUpError } = await supabase.auth.signUp({
       email: email,
       password: contraseña,
     });
@@ -49,25 +48,26 @@ function RegistrarComponent() {
       return;
     }
 
-    // Paso 2: Esperar a que la sesión esté activa
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    const sessionUserId = sessionData?.session?.user?.id;
-    const sessionUserEmail = sessionData?.session?.user?.email; // <- corregido aquí
+    // Paso 2: Obtener el usuario autenticado (esperar a que la sesión esté activa)
+    const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    if (!sessionUserId || sessionError) {
-      console.error('Error obteniendo la sesión:', sessionError);
+    const userId = userData?.user?.id;
+    const userEmail = userData?.user?.email;
+
+    if (!userId || userError) {
+      console.error('Usuario no autenticado:', userError);
       setErrorMsg('No se pudo autenticar al usuario.');
       return;
     }
 
-    // Paso 3: Guardar perfil en la tabla 'usuarios'
+    // Paso 3: Insertar en la tabla 'usuarios'
     const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
       .insert([{
-        auth_id: sessionUserId,
+        auth_id: userId,
         nombre: perfilData.nombre,
         apellido: perfilData.apellido,
-        email: sessionUserEmail, // <- email insertado correctamente
+        email: userEmail,
         telefono: perfilData.telefono,
         esPropietario: perfilData.esPropietario,
         dni: perfilData.dni
@@ -81,12 +81,12 @@ function RegistrarComponent() {
       return;
     }
 
-    // Paso 4: Guardar en localStorage y redirigir
     localStorage.setItem('usuario', JSON.stringify(perfil));
     setSuccessMsg('Usuario registrado correctamente.');
     navigate('/');
   };
-  
+
+
   return (
     <div className="registrar-background">
       <div className="split">
@@ -95,25 +95,25 @@ function RegistrarComponent() {
           <form className="registrar-form" onSubmit={handleRegister}>
             <div className="input-row">
               <div className="form-group">
-                <label className='subtitulo'>Nombre</label>
+                <label className="subtitulo">Nombre</label>
                 <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                <label className='subtitulo'>Apellido</label>
+                <label className="subtitulo">Apellido</label>
                 <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} required />
               </div>
             </div>
 
             <div className="input-row">
               <div className="form-group">
-                <label className='subtitulo'>Email</label>
+                <label className="subtitulo">Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} required />
               </div>
               <div className="form-group password-group">
-                <label className='subtitulo'>Contraseña</label>
+                <label className="subtitulo">Contraseña</label>
                 <div className="password-wrapper">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     name="contraseña"
                     value={formData.contraseña}
                     onChange={handleChange}
@@ -127,7 +127,7 @@ function RegistrarComponent() {
                   >
                     <img
                       src={showPassword ? OjoCerrado : OjoAbierto}
-                      alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      alt={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                       className="ojo-icon"
                     />
                   </button>
@@ -137,11 +137,11 @@ function RegistrarComponent() {
 
             <div className="input-row">
               <div className="form-group">
-                <label className='subtitulo'>Teléfono</label>
+                <label className="subtitulo">Teléfono</label>
                 <input type="number" name="telefono" value={formData.telefono} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                <label className='subtitulo'>DNI</label>
+                <label className="subtitulo">DNI</label>
                 <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
               </div>
             </div>
@@ -163,7 +163,9 @@ function RegistrarComponent() {
             {successMsg && <p className="success">{successMsg}</p>}
 
             <div className="registrar-buttons">
-              <button type="submit" className="secondary">Registrarse</button>
+              <button type="submit" className="secondary">
+                Registrarse
+              </button>
             </div>
           </form>
         </div>
@@ -178,7 +180,9 @@ function RegistrarComponent() {
             <div id="icon-apple" title="Apple"></div>
           </div>
           <div className="extra-buttons">
-            <button className="secondary" onClick={() => window.location.href = '/login'}>¿Ya tienes cuenta?</button>
+            <button className="secondary" onClick={() => window.location.href = '/login'}>
+              ¿Ya tienes cuenta?
+            </button>
           </div>
         </div>
       </div>
