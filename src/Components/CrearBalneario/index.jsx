@@ -42,7 +42,22 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const idUsuario = userData.user.id;
+  const authId = userData.user.id;
+
+  // 🔍 Buscar el id_usuario usando auth_id
+  const { data: usuarioData, error: errorUsuario } = await supabase
+    .from("usuarios")
+    .select("id_usuario")
+    .eq("auth_id", authId)
+    .single();
+
+  if (errorUsuario || !usuarioData) {
+    console.error("No se encontró el usuario en la tabla usuarios");
+    setMensaje("No se encontró el usuario.");
+    return;
+  }
+
+  const idUsuario = usuarioData.id_usuario;
 
   if (!ciudadSeleccionada) {
     setMensaje("Debe seleccionar una ciudad.");
@@ -57,7 +72,7 @@ const handleSubmit = async (e) => {
         direccion,
         telefono,
         imagen: imagenUrl,
-        id_usuario: idUsuario,
+        id_usuario: idUsuario, // ✅ Ahora es un entero válido
         id_ciudad: ciudadSeleccionada,
       },
     ])
@@ -79,7 +94,7 @@ const handleSubmit = async (e) => {
     cant_mesas: cantMesas,
     cant_reposeras: cantReposeras,
     capacidad: capacidad,
-    id_usuario: idUsuario, // importante: viene de supabase.auth
+    id_usuario: idUsuario, // ✅ También entero correcto
   }));
 
   console.log("Insertando carpas con:", carpas);
@@ -94,6 +109,7 @@ const handleSubmit = async (e) => {
 
   window.location.href = "/tusbalnearios";
 };
+
 
 
   return (
