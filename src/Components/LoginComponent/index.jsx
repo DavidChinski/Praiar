@@ -1,18 +1,19 @@
 import './LoginComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
-
+import OjoAbierto from '../../assets/OjoAbierto.png';
+import OjoCerrado from '../../assets/OjoCerrado.png';
 
 function LoginComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    // Paso 1: Login con email/contraseña
     const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -24,16 +25,14 @@ function LoginComponent() {
       return;
     }
 
-    const userId = authData.user.id; // UID del usuario autenticado
+    const userId = authData.user.id;
 
-    // Paso 2: Buscar al usuario en la tabla 'usuarios'
     const { data: usuario, error: fetchError } = await supabase
-    .from('usuarios')
-    .select('*')
-    .eq('auth_id', userId)
-    .limit(1)
-    .maybeSingle(); // <-- clave
-
+      .from('usuarios')
+      .select('*')
+      .eq('auth_id', userId)
+      .limit(1)
+      .maybeSingle();
 
     if (fetchError) {
       console.error("Error al buscar en la tabla usuarios:", fetchError.message);
@@ -41,12 +40,7 @@ function LoginComponent() {
       return;
     }
 
-    console.log("Usuario logueado:", usuario);
-
-    // (Opcional) Guardar datos en localStorage o context si querés usarlos después
     localStorage.setItem('usuario', JSON.stringify(usuario));
-
-    // Redireccionar al home u otra parte
     window.location.href = "/";
   };
 
@@ -56,9 +50,36 @@ function LoginComponent() {
         <h2>Inicia Sesión</h2>
         <form className="login-form" onSubmit={handleLogin}>
           <label className='subtitulo'>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ingrese su email" />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Ingrese su email"
+            required
+          />
+
           <label className='subtitulo'>Contraseña</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Ingrese su contraseña" />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingrese su contraseña"
+              required
+            />
+            <button
+              type="button"
+              className="eye-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Mostrar u ocultar contraseña"
+            >
+              <img
+                src={showPassword ? OjoCerrado : OjoAbierto}
+                alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className="ojo-icon"
+              />
+            </button>
+          </div>
 
           {errorMsg && <p className="error">{errorMsg}</p>}
 

@@ -2,9 +2,13 @@ import './RegistrarComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
 import { useNavigate } from 'react-router-dom';
+import OjoAbierto from '../../assets/OjoAbierto.png'
+import OjoCerrado from '../../assets/OjoCerrado.png'
 
 function RegistrarComponent() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -105,9 +109,29 @@ function RegistrarComponent() {
                 <label className='subtitulo'>Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} required />
               </div>
-              <div className="form-group">
+              <div className="form-group password-group">
                 <label className='subtitulo'>Contraseña</label>
-                <input type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} required />
+                <div className="password-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="contraseña"
+                    value={formData.contraseña}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="eye-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Mostrar u ocultar contraseña"
+                  >
+                    <img
+                      src={showPassword ? OjoCerrado : OjoAbierto}
+                      alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      className="ojo-icon"
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 

@@ -172,3 +172,33 @@ button {
   color: #003F5E;
   user-select: none;
 }
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 40px; /* deja espacio para el ícono */
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 10px;
+  top: 55%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #003F5E;
+  padding: 0;
+}
+
+.eye-toggle:focus {
+  outline: none;
+}
+.ojo-icon {
+  width: 24px;
+  height: 24px;
+}

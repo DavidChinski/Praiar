@@ -139,3 +139,28 @@ button:focus {
   background-color: #B0DBE7;
   color: #003F5E;
 }
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 40px; /* Espacio para el ícono */
+}
+
+.eye-toggle {
+  background: none;
+  border: none;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ojo-icon {
+  width: 24px;
+  height: 24px;
+}
