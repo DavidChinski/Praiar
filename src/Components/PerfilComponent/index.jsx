@@ -29,7 +29,7 @@ function PerfilComponent() {
       <div className="perfil-datos">
         <p><strong>Nombre:</strong> {usuario.nombre}</p>
         <p><strong>Apellido:</strong> {usuario.apellido}</p>
-        <p><strong>Email:</strong> {usuario.mail}</p>
+        <p><strong>Email:</strong> {usuario.email}</p>
         <p><strong>DNI:</strong> {usuario.dni}</p>
         <p><strong>Teléfono:</strong> {usuario.telefono}</p>
         <p><strong>Propietario:</strong> {usuario.esPropietario ? 'Sí' : 'No'}</p>

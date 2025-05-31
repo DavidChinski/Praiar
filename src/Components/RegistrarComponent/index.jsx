@@ -1,9 +1,6 @@
 import './RegistrarComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
-import appleIcon from '../../assets/apple.jpg';
-import facebookIcon from '../../assets/facebook.png';
-import googleIcon from '../../assets/google.png';
 import { useNavigate } from 'react-router-dom';
 
 function RegistrarComponent() {
@@ -12,7 +9,7 @@ function RegistrarComponent() {
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
-    email: '', // cambiado de mail → email
+    email: '',
     dni: '',
     telefono: '',
     contraseña: '',
@@ -48,33 +45,44 @@ function RegistrarComponent() {
       return;
     }
 
-    const userId = authData?.user?.id;
+    // Paso 2: Esperar a que la sesión esté activa
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const sessionUserId = sessionData?.session?.user?.id;
+    const sessionUserEmail = sessionData?.session?.user?.email; // <- corregido aquí
 
-    // Paso 2: Guardar perfil en la tabla 'usuarios'
+    if (!sessionUserId || sessionError) {
+      console.error('Error obteniendo la sesión:', sessionError);
+      setErrorMsg('No se pudo autenticar al usuario.');
+      return;
+    }
+
+    // Paso 3: Guardar perfil en la tabla 'usuarios'
     const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
       .insert([{
+        auth_id: sessionUserId,
         nombre: perfilData.nombre,
         apellido: perfilData.apellido,
+        email: sessionUserEmail, // <- email insertado correctamente
         telefono: perfilData.telefono,
-        dni: perfilData.dni,
         esPropietario: perfilData.esPropietario,
-        auth_id: userId
+        dni: perfilData.dni
       }])
       .select()
       .single();
 
     if (insertError) {
-      setErrorMsg('Error al guardar los datos del usuario.');
+      console.error('Insert Error:', insertError);
+      setErrorMsg('Error al guardar los datos del usuario: ' + insertError.message);
       return;
     }
 
-    // Paso 3: Guardar en localStorage y redirigir
+    // Paso 4: Guardar en localStorage y redirigir
     localStorage.setItem('usuario', JSON.stringify(perfil));
     setSuccessMsg('Usuario registrado correctamente.');
     navigate('/');
   };
-
+  
   return (
     <div className="registrar-background">
       <div className="split">
