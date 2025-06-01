@@ -10,6 +10,7 @@ import Perfil from "./Pages/Perfil";
 import TusBalnearios from "./Pages/TusBalnearios";
 import TusReservas from "./Pages/TusReservas";
 import VistaBalneario from "./Pages/VistaBalneario";
+import Reserva from "./Pages/Reserva";
 function App() {
   return (
     <Router>
@@ -24,6 +25,7 @@ function App() {
           <Route path="/tusbalnearios" element={<TusBalnearios />} /> 
           <Route path="/tusreservas" element={<TusReservas />} /> 
           <Route path="/balneario/:id" element={<VistaBalneario />} />
+          <Route path="/reservaubicacion/:id" element={<Reserva />} /> 
         </Routes>
       </div>
     </Router>

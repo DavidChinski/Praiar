@@ -26,6 +26,11 @@ function OpcionBalneariosHome() {
               Gestiónalo de una manera fácil, rápida y única en un solo lugar.{" "}
               <Link to="/tusbalnearios" className="link-registrar">Tus Balnearios</Link>.
             </p>
+          ) : user && !user.esPropietario ? (
+            <p>
+              <strong>Praiar</strong> es el lugar donde tu balneario <strong>importa</strong>.
+              Gestiónalo de una manera fácil, rápida y única en un solo lugar.{" "}
+            </p>
           ) : (
             <p>
               <strong>Praiar</strong> es el lugar donde tu balneario <strong>importa</strong>.

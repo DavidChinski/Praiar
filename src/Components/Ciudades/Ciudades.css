@@ -121,7 +121,7 @@ h2{
   align-items: center;
   justify-content: center;
   background-color: transparent; /* sin fondo detrás de la esfera */
-  box-shadow: none; /* sin sombra para que se vea solo la bola */
+  box-shadow: none !important; /* sin sombra para que se vea solo la bola */
 }
 
 .ver-mas-circular {
