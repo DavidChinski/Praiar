@@ -14,31 +14,15 @@ function BalneariosComponent() {
 
       if (authError || !user) {
         console.error("Usuario no autenticado:", authError?.message);
-        navigate("/login"); // Redirige si no está logueado
+        navigate("/login");
         return;
       }
 
-      // Buscar el usuario en la tabla `usuarios` usando su auth.uid
-      const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
-        .select("*")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (userError || !usuario) {
-        console.error("No se encontró el usuario en la tabla 'usuarios':", userError?.message);
-        setBalnearios([]);
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-
-      // Buscar balnearios del usuario
+      // Obtené los balnearios directamente usando el user.id (uuid del auth)
       const { data: balneariosData, error: balneariosError } = await supabase
         .from("balnearios")
         .select("*")
-        .eq("id_usuario", usuario.id_usuario);
+        .eq("id_usuario", user.id); // 🔑 Usa el uuid directamente
 
       if (balneariosError) {
         console.error("Error cargando balnearios:", balneariosError.message);

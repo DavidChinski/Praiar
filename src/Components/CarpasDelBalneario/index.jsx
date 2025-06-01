@@ -15,63 +15,76 @@ function CarpasDelBalneario() {
   const [carpaEditando, setCarpaEditando] = useState(null); // Carpa en edición
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) {
-      setError("No hay usuario autenticado.");
-      setLoading(false);
-      return;
-    }
-
     async function fetchData() {
-      try {
-        const { data: balneario, error: errorBalneario } = await supabase
-          .from("balnearios")
-          .select("id_usuario")
-          .eq("id_balneario", id)
-          .single();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (errorBalneario || !balneario) {
-          setError("No se pudo verificar el propietario del balneario.");
-          return;
-        }
-
-        if (balneario.id_usuario === usuario.id_usuario) {
-          setEsDuenio(true);
-        }
-
-        const { data: carpasData, error: carpasError } = await supabase
-          .from("ubicaciones")
-          .select("*")
-          .eq("id_balneario", id);
-
-        if (carpasError) throw carpasError;
-
-        const carpasConPos = carpasData.map((c, i) => ({
-          ...c,
-          x: c.x ?? i * 100,
-          y: c.y ?? 0,
-        }));
-
-        setCarpas(carpasConPos);
-
-        const { data: elementosData, error: elementosError } = await supabase
-          .from("elementos_ubicacion")
-          .select("*")
-          .eq("id_balneario", id);
-
-        if (elementosError) throw elementosError;
-
-        setElementos(elementosData);
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar datos.");
-      } finally {
+      if (authError || !user) {
+        setError("No hay usuario autenticado.");
         setLoading(false);
+        return;
       }
+
+      // Buscar el usuario en la tabla usuarios
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("*")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (userError || !usuario) {
+        setError("No se encontró el usuario.");
+        setLoading(false);
+        return;
+      }
+
+      // Verificar si es dueño del balneario
+      const { data: balneario, error: errorBalneario } = await supabase
+        .from("balnearios")
+        .select("id_usuario")
+        .eq("id_balneario", id)
+        .single();
+
+      if (errorBalneario || !balneario) {
+        setError("No se pudo verificar el propietario del balneario.");
+        setLoading(false);
+        return;
+      }
+
+      if (balneario.id_usuario === usuario.auth_id) {
+        setEsDuenio(true);
+      }
+
+      // Obtener carpas
+      const { data: carpasData, error: carpasError } = await supabase
+        .from("ubicaciones")
+        .select("*")
+        .eq("id_balneario", id);
+
+      if (carpasError) throw carpasError;
+
+      const carpasConPos = carpasData.map((c, i) => ({
+        ...c,
+        x: c.x ?? i * 100,
+        y: c.y ?? 0,
+      }));
+
+      setCarpas(carpasConPos);
+
+      // Obtener elementos
+      const { data: elementosData, error: elementosError } = await supabase
+        .from("elementos_ubicacion")
+        .select("*")
+        .eq("id_balneario", id);
+
+      if (elementosError) throw elementosError;
+
+      setElementos(elementosData);
+      setLoading(false);
     }
 
     fetchData();
   }, [id]);
+
 
   async function agregarElemento(tipo) {
     const x = 100, y = 100;

@@ -21,7 +21,9 @@ function CrearBalneario() {
 
   useEffect(() => {
     async function fetchCiudades() {
-      const { data, error } = await supabase.from("ciudades").select("id_ciudad, nombre");
+      const { data, error } = await supabase
+        .from("ciudades")
+        .select("id_ciudad, nombre");
       if (error) {
         console.error("Error al obtener ciudades:", error.message);
       } else {
@@ -31,86 +33,73 @@ function CrearBalneario() {
     fetchCiudades();
   }, []);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
+    // 🔐 Obtener el usuario autenticado (UUID)
+    const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  if (userError || !userData?.user) {
-    console.error("No se pudo obtener el usuario autenticado");
-    setMensaje("Sesión no válida.");
-    return;
-  }
+    if (userError || !userData?.user) {
+      console.error("No se pudo obtener el usuario autenticado");
+      setMensaje("Sesión no válida.");
+      return;
+    }
 
-  const authId = userData.user.id;
+    const idUsuario = userData.user.id; // ← UUID válido para todas las tablas
 
-  // 🔍 Buscar el id_usuario usando auth_id
-  const { data: usuarioData, error: errorUsuario } = await supabase
-    .from("usuarios")
-    .select("id_usuario")
-    .eq("auth_id", authId)
-    .single();
+    if (!ciudadSeleccionada) {
+      setMensaje("Debe seleccionar una ciudad.");
+      return;
+    }
 
-  if (errorUsuario || !usuarioData) {
-    console.error("No se encontró el usuario en la tabla usuarios");
-    setMensaje("No se encontró el usuario.");
-    return;
-  }
+    // ✅ Insertar balneario
+    const { data, error } = await supabase
+      .from("balnearios")
+      .insert([
+        {
+          nombre,
+          direccion,
+          telefono,
+          imagen: imagenUrl,
+          id_usuario: idUsuario,
+          id_ciudad: ciudadSeleccionada,
+        },
+      ])
+      .select();
 
-  const idUsuario = usuarioData.id_usuario;
+    if (error) {
+      console.error("Error al agregar balneario:", error.message);
+      setMensaje("Error al guardar. Intente nuevamente.");
+      return;
+    }
 
-  if (!ciudadSeleccionada) {
-    setMensaje("Debe seleccionar una ciudad.");
-    return;
-  }
+    const nuevoBalnearioId = data[0].id_balneario;
 
-  const { data, error } = await supabase
-    .from("balnearios")
-    .insert([
-      {
-        nombre,
-        direccion,
-        telefono,
-        imagen: imagenUrl,
-        id_usuario: idUsuario, // ✅ Ahora es un entero válido
-        id_ciudad: ciudadSeleccionada,
-      },
-    ])
-    .select();
+    // 🏖️ Crear carpas asociadas
+    const carpas = Array.from({ length: cantidadCarpas }, (_, i) => ({
+      id_balneario: nuevoBalnearioId,
+      posicion: i + 1,
+      reservado: false,
+      cant_sillas: cantSillas,
+      cant_mesas: cantMesas,
+      cant_reposeras: cantReposeras,
+      capacidad: capacidad,
+      id_usuario: idUsuario, // UUID correcto
+    }));
 
-  if (error) {
-    console.error("Error al agregar balneario:", error.message);
-    setMensaje("Error al guardar. Intente nuevamente.");
-    return;
-  }
+    const { error: errorCarpas } = await supabase
+      .from("ubicaciones")
+      .insert(carpas);
 
-  const nuevoBalnearioId = data[0].id_balneario;
+    if (errorCarpas) {
+      console.error("Error al agregar carpas:", errorCarpas.message);
+      setMensaje("Balneario creado, pero ocurrió un error al crear las carpas.");
+      return;
+    }
 
-  const carpas = Array.from({ length: cantidadCarpas }, (_, i) => ({
-    id_balneario: nuevoBalnearioId,
-    posicion: i + 1,
-    reservado: false,
-    cant_sillas: cantSillas,
-    cant_mesas: cantMesas,
-    cant_reposeras: cantReposeras,
-    capacidad: capacidad,
-    id_usuario: idUsuario, // ✅ También entero correcto
-  }));
-
-  console.log("Insertando carpas con:", carpas);
-
-  const { error: errorCarpas } = await supabase.from("ubicaciones").insert(carpas);
-
-  if (errorCarpas) {
-    console.error("Error al agregar carpas:", errorCarpas.message);
-    setMensaje("Balneario creado, pero ocurrió un error al crear las carpas.");
-    return;
-  }
-
-  window.location.href = "/tusbalnearios";
-};
-
-
+    // ✅ Todo ok, redirigir
+    window.location.href = "/tusbalnearios";
+  };
 
   return (
     <div className="form-consultas">
@@ -122,16 +111,39 @@ const handleSubmit = async (e) => {
             {/* Columna izquierda */}
             <div className="columna-izquierda">
               <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+              <input
+                id="nombre"
+                type="text"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                required
+              />
 
               <label htmlFor="direccion">Dirección</label>
-              <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
+              <input
+                id="direccion"
+                type="text"
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+                required
+              />
 
               <label htmlFor="telefono">Teléfono</label>
-              <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
+              <input
+                id="telefono"
+                type="number"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                required
+              />
 
               <label htmlFor="imagenUrl">Imagen URL</label>
-              <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
+              <input
+                id="imagenUrl"
+                type="text"
+                value={imagenUrl}
+                onChange={(e) => setImagenUrl(e.target.value)}
+              />
 
               <label htmlFor="ciudad">Ciudad</label>
               <select
@@ -154,22 +166,54 @@ const handleSubmit = async (e) => {
               <h3>Configuración de carpas</h3>
               <div className="carpa-grid">
                 <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
-                <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value))} required />
+                <input
+                  id="cantidadCarpas"
+                  type="number"
+                  value={cantidadCarpas}
+                  onChange={(e) => setCantidadCarpas(parseInt(e.target.value))}
+                  required
+                />
 
                 <label htmlFor="sillas">Cantidad de sillas</label>
-                <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value))} required />
+                <input
+                  id="sillas"
+                  type="number"
+                  value={cantSillas}
+                  onChange={(e) => setCantSillas(parseInt(e.target.value))}
+                  required
+                />
 
                 <label htmlFor="mesas">Cantidad de mesas</label>
-                <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value))} required />
+                <input
+                  id="mesas"
+                  type="number"
+                  value={cantMesas}
+                  onChange={(e) => setCantMesas(parseInt(e.target.value))}
+                  required
+                />
 
                 <label htmlFor="reposeras">Cantidad de reposeras</label>
-                <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value))} required />
+                <input
+                  id="reposeras"
+                  type="number"
+                  value={cantReposeras}
+                  onChange={(e) => setCantReposeras(parseInt(e.target.value))}
+                  required
+                />
 
                 <label htmlFor="capacidad">Capacidad por carpa</label>
-                <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value))} required />
+                <input
+                  id="capacidad"
+                  type="number"
+                  value={capacidad}
+                  onChange={(e) => setCapacidad(parseInt(e.target.value))}
+                  required
+                />
               </div>
 
-              <button className="enviar" type="submit">Enviar</button>
+              <button className="enviar" type="submit">
+                Enviar
+              </button>
             </div>
           </form>
 

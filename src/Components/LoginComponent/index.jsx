@@ -99,7 +99,6 @@ function LoginComponent() {
 
         <div className="extra-buttons">
           <button className="secondary" onClick={() => window.location.href = '/registrar'}>Regístrate</button>
-          <button className="secondary">Inicia como Balneario</button>
         </div>
       </div>
     </div>
