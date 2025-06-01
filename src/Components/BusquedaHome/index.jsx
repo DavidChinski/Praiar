@@ -33,7 +33,8 @@ function BusquedaHome() {
     async function fetchCiudades() {
       const { data, error } = await supabase
         .from('ciudades')
-        .select('id_ciudad, nombre');
+        .select('id_ciudad, nombre')
+        .order('nombre', { ascending: true }); // Ordenar desde la base de datos
 
       if (error) {
         console.error('Error al obtener ciudades:', error.message);
@@ -77,7 +78,6 @@ function BusquedaHome() {
         <div className="overlay">
           <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
           <div className="busqueda-form">
-            {/* Localidades */}
             <div className="input-group">
               <img src={LocalizacionBusquedaHome} className="icon" alt="Localización" />
               <div className="input-wrapper">
@@ -88,11 +88,11 @@ function BusquedaHome() {
                   onChange={handleCiudadChange}
                   value={ciudadSeleccionada || ''}
                 >
-                  <option value="">Ingresar la localidad</option>
+                  <option value="" disabled hidden>Ingresar la localidad</option>
                   {ciudades.map((ciudad) => (
-                    <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
-                      {ciudad.nombre}
-                    </option>
+                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
+                    {ciudad.nombre}
+                  </option>
                   ))}
                 </select>
               </div>
@@ -108,7 +108,7 @@ function BusquedaHome() {
                   className="input-estandar"
                   disabled={!ciudadSeleccionada}
                 >
-                  <option value="">Ingresar el balneario</option>
+                  <option value="" hidden >Ingresar el balneario</option>
                   {balnearios.map((balneario) => (
                     <option key={balneario.id_balneario} value={balneario.id_balneario}>
                       {balneario.nombre}

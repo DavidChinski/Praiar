@@ -16,7 +16,8 @@ function Ciudades() {
     async function fetchCiudadesConBalnearios() {
       const { data: ciudadesData, error: ciudadesError } = await supabase
         .from('ciudades')
-        .select('id_ciudad, nombre');
+        .select('id_ciudad, nombre')
+        .order('nombre', { ascending: true });
 
       if (ciudadesError) {
         console.error('Error al obtener ciudades:', ciudadesError.message);
@@ -24,7 +25,7 @@ function Ciudades() {
       }
 
       const ciudadesConCantidad = await Promise.all(
-        ciudadesData.map(async (ciudad) => {
+        (ciudadesData || []).map(async (ciudad) => {
           const { count, error: countError } = await supabase
             .from('balnearios')
             .select('*', { count: 'exact', head: true })
@@ -35,7 +36,7 @@ function Ciudades() {
             return { ...ciudad, cantidadBalnearios: 0 };
           }
 
-          return { ...ciudad, cantidadBalnearios: count };
+          return { ...ciudad, cantidadBalnearios: typeof count === 'number' ? count : 0 };
         })
       );
 
