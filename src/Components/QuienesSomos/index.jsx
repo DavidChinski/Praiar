@@ -1,5 +1,8 @@
 import './QuienesSomos.css';
 import LinkedinTrasparente from "../../assets/LinkedinTrasparente.webp";
+const linkedinBenezra = "https://www.linkedin.com/in/lucas-benezra/";
+const linkedinBrodsky = "https://www.linkedin.com/in/elias-brodsky-ba6b26315/";
+const linkedinChinski = "https://www.linkedin.com/in/david-chinski-a16a88297/";
 
 function QuienesSomos() {
   return (
@@ -9,19 +12,49 @@ function QuienesSomos() {
         <div className="miembro">
           <div alt="Icono Lucas" className="icono" id="benezra"/>
           <p className="nombre">Lucas<br/>Benezra</p>
-          <img src={LinkedinTrasparente} alt="LinkedIn Lucas" className="linkedin" />
+          <a
+            href={linkedinBenezra}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={LinkedinTrasparente}
+              alt="LinkedIn Lucas"
+              className="linkedin"
+            />
+          </a>
         </div>
 
         <div className="miembro">
-        <div alt="Icono Elias" className="icono" id="brodsky"/>
+          <div alt="Icono Elias" className="icono" id="brodsky"/>
           <p className="nombre">Elias<br/>Brodsky</p>
-          <img src={LinkedinTrasparente} alt="LinkedIn Elias" className="linkedin" />
+          <a
+            href={linkedinBrodsky}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={LinkedinTrasparente}
+              alt="LinkedIn Elias"
+              className="linkedin"
+            />
+          </a>
         </div>
 
         <div className="miembro">
           <div alt="Icono David" className="icono" id="chinski"/>
           <p className="nombre">David<br/>Chinski</p>
-          <img src={LinkedinTrasparente} alt="LinkedIn David" className="linkedin" />
+          <a
+            href={linkedinChinski}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={LinkedinTrasparente}
+              alt="LinkedIn David"
+              className="linkedin"
+            />
+          </a>
         </div>
       </div>
     </div>

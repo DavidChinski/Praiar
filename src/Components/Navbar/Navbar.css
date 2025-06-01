@@ -184,7 +184,7 @@
     align-items: center; /* Centra el contenido horizontalmente */
     justify-content: center;
     width: 100%;
-    background: rgba(255,255,255,0.97);
+    background: #fef8e8;
     border-radius: 0 0 18px 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.10);
     padding-top: 0;

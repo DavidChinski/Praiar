@@ -13,14 +13,21 @@
 
 .ciudad-card {
   position: relative;
-  width: 100%; 
-  max-width: 320px; /* antes 400px */
-  height: 220px; /* opcional: un poco más baja */
-  border-radius: 12px;
+  width: 100%;
+  max-width: 320px;
+  height: 220px;
+  border-radius: 18px; /* más redondeado */
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   background-color: white;
   font-family: Arial, sans-serif;
+  transition: transform 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s;
+}
+
+.ciudad-card:hover {
+  transform: translateY(-8px) scale(1.035);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  z-index: 2;
 }
 
 .imgCiudad{
@@ -33,53 +40,74 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: brightness(70%);
-  
+  filter: brightness(68%);
+  transition: filter 0.2s;
 }
 
-/* Contenido sobre la imagen */
+.ciudad-card:hover img {
+  filter: brightness(80%) blur(0.5px);
+}
+
+/* Degradado sobre la imagen para mejorar contraste */
+.card-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.65) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .card-content {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 20px;
+  padding: 22px 20px 18px 20px;
   width: 100%;
-  height: 80%;
-  color: white;
+  height: 100%;
+  color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border-radius: 12px;
+  border-radius: 18px;
+  z-index: 1;
 }
 
 .card-content h3 {
   font-family: "El Messiri", sans-serif;
-  font-size: 2rem;
+  font-size: 2.1rem;
   margin: 0 0 8px;
-  font-weight: 400;
-  
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .card-content p {
-  font-size: 1.2rem;
-  margin: 0 0 16px;
+  font-size: 1.15rem;
+  margin: 0 0 18px;
+  font-weight: 400;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.18);
 }
 
 .card-content button {
-  background-color: #007b99;
+  background: linear-gradient(90deg, #007b99 60%, #00b4d8 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 1.1rem;
+  padding: 10px 26px;
+  border-radius: 12px;
+  font-size: 1.13rem;
   cursor: pointer;
   width: fit-content;
-  transition: background-color 0.3s ease;
   font-family: inherit;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.3s, transform 0.18s;
+  z-index: 2;
 }
 
 .card-content button:hover {
-  background-color: #003F5E;
+  background: linear-gradient(90deg, #003F5E 60%, #007b99 100%);
+  transform: scale(1.06);
 }
 
 h2{

@@ -2,8 +2,6 @@ import './RegistrarComponent.css';
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient.js';
 import { useNavigate } from 'react-router-dom';
-import OjoAbierto from '../../assets/OjoAbierto.png';
-import OjoCerrado from '../../assets/OjoCerrado.png';
 
 function RegistrarComponent() {
   const navigate = useNavigate();
@@ -121,15 +119,13 @@ function RegistrarComponent() {
                   />
                   <button
                     type="button"
-                    className="eye-toggle"
+                    className={`eye-toggle${showPassword ? " cruz" : ""}`}
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label="Mostrar u ocultar contraseña"
                   >
-                    <img
-                      src={showPassword ? OjoCerrado : OjoAbierto}
-                      alt={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      className="ojo-icon"
-                    />
+                    <span className="material-icons ojo-icon">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
                   </button>
                 </div>
               </div>
