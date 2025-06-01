@@ -41,6 +41,18 @@ function ReservaComponent() {
     setError(null);
     setExito(null);
 
+    // Validación de fechas
+    if (!fechaInicio || !fechaSalida) {
+      setError("Debes seleccionar una fecha de inicio y una de salida.");
+      return;
+    }
+
+    if (fechaInicio > fechaSalida) {
+      setError("La fecha de inicio no puede ser posterior a la de salida.");
+      return;
+    }
+
+    // Autenticación del usuario
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (!user) {
       setError("Debes iniciar sesión para reservar.");
@@ -49,12 +61,13 @@ function ReservaComponent() {
 
     const id_balneario = ubicacionInfo?.id_balneario;
 
+    // Verificar reservas existentes que se solapen
     const { data: reservasExistentes, error: reservasError } = await supabase
       .from("reservas")
       .select("*")
       .eq("id_ubicacion", id_ubicacion)
       .eq("id_balneario", id_balneario)
-      .or(`and(fecha_inicio,lte.${fechaSalida}),and(fecha_salida,gte.${fechaInicio})`);
+      .or(`fecha_inicio.lte.${fechaSalida},fecha_salida.gte.${fechaInicio}`);
 
     if (reservasError) {
       setError("Error verificando reservas.");
@@ -66,6 +79,7 @@ function ReservaComponent() {
       return;
     }
 
+    // Insertar nueva reserva
     const { error: insertError } = await supabase.from("reservas").insert({
       id_usuario: user.id,
       id_ubicacion: id_ubicacion,
@@ -79,7 +93,7 @@ function ReservaComponent() {
       setError("Error al realizar la reserva.");
     } else {
       setExito("Reserva realizada con éxito.");
-      setTimeout(() => navigate("/misreservas"), 2000);
+      setTimeout(() => navigate("/tusreservas"), 2000);
     }
   };
 
