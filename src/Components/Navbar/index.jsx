@@ -2,6 +2,7 @@ import './Navbar.css';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
+import { supabase } from '../../supabaseClient';
 
 function NavLinks({ usuario }) {
   if (!usuario) {
@@ -87,12 +88,14 @@ function Navbar() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();  
     localStorage.removeItem('usuario');
     setUsuario(null);
     navigate('/');
     window.location.reload();
   };
+
 
   return (
     <>

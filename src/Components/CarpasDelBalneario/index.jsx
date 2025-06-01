@@ -12,19 +12,51 @@ function CarpasDelBalneario() {
   const [error, setError] = useState(null);
   const [esDuenio, setEsDuenio] = useState(false);
   const [dragging, setDragging] = useState(null);
-  const [carpaEditando, setCarpaEditando] = useState(null); // Carpa en edición
+  const [carpaEditando, setCarpaEditando] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      // 1. Cargar carpas
+      const { data: carpasData, error: carpasError } = await supabase
+        .from("ubicaciones")
+        .select("*")
+        .eq("id_balneario", id);
 
-      if (authError || !user) {
-        setError("No hay usuario autenticado.");
+      if (carpasError) {
+        setError("Error al cargar carpas.");
         setLoading(false);
         return;
       }
 
-      // Buscar el usuario en la tabla usuarios
+      const carpasConPos = carpasData.map((c, i) => ({
+        ...c,
+        x: c.x ?? i * 100,
+        y: c.y ?? 0,
+      }));
+      setCarpas(carpasConPos);
+
+      // 2. Cargar elementos
+      const { data: elementosData, error: elementosError } = await supabase
+        .from("elementos_ubicacion")
+        .select("*")
+        .eq("id_balneario", id);
+
+      if (elementosError) {
+        setError("Error al cargar elementos.");
+        setLoading(false);
+        return;
+      }
+
+      setElementos(elementosData);
+
+      // 3. Verificar autenticación
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        setLoading(false); // Solo visualización
+        return;
+      }
+
+      // 4. Verificar si es dueño
       const { data: usuario, error: userError } = await supabase
         .from("usuarios")
         .select("*")
@@ -32,61 +64,28 @@ function CarpasDelBalneario() {
         .single();
 
       if (userError || !usuario) {
-        setError("No se encontró el usuario.");
         setLoading(false);
         return;
       }
 
-      // Verificar si es dueño del balneario
       const { data: balneario, error: errorBalneario } = await supabase
         .from("balnearios")
         .select("id_usuario")
         .eq("id_balneario", id)
         .single();
 
-      if (errorBalneario || !balneario) {
-        setError("No se pudo verificar el propietario del balneario.");
-        setLoading(false);
-        return;
-      }
-
-      if (balneario.id_usuario === usuario.auth_id) {
+      if (!errorBalneario && balneario?.id_usuario === usuario.auth_id) {
         setEsDuenio(true);
       }
 
-      // Obtener carpas
-      const { data: carpasData, error: carpasError } = await supabase
-        .from("ubicaciones")
-        .select("*")
-        .eq("id_balneario", id);
-
-      if (carpasError) throw carpasError;
-
-      const carpasConPos = carpasData.map((c, i) => ({
-        ...c,
-        x: c.x ?? i * 100,
-        y: c.y ?? 0,
-      }));
-
-      setCarpas(carpasConPos);
-
-      // Obtener elementos
-      const { data: elementosData, error: elementosError } = await supabase
-        .from("elementos_ubicacion")
-        .select("*")
-        .eq("id_balneario", id);
-
-      if (elementosError) throw elementosError;
-
-      setElementos(elementosData);
       setLoading(false);
     }
 
     fetchData();
   }, [id]);
 
-
   async function agregarElemento(tipo) {
+    if (!esDuenio) return;
     const x = 100, y = 100;
     const { data, error } = await supabase
       .from("elementos_ubicacion")
@@ -99,7 +98,7 @@ function CarpasDelBalneario() {
   }
 
   function onMouseMove(e) {
-    if (!dragging || !containerRef.current) return;
+    if (!esDuenio || !dragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left - 40;
     const y = e.clientY - rect.top - 40;
@@ -120,7 +119,7 @@ function CarpasDelBalneario() {
   }
 
   async function onMouseUp() {
-    if (!dragging) return;
+    if (!esDuenio || !dragging) return;
 
     if (dragging.tipo === "carpa") {
       const carpa = carpas.find((c) => c.id_carpa === dragging.id);
@@ -146,6 +145,7 @@ function CarpasDelBalneario() {
   }
 
   async function eliminarCarpa(id_carpa) {
+    if (!esDuenio) return;
     const { error } = await supabase.from("ubicaciones").delete().eq("id_carpa", id_carpa);
     if (!error) {
       setCarpas((prev) => prev.filter((carpa) => carpa.id_carpa !== id_carpa));
@@ -153,6 +153,7 @@ function CarpasDelBalneario() {
   }
 
   function handleEditarCarpa(carpa) {
+    if (!esDuenio) return;
     setCarpaEditando({ ...carpa });
   }
 
@@ -165,6 +166,7 @@ function CarpasDelBalneario() {
   }
 
   async function guardarCambios() {
+    if (!esDuenio) return;
     const { id_carpa, ...datos } = carpaEditando;
     const { error } = await supabase
       .from("ubicaciones")
@@ -182,27 +184,27 @@ function CarpasDelBalneario() {
   }
 
   function rotarElemento(id_elemento) {
-  setElementos((prev) =>
-    prev.map((el) =>
-      el.id_elemento === id_elemento
-        ? { ...el, rotado: (el.rotado || 0) + 90 }
-        : el
-    )
-  );
+    if (!esDuenio) return;
 
-  // Opcional: guardar en Supabase si lo tenés en la DB
-  const el = elementos.find((e) => e.id_elemento === id_elemento);
-  if (el) {
-    supabase
-      .from("elementos_ubicacion")
-      .update({ rotado: (el.rotado || 0) + 90 })
-      .eq("id_elemento", id_elemento)
-      .then(({ error }) => {
-        if (error) console.error("Error al rotar en Supabase:", error);
-      });
+    setElementos((prev) =>
+      prev.map((el) =>
+        el.id_elemento === id_elemento
+          ? { ...el, rotado: (el.rotado || 0) + 90 }
+          : el
+      )
+    );
+
+    const el = elementos.find((e) => e.id_elemento === id_elemento);
+    if (el) {
+      supabase
+        .from("elementos_ubicacion")
+        .update({ rotado: (el.rotado || 0) + 90 })
+        .eq("id_elemento", id_elemento)
+        .then(({ error }) => {
+          if (error) console.error("Error al rotar en Supabase:", error);
+        });
+    }
   }
-}
-
 
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
@@ -210,6 +212,10 @@ function CarpasDelBalneario() {
   return (
     <div className="carpas-del-balneario">
       <h2>Carpas del Balneario</h2>
+
+      {!esDuenio && (
+        <p className="aviso-lectura">Vista de solo lectura. Iniciá sesión como propietario para editar.</p>
+      )}
 
       {esDuenio && (
         <div className="toolbar">
@@ -251,8 +257,8 @@ function CarpasDelBalneario() {
               left: `${el.x}px`,
               top: `${el.y}px`,
               transform: `rotate(${el.rotado || 0}deg)`,
-              transformOrigin: 'center center',
-              position: 'absolute'
+              transformOrigin: "center center",
+              position: "absolute",
             }}
             onMouseDown={() =>
               esDuenio && setDragging({ tipo: "elemento", id: el.id_elemento })
@@ -260,7 +266,6 @@ function CarpasDelBalneario() {
             title={el.tipo}
           >
             {el.tipo}
-
             {esDuenio && (
               <div className="acciones">
                 <button onClick={() => rotarElemento(el.id_elemento)}>🔄</button>
@@ -268,8 +273,6 @@ function CarpasDelBalneario() {
             )}
           </div>
         ))}
-
-
       </div>
 
       {carpaEditando && (
