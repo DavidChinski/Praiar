@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
 import { Link, useNavigate } from "react-router-dom";
 import './BalneariosComponent.css';
+import Mapa from '../../assets/LocalizacionBusquedaHome.png'
+import Carpa from '../../assets/Carpa.png'
 
 function BalneariosComponent() {
   const [balnearios, setBalnearios] = useState([]);
@@ -50,20 +52,33 @@ function BalneariosComponent() {
       ) : (
         <div className="card-grid-balnearios">
           {balnearios.map((balneario) => (
-            <div key={balneario.id_balneario} className="balneario-card">
+            <div key={balneario.id_balneario} className="balneario-card card-detalle">
               <img
                 src={balneario.imagen || "https://via.placeholder.com/240x150"}
                 alt={balneario.nombre}
+                className="imgCiudad imgCiudades-margin"
               />
-              <div className="card-content-balnearios">
-                <h3>{balneario.nombre}</h3>
-                <p>{balneario.direccion}</p>
-                <Link to={`/balneario/${balneario.id_balneario}`}>
-                  <button className="mirar-btn">Ver balneario</button>
-                </Link>
+              <div className="detalle-card">
+                <div className="info-contenido">
+                  <div className="info-izquierda">
+                    <h3>{balneario.nombre}</h3>
+                    <p>
+                      <img src={Mapa} alt="mapa" className="iconoCard" />
+                      {balneario.direccion}
+                    </p>
+                    <p>
+                      <img src={Carpa} alt="carpa" className="iconoCard" />
+                      Cantidad de carpas
+                    </p>
+                  </div>
+                  <Link to={`/balneario/${balneario.id_balneario}`}>
+                    <button className="mirar-btn">Entrar</button>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
+
         </div>
       )}
     </div>
