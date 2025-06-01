@@ -63,7 +63,7 @@ function Ciudades() {
       <div className="card-grid">
         {ciudades.map((ciudad) => (
           <div key={ciudad.id_ciudad} className={`ciudad-card ${isPaginaCiudades ? 'card-detalle' : ''}`}>
-            <img src={Logo} alt={ciudad.nombre} className='imgCiudad' />
+            <img src={Logo} alt={ciudad.nombre} className={`imgCiudad ${isPaginaCiudades ? 'imgCiudades-margin' : ''}`}  />
             
             {isPaginaCiudades ? (
               <div className="detalle-card">

@@ -31,8 +31,12 @@
 }
 
 .imgCiudad {
-  margin: -2%;
   width: 105% !important;
+  margin: 0;
+}
+
+.imgCiudades-margin {
+  margin: -2%;
 }
 
 .ciudad-card img {
@@ -42,6 +46,7 @@
   display: block;
   filter: brightness(68%);
   transition: filter 0.2s;
+  
 }
 
 .ciudad-card:hover img {
@@ -68,7 +73,6 @@
   color: #fff;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   border-radius: 18px;
   z-index: 1;
 }
