@@ -105,117 +105,58 @@ function CrearBalneario() {
     <div className="form-consultas">
       <div className="form-layout">
         <div className="form-container-consultas">
-          <h2 className="titulo">Agregar nuevo Balneario</h2>
+          <h1 className="titulo">Agregar nuevo Balneario</h1>
 
           <form onSubmit={handleSubmit} className="formulario">
-            {/* Columna izquierda */}
-            <div className="columna-izquierda">
+            <div className="form-section">
+              <h3>Configuración del balneario</h3>
               <label htmlFor="nombre">Nombre</label>
-              <input
-                id="nombre"
-                type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
+              <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
 
               <label htmlFor="direccion">Dirección</label>
-              <input
-                id="direccion"
-                type="text"
-                value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
-                required
-              />
+              <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
 
               <label htmlFor="telefono">Teléfono</label>
-              <input
-                id="telefono"
-                type="number"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                required
-              />
+              <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
 
               <label htmlFor="imagenUrl">Imagen URL</label>
-              <input
-                id="imagenUrl"
-                type="text"
-                value={imagenUrl}
-                onChange={(e) => setImagenUrl(e.target.value)}
-              />
+              <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
 
               <label htmlFor="ciudad">Ciudad</label>
-              <select
-                id="ciudad"
-                value={ciudadSeleccionada}
-                onChange={(e) => setCiudadSeleccionada(e.target.value)}
-                required
-              >
+              <select id="ciudad" value={ciudadSeleccionada} onChange={(e) => setCiudadSeleccionada(e.target.value)} required>
                 <option value="">Seleccione una ciudad</option>
                 {ciudades.map((ciudad) => (
-                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
-                    {ciudad.nombre}
-                  </option>
+                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>{ciudad.nombre}</option>
                 ))}
               </select>
             </div>
 
-            {/* Columna derecha */}
-            <div className="columna-derecha">
+            <div className="form-section">
               <h3>Configuración de carpas</h3>
-              <div className="carpa-grid">
-                <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
-                <input
-                  id="cantidadCarpas"
-                  type="number"
-                  value={cantidadCarpas}
-                  onChange={(e) => setCantidadCarpas(parseInt(e.target.value))}
-                  required
-                />
 
-                <label htmlFor="sillas">Cantidad de sillas</label>
-                <input
-                  id="sillas"
-                  type="number"
-                  value={cantSillas}
-                  onChange={(e) => setCantSillas(parseInt(e.target.value))}
-                  required
-                />
+              <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
+              <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value))} required />
 
-                <label htmlFor="mesas">Cantidad de mesas</label>
-                <input
-                  id="mesas"
-                  type="number"
-                  value={cantMesas}
-                  onChange={(e) => setCantMesas(parseInt(e.target.value))}
-                  required
-                />
+              <label htmlFor="sillas">Cantidad de sillas</label>
+              <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value))} required />
 
-                <label htmlFor="reposeras">Cantidad de reposeras</label>
-                <input
-                  id="reposeras"
-                  type="number"
-                  value={cantReposeras}
-                  onChange={(e) => setCantReposeras(parseInt(e.target.value))}
-                  required
-                />
+              <label htmlFor="mesas">Cantidad de mesas</label>
+              <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value))} required />
 
-                <label htmlFor="capacidad">Capacidad por carpa</label>
-                <input
-                  id="capacidad"
-                  type="number"
-                  value={capacidad}
-                  onChange={(e) => setCapacidad(parseInt(e.target.value))}
-                  required
-                />
-              </div>
+              <label htmlFor="reposeras">Cantidad de reposeras</label>
+              <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value))} required />
 
-              <button className="enviar" type="submit">
-                Enviar
-              </button>
+              <label htmlFor="capacidad">Capacidad por carpa</label>
+              <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value))} required />
             </div>
           </form>
+
+          {/* Botón fuera del formulario, pero sigue ejecutando submit */}
+          <div className="boton-contenedor">
+            <button className="enviar" type="submit" onClick={handleSubmit}>
+              Enviar
+            </button>
+          </div>
 
           {mensaje && <p className="mensaje">{mensaje}</p>}
         </div>
