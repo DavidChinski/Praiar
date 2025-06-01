@@ -1,0 +1,62 @@
+.formulario-reserva {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  font-family: sans-serif;
+}
+
+.formulario-reserva h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.formulario-reserva label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.formulario-reserva input,
+.formulario-reserva select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.formulario-reserva button {
+  width: 100%;
+  padding: 0.7rem;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.formulario-reserva button:hover {
+  background-color: #0056b3;
+}
+
+.error {
+  color: red;
+  margin-top: 1rem;
+}
+
+.exito {
+  color: green;
+  margin-top: 1rem;
+}
+
+.info-ubicacion {
+  background-color: #e9ecef;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
