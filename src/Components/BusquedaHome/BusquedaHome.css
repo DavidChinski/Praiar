@@ -6,14 +6,11 @@
   overflow: visible;
 }
 
-.hero-background {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
+.hero{
+  background-image: url(../../assets/ImagenBusquedaHome.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .overlay {
@@ -28,6 +25,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2; /* debe ir encima del .hero-darken */
+  
 }
 
 .hero-darken {
@@ -41,11 +39,11 @@
 }
 
 .hero-title {
-  color: white !important;
-  font-size: 3rem !important;
-  font-weight: 500 !important;
-  margin-bottom: 2rem !important;
-  text-align: center !important;
+  color: white;
+  font-size: 3rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  text-align: center;
   font-family: "El Messiri";
   padding-bottom: 15px !important;
 }

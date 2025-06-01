@@ -6,7 +6,6 @@ import { DateRange } from 'react-date-range';
 import { format } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import Logo from '../../assets/ImagenBusquedaHome.png';
 import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
 import LocalizacionBusquedaHome from '../../assets/LocalizacionBusquedaHome.png';
 import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
@@ -79,10 +78,9 @@ function BusquedaHome() {
   return (
     <div className="busqueda-home">
       <div className="hero">
-        <img src={Logo} alt="Playa" className="hero-background" />
         <div className="hero-darken"></div>
         <div className="overlay">
-          <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
+          <h1 className="titulo-home">Encontrá tu próximo lugar en la playa</h1>
           <div className="busqueda-form">
 
             {/* Localidades */}

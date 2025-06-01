@@ -42,6 +42,15 @@ function LoginComponent() {
     window.location.href = "/";
   };
 
+  const handleSocialLogin = async (provider) => {
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+  };
+
   return (
     <div className="login-background">
       <div className="login-container">
@@ -88,9 +97,24 @@ function LoginComponent() {
         <hr className='linea'/>
         <p>O usa alguna de estas opciones</p>
         <div className="login-icons">
-          <div id="icon-google" title="Google"></div>
-          <div id="icon-facebook" title="Facebook"></div>
-          <div id="icon-apple" title="Apple"></div>
+          <div
+            id="icon-google"
+            title="Google"
+            onClick={() => handleSocialLogin('google')}
+            style={{ cursor: 'pointer' }}
+          ></div>
+          <div
+            id="icon-facebook"
+            title="Facebook"
+            onClick={() => handleSocialLogin('facebook')}
+            style={{ cursor: 'pointer' }}
+          ></div>
+          <div
+            id="icon-apple"
+            title="Apple"
+            onClick={() => handleSocialLogin('apple')}
+            style={{ cursor: 'pointer' }}
+          ></div>
         </div>
 
         <div className="extra-buttons">
