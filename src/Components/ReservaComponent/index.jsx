@@ -67,7 +67,9 @@ function ReservaComponent() {
       .select("*")
       .eq("id_ubicacion", id_ubicacion)
       .eq("id_balneario", id_balneario)
-      .or(`fecha_inicio.lte.${fechaSalida},fecha_salida.gte.${fechaInicio}`);
+      .lte("fecha_inicio", fechaSalida)
+      .gte("fecha_salida", fechaInicio);
+
 
     if (reservasError) {
       setError("Error verificando reservas.");
