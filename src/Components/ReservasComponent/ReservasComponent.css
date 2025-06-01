@@ -1,55 +1,185 @@
+/* ---------- Fondo y título ---------- */
 .tus-reservas {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  font-family: 'Segoe UI', sans-serif;
+  min-height: 80vh;
+  font-family: 'El Messiri', sans-serif;
+  padding: 0.5rem 6vw; /* más margen lateral */
+  max-width: 960px;   /* más estrecho */
+  margin: 0 auto;
 }
 
-.tus-reservas h1 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #111827;
+.hero-title {
+  color: #003f5e;
+  font-size: 2.5rem;
+  font-weight: 600;
   text-align: center;
+  margin-bottom: 2rem;
 }
 
-.tus-reservas p {
-  margin: 0.25rem 0;
-  color: #374151;
+/* ---------- Formulario de búsqueda ---------- */
+.busqueda-form {
+  display: flex;
+  background-color: white;
+  border-radius: 2rem;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
-.tus-reservas ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 2rem;
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 56px;
+  min-height: 56px;
+  box-sizing: border-box;
+  position: relative;
 }
 
-.tus-reservas li {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  transition: box-shadow 0.3s ease;
-  background-color: #f9fafb;
+.iconFecha {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+  cursor: pointer;
 }
 
-.tus-reservas li:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: #005984;
+  height: 100%;
 }
 
-.tus-reservas strong {
-  color: #111827;
+.input-estandar,
+.date-summary {
+  border: 1px solid #005984;
+  border-radius: 15px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  color: #005a84;
+  background-color: white;
+  min-width: 180px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.3s, border 0.3s;
+  box-sizing: border-box;
 }
 
-.tus-reservas .error {
-  color: #dc2626;
+.date-summary:hover {
+  box-shadow: 0 0 10px rgba(0, 89, 132, 0.3);
+  border: 1.5px solid #0077b6;
+  transform: scale(1.02);
+}
+
+/* ---------- Calendario ---------- */
+.calendario-container {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+/* ---------- Botón ---------- */
+.search-button {
+  background-color: #006699;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  height: 56px;
+  color: white;
+  font-weight: bold;
+}
+
+.search-button:hover {
+  background-color: #00527c;
+  transform: scale(1.05);
+}
+
+.search-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 89, 132, 0.3);
+}
+
+/* ---------- Tabla de reservas ---------- */
+.tabla-reservas {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-reservas th,
+.tabla-reservas td {
+  padding: 1rem;
   text-align: center;
-  margin-top: 1rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.tus-reservas .loading {
-  text-align: center;
-  color: #6b7280;
+.tabla-reservas th {
+  background-color: #005984;
+  color: white;
+  font-weight: 600;
+}
+
+.tabla-reservas tr:last-child td {
+  border-bottom: none;
+}
+
+.ver-button {
+  background-color: #0099cc;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.ver-button:hover {
+  background-color: #0077a6;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .busqueda-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input-estandar,
+  .date-summary {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .tabla-reservas {
+    font-size: 0.9rem;
+  }
+
+  .tabla-reservas th,
+  .tabla-reservas td {
+    padding: 0.75rem;
+  }
 }
