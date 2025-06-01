@@ -1,0 +1,55 @@
+.tus-reservas {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.tus-reservas h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  text-align: center;
+}
+
+.tus-reservas p {
+  margin: 0.25rem 0;
+  color: #374151;
+}
+
+.tus-reservas ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.tus-reservas li {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.3s ease;
+  background-color: #f9fafb;
+}
+
+.tus-reservas li:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.tus-reservas strong {
+  color: #111827;
+}
+
+.tus-reservas .error {
+  color: #dc2626;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.tus-reservas .loading {
+  text-align: center;
+  color: #6b7280;
+}
