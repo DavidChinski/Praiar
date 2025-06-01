@@ -76,7 +76,7 @@ function ReservasComponent() {
 
   return (
     <div className="tus-reservas">
-      <h1 className="hero-title">Tus Reservas Conseguidas</h1>
+      <h1 className="hero-title">Tus Reservas</h1>
 
       {/* Filtros estilo búsqueda */}
       <div className="busqueda-form">
