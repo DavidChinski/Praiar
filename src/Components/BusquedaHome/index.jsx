@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import './BusquedaHome.css';
 import { DateRange } from 'react-date-range';
@@ -15,6 +16,7 @@ function BusquedaHome() {
   const [ciudades, setCiudades] = useState([]);
   const [balnearios, setBalnearios] = useState([]);
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
+  const [balnearioSeleccionado, setBalnearioSeleccionado] = useState(null);
   const [rangoFechas, setRangoFechas] = useState([
     {
       startDate: new Date(),
@@ -24,9 +26,12 @@ function BusquedaHome() {
   ]);
   const [showCalendario, setShowCalendario] = useState(false);
 
+  const navigate = useNavigate();
+
   function handleCiudadChange(event) {
     const idCiudad = event.target.value;
     setCiudadSeleccionada(idCiudad !== '' ? parseInt(idCiudad) : null);
+    setBalnearioSeleccionado(null); // Reinicia el balneario si cambia la ciudad
   }
 
   useEffect(() => {
@@ -34,7 +39,7 @@ function BusquedaHome() {
       const { data, error } = await supabase
         .from('ciudades')
         .select('id_ciudad, nombre')
-        .order('nombre', { ascending: true }); // Ordenar desde la base de datos
+        .order('nombre', { ascending: true });
 
       if (error) {
         console.error('Error al obtener ciudades:', error.message);
@@ -48,27 +53,28 @@ function BusquedaHome() {
   }, []);
 
   useEffect(() => {
-  async function fetchBalnearios() {
-    if (!ciudadSeleccionada) {
-      setBalnearios([]);
-      return;
+    async function fetchBalnearios() {
+      if (!ciudadSeleccionada) {
+        setBalnearios([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('balnearios')
+        .select('id_balneario, nombre')
+        .eq('id_ciudad', ciudadSeleccionada);
+
+      if (error) {
+        console.error('Error al obtener balnearios:', error.message);
+        setBalnearios([]);
+        return;
+      }
+
+      setBalnearios(data);
     }
-    const { data, error } = await supabase
-      .from('balnearios')
-      .select('id_balneario, nombre')
-      .eq('id_ciudad', ciudadSeleccionada);
 
-    if (error) {
-      console.error('Error al obtener balnearios:', error.message);
-      setBalnearios([]);
-      return;
-    }
-    setBalnearios(data);
-  }
-
-  fetchBalnearios();
-}, [ciudadSeleccionada]);
-
+    fetchBalnearios();
+  }, [ciudadSeleccionada]);
 
   return (
     <div className="busqueda-home">
@@ -78,6 +84,8 @@ function BusquedaHome() {
         <div className="overlay">
           <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
           <div className="busqueda-form">
+
+            {/* Localidades */}
             <div className="input-group">
               <img src={LocalizacionBusquedaHome} className="icon" alt="Localización" />
               <div className="input-wrapper">
@@ -90,9 +98,9 @@ function BusquedaHome() {
                 >
                   <option value="" disabled hidden>Ingresar la localidad</option>
                   {ciudades.map((ciudad) => (
-                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
-                    {ciudad.nombre}
-                  </option>
+                    <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>
+                      {ciudad.nombre}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -107,8 +115,10 @@ function BusquedaHome() {
                   id="balneario"
                   className="input-estandar"
                   disabled={!ciudadSeleccionada}
+                  onChange={(e) => setBalnearioSeleccionado(e.target.value)}
+                  value={balnearioSeleccionado || ''}
                 >
-                  <option value="" hidden >Ingresar el balneario</option>
+                  <option value="" hidden>Ingresar el balneario</option>
                   {balnearios.map((balneario) => (
                     <option key={balneario.id_balneario} value={balneario.id_balneario}>
                       {balneario.nombre}
@@ -150,9 +160,18 @@ function BusquedaHome() {
             </div>
 
             {/* Botón buscar */}
-            <button className="search-button">
+            <button
+              className="search-button"
+              onClick={() => {
+                if (balnearioSeleccionado) {
+                  navigate(`/balneario/${balnearioSeleccionado}`);
+                }
+              }}
+              disabled={!balnearioSeleccionado}
+            >
               <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
             </button>
+
           </div>
         </div>
       </div>
