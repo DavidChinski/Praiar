@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
+import { Link } from "react-router-dom";
+
 import "./CarpasDelBalneario.css";
 import Carpa from '../../assets/Carpa.png';
 
@@ -223,6 +225,7 @@ function CarpasDelBalneario() {
             <button onClick={() => agregarElemento("pileta")}>Pileta</button>
             <button onClick={() => agregarElemento("quincho")}>Quincho</button>
           </div>
+          <Link to={`/tusreservas/${balnearioInfo.id_balneario}`}>Tus Reservas</Link>
         </div>
       )}
 

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useParams, useSearchParams  } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import FechaBusquedaHome from "../../assets/FechaBusquedaHome.png";
-import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
+import BusquedaHomeSearch from "../../assets/BusquedaHome.png";
 import "./ReservasComponent.css";
 
 function ReservasComponent() {
@@ -20,6 +21,9 @@ function ReservasComponent() {
     },
   ]);
   const [showCalendario, setShowCalendario] = useState(false);
+  const [searchParams] = useSearchParams();
+  const { id } = useParams();
+  const idBalneario = Number.isNaN(parseInt(id)) ? null : parseInt(id);
 
   const fetchReservas = async (filtrarPorFechas = false) => {
     setLoading(true);
@@ -33,31 +37,75 @@ function ReservasComponent() {
       return;
     }
 
-    let query = supabase
-      .from("reservas")
-      .select(`
-        *,
-        ubicaciones (
-          id_carpa,
-          posicion
-        ),
-        balnearios (
-          nombre
-        )
-      `)
-      .eq("id_usuario", user.id);
+    let query = null;
 
-    if (filtrarPorFechas) {
-      const { startDate, endDate } = rangoFechas[0];
+    // Si hay id de balneario en la URL
+    if (idBalneario) {
+      // Verificamos si el usuario es propietario
+      const { data: usuario, error: usuarioError } = await supabase
+        .from("usuarios")
+        .select("esPropietario")
+        .eq("auth_id", user.id)
+        .single();
 
-      query = query
-        .gte("fecha_salida", format(startDate, "yyyy-MM-dd"))
-        .lte("fecha_inicio", format(endDate, "yyyy-MM-dd"));
+      if (usuarioError || !usuario) {
+        setError("No se pudo verificar si el usuario es propietario.");
+        setLoading(false);
+        return;
+      }
+
+      if (usuario.esPropietario) {
+        // El usuario es propietario, filtramos por id_balneario
+        query = supabase
+          .from("reservas")
+          .select(`
+            *,
+            ubicaciones (
+              id_carpa,
+              posicion
+            ),
+            balnearios (
+              nombre
+            )
+          `)
+          .eq("id_balneario", idBalneario);
+
+        
+      } else {
+        setError("No tenés permisos para ver reservas de este balneario.");
+        setLoading(false);
+        return;
+      }
+    } else {
+      // No hay id en la URL, mostramos las reservas del usuario
+      query = supabase
+        .from("reservas")
+        .select(`
+          *,
+          ubicaciones (
+            id_carpa,
+            posicion
+          ),
+          balnearios (
+            nombre
+          )
+        `)
+        .eq("id_usuario", user.id);
     }
 
+    // Filtrado por fechas si se pidió
+    if (filtrarPorFechas && query) {
+      const { startDate, endDate } = rangoFechas[0];
+      query = query
+      .lte("fecha_inicio", format(endDate, "yyyy-MM-dd"))  // empieza antes del final
+      .gte("fecha_salida", format(startDate, "yyyy-MM-dd")); // termina después del inicio
+    }
+    // Ejecutamos la consulta
     const { data, error: reservasError } = await query;
 
+ 
     if (reservasError) {
+      console.error("Error al obtener reservas:", reservasError);
       setError("Error cargando reservas.");
     } else {
       setReservas(data);
@@ -65,6 +113,7 @@ function ReservasComponent() {
 
     setLoading(false);
   };
+
 
   useEffect(() => {
     fetchReservas();
@@ -78,7 +127,6 @@ function ReservasComponent() {
     <div className="tus-reservas">
       <h1 className="hero-title">Tus Reservas</h1>
 
-      {/* Filtros estilo búsqueda */}
       <div className="busqueda-form">
         <div className="input-group date-group">
           <img
@@ -119,7 +167,6 @@ function ReservasComponent() {
         </button>
       </div>
 
-      {/* Resultados */}
       {loading && <p>Cargando reservas...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
       {!loading && reservas.length === 0 && <p>No tenés reservas aún.</p>}
@@ -139,7 +186,10 @@ function ReservasComponent() {
             {reservas.map((reserva) => (
               <tr key={reserva.id_reserva}>
                 <td>{reserva.balnearios?.nombre}</td>
-                <td>{reserva.ubicaciones?.posicion || reserva.ubicaciones?.id_carpa}</td>
+                <td>
+                  {reserva.ubicaciones?.posicion ||
+                    reserva.ubicaciones?.id_carpa}
+                </td>
                 <td>{format(new Date(reserva.fecha_inicio), "dd/MM/yyyy")}</td>
                 <td>{format(new Date(reserva.fecha_salida), "dd/MM/yyyy")}</td>
                 <td>

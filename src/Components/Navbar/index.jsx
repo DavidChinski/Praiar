@@ -24,7 +24,7 @@ function NavLinks({ usuario }) {
   }
   return (
     <>
-      <Link to="/tusreservas">Tus Reservas</Link>
+      <Link to="/tusreservas/null">Tus Reservas</Link>
       <Link to="/ciudades">Ciudades</Link>
       <Link to="/nosotros">Contactos</Link>
     </>

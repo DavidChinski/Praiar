@@ -23,7 +23,7 @@ function App() {
           <Route path="/perfil" element={<Perfil />} /> 
           <Route path="/registrar" element={<Registrar />} /> 
           <Route path="/tusbalnearios" element={<TusBalnearios />} /> 
-          <Route path="/tusreservas" element={<TusReservas />} /> 
+          <Route path="/tusreservas/:id" element={<TusReservas />} /> 
           <Route path="/balneario/:id" element={<VistaBalneario />} />
           <Route path="/reservaubicacion/:id" element={<Reserva />} /> 
         </Routes>
