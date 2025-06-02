@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams  } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
@@ -11,6 +11,7 @@ import "./ReservasComponent.css";
 
 function ReservasComponent() {
   const [reservas, setReservas] = useState([]);
+  const [usuarios, setUsuarios] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rangoFechas, setRangoFechas] = useState([
@@ -24,6 +25,25 @@ function ReservasComponent() {
   const [searchParams] = useSearchParams();
   const { id } = useParams();
   const idBalneario = Number.isNaN(parseInt(id)) ? null : parseInt(id);
+
+  const fetchUsuarios = async (reservasData) => {
+    const ids = [...new Set(reservasData.map((r) => r.id_usuario).filter(Boolean))];
+
+    if (ids.length === 0) return;
+
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("id_usuario, nombre, apellido")
+      .in("id_usuario", ids);
+
+    if (!error && data) {
+      const map = {};
+      data.forEach((user) => {
+        map[user.id_usuario] = user;
+      });
+      setUsuarios(map);
+    }
+  };
 
   const fetchReservas = async (filtrarPorFechas = false) => {
     setLoading(true);
@@ -39,9 +59,7 @@ function ReservasComponent() {
 
     let query = null;
 
-    // Si hay id de balneario en la URL
     if (idBalneario) {
-      // Verificamos si el usuario es propietario
       const { data: usuario, error: usuarioError } = await supabase
         .from("usuarios")
         .select("esPropietario")
@@ -55,7 +73,6 @@ function ReservasComponent() {
       }
 
       if (usuario.esPropietario) {
-        // El usuario es propietario, filtramos por id_balneario
         query = supabase
           .from("reservas")
           .select(`
@@ -69,15 +86,12 @@ function ReservasComponent() {
             )
           `)
           .eq("id_balneario", idBalneario);
-
-        
       } else {
         setError("No tenés permisos para ver reservas de este balneario.");
         setLoading(false);
         return;
       }
     } else {
-      // No hay id en la URL, mostramos las reservas del usuario
       query = supabase
         .from("reservas")
         .select(`
@@ -93,27 +107,27 @@ function ReservasComponent() {
         .eq("id_usuario", user.id);
     }
 
-    // Filtrado por fechas si se pidió
     if (filtrarPorFechas && query) {
       const { startDate, endDate } = rangoFechas[0];
       query = query
-      .lte("fecha_inicio", format(endDate, "yyyy-MM-dd"))  // empieza antes del final
-      .gte("fecha_salida", format(startDate, "yyyy-MM-dd")); // termina después del inicio
+        .lte("fecha_inicio", format(endDate, "yyyy-MM-dd"))
+        .gte("fecha_salida", format(startDate, "yyyy-MM-dd"));
     }
-    // Ejecutamos la consulta
+
     const { data, error: reservasError } = await query;
 
- 
     if (reservasError) {
       console.error("Error al obtener reservas:", reservasError);
       setError("Error cargando reservas.");
     } else {
       setReservas(data);
+      if (idBalneario) {
+        await fetchUsuarios(data); // Solo cuando es propietario
+      }
     }
 
     setLoading(false);
   };
-
 
   useEffect(() => {
     fetchReservas();
@@ -125,7 +139,7 @@ function ReservasComponent() {
 
   return (
     <div className="tus-reservas">
-      <h1 className="hero-title">Tus Reservas</h1>
+      <h1 className="hero-title">{idBalneario ? "Reservas de Clientes" : "Tus Reservas"}</h1>
 
       <div className="busqueda-form">
         <div className="input-group date-group">
@@ -175,7 +189,7 @@ function ReservasComponent() {
         <table className="tabla-reservas">
           <thead>
             <tr>
-              <th>Balneario</th>
+              <th>{idBalneario ? "Cliente" : "Balneario"}</th>
               <th>Ubicación</th>
               <th>Entrada</th>
               <th>Salida</th>
@@ -185,10 +199,13 @@ function ReservasComponent() {
           <tbody>
             {reservas.map((reserva) => (
               <tr key={reserva.id_reserva}>
-                <td>{reserva.balnearios?.nombre}</td>
                 <td>
-                  {reserva.ubicaciones?.posicion ||
-                    reserva.ubicaciones?.id_carpa}
+                  {idBalneario && usuarios[reserva.id_usuario]
+                    ? `${usuarios[reserva.id_usuario].nombre} ${usuarios[reserva.id_usuario].apellido}`
+                    : reserva.balnearios?.nombre}
+                </td>
+                <td>
+                  {reserva.ubicaciones?.posicion || reserva.ubicaciones?.id_carpa}
                 </td>
                 <td>{format(new Date(reserva.fecha_inicio), "dd/MM/yyyy")}</td>
                 <td>{format(new Date(reserva.fecha_salida), "dd/MM/yyyy")}</td>
