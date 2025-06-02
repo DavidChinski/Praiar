@@ -1,27 +1,100 @@
-.perfil-container {
-  max-width: 500px;
-  margin: auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+.perfil-wrapper {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 20px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #262626;
 }
 
-.perfil-datos p {
-  font-size: 1.1rem;
-  margin: 0.5rem 0;
+.perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.perfil-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #dbdbdb;
+}
+
+.perfil-info {
+  flex: 1;
+}
+
+.perfil-nombre {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.perfil-botones {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-editar, .btn-logout {
+  padding: 8px 14px;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  background-color: #fafafa;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-editar:hover {
+  background-color: #efefef;
 }
 
 .btn-logout {
-  margin-top: 2rem;
-  padding: 0.5rem 1.2rem;
-  background-color: #c0392b;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  color: #ed4956;
+  border-color: #ed4956;
+  background-color: transparent;
+}
+
+.btn-editar{
+  border-color: #646cff;
 }
 
 .btn-logout:hover {
-  background-color: #e74c3c;
+  background-color: #fff0f0;
+  border-color: #ed4956;
+}
+
+.perfil-datos {
+  border-top: 1px solid #dbdbdb;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.perfil-datos p {
+  margin: 0;
+}
+
+.perfil-datos strong {
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .perfil-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .perfil-botones {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-editar, .btn-logout {
+    width: 100%;
+  }
 }

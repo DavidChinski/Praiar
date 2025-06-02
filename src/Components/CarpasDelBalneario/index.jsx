@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import "./CarpasDelBalneario.css";
+import Carpa from '../../assets/Carpa.png';
 
 function CarpasDelBalneario() {
   const { id } = useParams();
@@ -14,6 +15,8 @@ function CarpasDelBalneario() {
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [dragging, setDragging] = useState(null);
   const [carpaEditando, setCarpaEditando] = useState(null);
+  const [balnearioInfo, setBalnearioInfo] = useState(null);
+  const [Ciudad, setCiudad] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,33 +26,45 @@ function CarpasDelBalneario() {
       if (!user) {
         setUsuarioLogueado(false);
         setLoading(false);
-      } else {
-        setUsuarioLogueado(true);
-        // Buscar el usuario en la tabla usuarios
-        const { data: usuario, error: userError } = await supabase
-          .from("usuarios")
-          .select("*")
-          .eq("auth_id", user.id)
-          .single();
-
-        if (!usuario) {
-          setLoading(false);
-          return;
-        }
-
-        // Verificar si es dueño del balneario
-        const { data: balneario } = await supabase
-          .from("balnearios")
-          .select("id_usuario")
-          .eq("id_balneario", id)
-          .single();
-
-        if (balneario?.id_usuario === usuario.auth_id) {
-          setEsDuenio(true);
-        }
+        return;
       }
 
-      // Obtener carpas
+      setUsuarioLogueado(true);
+
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("*")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (!usuario) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: balnearioData } = await supabase
+        .from("balnearios")
+        .select("*")
+        .eq("id_balneario", id)
+        .single();
+      let ciudadNombre = "";
+      
+      if (balnearioData?.id_ciudad) {
+        const { data: ciudadData } = await supabase
+          .from("ciudades")
+          .select("nombre")
+          .eq("id_ciudad", balnearioData.id_ciudad)
+          .single();
+        ciudadNombre = ciudadData?.nombre || "";
+      }
+      
+      setCiudad(ciudadNombre)
+
+      if (balnearioData?.id_usuario === usuario.auth_id) {
+        setEsDuenio(true);
+      }
+      setBalnearioInfo(balnearioData);
+
       const { data: carpasData } = await supabase
         .from("ubicaciones")
         .select("*")
@@ -60,9 +75,9 @@ function CarpasDelBalneario() {
         x: c.x ?? i * 100,
         y: c.y ?? 0,
       }));
+
       setCarpas(carpasConPos);
 
-      // Obtener elementos
       const { data: elementosData } = await supabase
         .from("elementos_ubicacion")
         .select("*")
@@ -82,6 +97,7 @@ function CarpasDelBalneario() {
       .insert({ id_balneario: id, tipo, x, y })
       .select()
       .single();
+
     if (data) {
       setElementos((prev) => [...prev, data]);
     }
@@ -189,13 +205,24 @@ function CarpasDelBalneario() {
 
   return (
     <div className="carpas-del-balneario">
-      <h2>Carpas del Balneario</h2>
+      <h2>{balnearioInfo.nombre}</h2>
+
+      {balnearioInfo && (
+        <div className="balneario-info">
+          <p><strong>Dirección:</strong> {balnearioInfo.direccion}</p>
+          <p><strong>Ciudad:</strong> {Ciudad}</p>
+          <p><strong>Teléfono:</strong> {balnearioInfo.telefono}</p>
+        </div>
+      )}
 
       {esDuenio && (
-        <div className="toolbar">
-          <button onClick={() => agregarElemento("pasillo")}>Agregar Pasillo</button>
-          <button onClick={() => agregarElemento("pileta")}>Agregar Pileta</button>
-          <button onClick={() => agregarElemento("quincho")}>Agregar Quincho</button>
+        <div className="toolbar-dropdown">
+          <button className="dropdown-toggle">Agregar elemento ▾</button>
+          <div className="dropdown-menu">
+            <button onClick={() => agregarElemento("pasillo")}>Pasillo</button>
+            <button onClick={() => agregarElemento("pileta")}>Pileta</button>
+            <button onClick={() => agregarElemento("quincho")}>Quincho</button>
+          </div>
         </div>
       )}
 
@@ -213,20 +240,26 @@ function CarpasDelBalneario() {
             onMouseDown={() =>
               esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
             }
+            onClick={() => {
+              if (!esDuenio && usuarioLogueado) {
+                navigate(`/reservaubicacion/${carpa.id_carpa}`);
+              }
+            }}
             title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
           >
-            {carpa.posicion}
+            <div className="carpa-posicion">{carpa.posicion}</div>
+            <img
+              src={Carpa}
+              alt={`Carpa ${carpa.posicion}`}
+              className="carpa-imagen"
+            />
             <div className="acciones">
-              {esDuenio ? (
+              {esDuenio && (
                 <>
                   <button onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
                   <button onClick={() => handleEditarCarpa(carpa)}>✏️</button>
                 </>
-              ) : usuarioLogueado ? (
-                <button onClick={() => navigate(`/reservaubicacion/${carpa.id_carpa}`)}>
-                  Reservar
-                </button>
-              ) : null}
+              )}
             </div>
           </div>
         ))}
@@ -248,7 +281,6 @@ function CarpasDelBalneario() {
             title={el.tipo}
           >
             {el.tipo}
-
             {esDuenio && (
               <div className="acciones">
                 <button onClick={() => rotarElemento(el.id_elemento)}>🔄</button>

@@ -11,7 +11,6 @@ function PerfilComponent() {
     if (userData) {
       setUsuario(userData);
     } else {
-      // Si no hay sesión, redirige al login
       navigate('/login');
     }
   }, []);
@@ -21,20 +20,34 @@ function PerfilComponent() {
     navigate('/');
   };
 
-  if (!usuario) return null; // o un loading...
+  const handleEditProfile = () => {
+    navigate('/editar-perfil');
+  };
+
+  if (!usuario) return null;
 
   return (
-    <div className="perfil-container">
-      <h2>Mi Perfil</h2>
+    <div className="perfil-wrapper">
+      <div className="perfil-header">
+        <img
+          src={usuario.imagen}
+          alt="Foto de perfil"
+          className="perfil-avatar"
+        />
+        <div className="perfil-info">
+          <h2 className="perfil-nombre">{usuario.nombre} {usuario.apellido}</h2>
+          <div className="perfil-botones">
+            <button className="btn-editar" onClick={handleEditProfile}>Editar perfil</button>
+            <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
       <div className="perfil-datos">
-        <p><strong>Nombre:</strong> {usuario.nombre}</p>
-        <p><strong>Apellido:</strong> {usuario.apellido}</p>
         <p><strong>Email:</strong> {usuario.email}</p>
         <p><strong>DNI:</strong> {usuario.dni}</p>
         <p><strong>Teléfono:</strong> {usuario.telefono}</p>
         <p><strong>Propietario:</strong> {usuario.esPropietario ? 'Sí' : 'No'}</p>
       </div>
-      <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
     </div>
   );
 }

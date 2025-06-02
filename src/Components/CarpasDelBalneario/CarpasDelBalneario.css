@@ -9,7 +9,6 @@
   width: 90%;
   height: 500px;
   margin: auto;
-  background-color: #dfe3e6;
   border-radius: 12px;
   border: 1px solid #aaa;
   overflow: hidden;
@@ -27,18 +26,16 @@
 }
 
 .carpa {
-  width: 60px;
-  height: 60px;
-  background: #add8e6;
-  border: 2px solid #004a70;
-  border-radius: 8px;
   position: absolute;
-  font-weight: bold;
+  width: 80px;
+  height: 80px;
   cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  border: none;
+  background: none;
+  padding: 0;
 }
 
 .carpa:hover {
@@ -49,6 +46,15 @@
   background-color: #ffa8a8;
 }
 
+.carpa.reservada .carpa-imagen {
+  filter: grayscale(100%) brightness(0.7);
+}
+
+.carpa-imagen {
+  width: 100%;
+  height: auto;
+  pointer-events: none; /* para que no interfiera con el drag */
+}
 .elemento {
   position: absolute;
   padding: 10px 16px;
@@ -80,6 +86,7 @@
   flex-direction: column;
   gap: 2px;
 }
+
 
 .carpa .acciones button,
 .elemento .acciones button {
@@ -169,3 +176,58 @@
   opacity: 1;
 }
 
+.toolbar-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.dropdown-toggle {
+  padding: 8px 16px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  z-index: 1;
+  margin-top: 5px;
+  min-width: 150px;
+}
+
+.toolbar-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f0f0;
+}
+.carpa-posicion {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  background: white;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+}

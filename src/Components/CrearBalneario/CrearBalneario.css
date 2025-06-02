@@ -30,7 +30,7 @@
 .formulario {
   display: flex;
   flex-direction: row;
-  gap: 10rem;
+  gap: 7.5rem;
   flex-wrap: wrap;
 }
 
