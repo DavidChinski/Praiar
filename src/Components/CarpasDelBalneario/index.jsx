@@ -23,8 +23,7 @@ function CarpasDelBalneario() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setUsuarioLogueado(false);
         setLoading(false);
@@ -33,7 +32,7 @@ function CarpasDelBalneario() {
 
       setUsuarioLogueado(true);
 
-      const { data: usuario, error: userError } = await supabase
+      const { data: usuario } = await supabase
         .from("usuarios")
         .select("*")
         .eq("auth_id", user.id)
@@ -49,8 +48,8 @@ function CarpasDelBalneario() {
         .select("*")
         .eq("id_balneario", id)
         .single();
+
       let ciudadNombre = "";
-      
       if (balnearioData?.id_ciudad) {
         const { data: ciudadData } = await supabase
           .from("ciudades")
@@ -59,13 +58,29 @@ function CarpasDelBalneario() {
           .single();
         ciudadNombre = ciudadData?.nombre || "";
       }
-      
-      setCiudad(ciudadNombre)
+      setCiudad(ciudadNombre);
+
+      // 🔄 Obtener servicios
+      const { data: relaciones } = await supabase
+        .from("balnearios_servicios")
+        .select("id_servicio")
+        .eq("id_balneario", id);
+
+
+      const idsServicios = relaciones?.map(r => r.id_servicio) || [];
+
+      const { data: servicios } = await supabase
+        .from("servicios")
+        .select("id_servicio, nombre")
+        .in("id_servicio", idsServicios);
+
 
       if (balnearioData?.id_usuario === usuario.auth_id) {
         setEsDuenio(true);
       }
-      setBalnearioInfo(balnearioData);
+
+      // 🔄 Guardamos balneario con servicios incluidos
+      setBalnearioInfo({ ...balnearioData, servicios });
 
       const { data: carpasData } = await supabase
         .from("ubicaciones")
@@ -77,7 +92,6 @@ function CarpasDelBalneario() {
         x: c.x ?? i * 100,
         y: c.y ?? 0,
       }));
-
       setCarpas(carpasConPos);
 
       const { data: elementosData } = await supabase
@@ -91,6 +105,7 @@ function CarpasDelBalneario() {
 
     fetchData();
   }, [id]);
+
 
   async function agregarElemento(tipo) {
     const x = 100, y = 100;
@@ -216,6 +231,18 @@ function CarpasDelBalneario() {
           <p><strong>Teléfono:</strong> {balnearioInfo.telefono}</p>
         </div>
       )}
+      {balnearioInfo?.servicios?.length > 0 ? (
+        <div className="iconos-servicios">
+          {balnearioInfo.servicios.map((servicio) => (
+            <div key={servicio.id_servicio} className="servicio-icono">
+              <span>{servicio.nombre}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No hay servicios cargados para este balneario.</p>
+      )}
+
 
       {esDuenio && (
         <div className="toolbar-dropdown">
