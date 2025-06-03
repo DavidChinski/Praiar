@@ -19,6 +19,9 @@ function CarpasDelBalneario() {
   const [carpaEditando, setCarpaEditando] = useState(null);
   const [balnearioInfo, setBalnearioInfo] = useState(null);
   const [Ciudad, setCiudad] = useState(null);
+  const [mostrarModalServicios, setMostrarModalServicios] = useState(false);
+  const [todosLosServicios, setTodosLosServicios] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,6 +63,12 @@ function CarpasDelBalneario() {
       }
       setCiudad(ciudadNombre);
 
+      const { data: todos } = await supabase
+      .from("servicios")
+      .select("id_servicio, nombre, imagen");
+    setTodosLosServicios(todos || []);
+
+
       // 🔄 Obtener servicios
       const { data: relaciones } = await supabase
         .from("balnearios_servicios")
@@ -71,9 +80,9 @@ function CarpasDelBalneario() {
 
       const { data: servicios } = await supabase
         .from("servicios")
-        .select("id_servicio, nombre")
+        .select("id_servicio, nombre, imagen")
         .in("id_servicio", idsServicios);
-
+      
 
       if (balnearioData?.id_usuario === usuario.auth_id) {
         setEsDuenio(true);
@@ -105,6 +114,33 @@ function CarpasDelBalneario() {
 
     fetchData();
   }, [id]);
+
+  async function toggleServicio(servicioId, tiene) {
+    if (tiene) {
+      await supabase
+      .from("balnearios_servicios")
+      .delete()
+      .match({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+    } else {
+      await supabase
+      .from("balnearios_servicios")
+      .insert({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+    }
+
+    // Volver a cargar servicios actualizados
+    const { data: relacionesActualizadas } = await supabase
+      .from("balnearios_servicios")
+      .select("id_servicio")
+      .eq("id_balneario", id);
+    const idsServicios = relacionesActualizadas?.map(r => r.id_servicio) || [];
+
+    const { data: serviciosActualizados } = await supabase
+      .from("servicios")
+      .select("id_servicio, nombre, imagen")
+      .in("id_servicio", idsServicios);
+
+    setBalnearioInfo(prev => ({ ...prev, servicios: serviciosActualizados }));
+  }
 
 
   async function agregarElemento(tipo) {
@@ -233,15 +269,56 @@ function CarpasDelBalneario() {
       )}
       {balnearioInfo?.servicios?.length > 0 ? (
         <div className="iconos-servicios">
-          {balnearioInfo.servicios.map((servicio) => (
-            <div key={servicio.id_servicio} className="servicio-icono">
-              <span>{servicio.nombre}</span>
-            </div>
-          ))}
+          <h3>Servicios</h3>
+          <div className="servicios-lista">
+            {balnearioInfo.servicios.map((servicio) => (
+              <div key={servicio.id_servicio} className="servicio-icono">
+                <img src={servicio.imagen} className="icono-imagen" />
+                <span>{servicio.nombre}</span>
+              </div>
+            ))}
+            {esDuenio && (
+              <button
+                className="boton-agregar-servicio"
+                onClick={() => setMostrarModalServicios(true)}
+              >
+                Agrega un Servicio
+              </button>
+
+            )}
+            {mostrarModalServicios && (
+              <div className="modal-servicios">
+                <div className="modal-content-servicios">
+                  <h3>Editar Servicios del Balneario</h3>
+                  <div className="servicios-lista">
+                    {todosLosServicios.map(serv => {
+                      const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
+                      return (
+                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
+                          <img src={serv.imagen} className="icono-imagen" />
+                          <span>{serv.nombre}</span>
+                          <button
+                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
+                          >
+                            {tieneServicio ? "Quitar" : "Agregar"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="modal-buttons-servicios">
+                    <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
       ) : (
         <p>No hay servicios cargados para este balneario.</p>
       )}
+
 
 
       {esDuenio && (

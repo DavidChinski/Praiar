@@ -1,5 +1,4 @@
 .carpas-del-balneario {
-  text-align: center;
   padding: 2rem;
   font-family: sans-serif;
 }
@@ -230,4 +229,97 @@
   border-radius: 4px;
   font-size: 12px;
   border: 1px solid #ccc;
+}
+.servicios-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: left;
+}
+
+.servicio-icono {
+  display: flex;
+  align-items: left;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.icono-imagen {
+  width: 30px;
+  height: 30px;
+  object-fit: contain; /* o 'cover', según el diseño que prefieras */
+  border-radius: 4px; /* opcional: bordes redondeados */
+}
+
+
+.boton-agregar-servicio {
+  background-color: #004A68;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+}
+
+.boton-agregar-servicio:hover {
+  background-color: #003F5E;
+}
+
+.modal-servicios {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content-servicios {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.servicios-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.servicio-icono {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid transparent;
+  padding: 0.5rem;
+  border-radius: 8px;
+  width: 120px;
+  text-align: center;
+}
+
+.servicio-icono.activo {
+  border-color: #007bff;
+  background: #e9f2ff;
+}
+
+.icono-imagen {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.modal-buttons-servicios {
+  margin-top: 1rem;
+  text-align: right;
 }
