@@ -171,9 +171,20 @@ function RegistrarComponent() {
             </div>
 
             <div className="form-group">
-              <label className="subtitulo">Imagen de perfil</label>
-              <input type="file" accept="image/*" onChange={(e) => setImagenFile(e.target.files[0])} />
+              <label htmlFor="imagen" className="custom-file-upload subtitulo">
+                Subir imagen
+              </label>
+              <input
+                type="file"
+                id="imagen"
+                accept="image/*"
+                onChange={(e) => setImagenFile(e.target.files[0])}
+                style={{ display: 'none' }}
+              />
+              {imagenFile && <p className="archivo-nombre">Archivo: {imagenFile.name}</p>}
             </div>
+
+
 
             <div className="form-group checkbox-group">
               <label htmlFor="esPropietario" className="checkbox-label subtitulo">

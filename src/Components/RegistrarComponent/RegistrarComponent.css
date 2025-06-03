@@ -202,3 +202,24 @@ button {
   font-size: 24px;
   transition: transform 0.2s;
 }
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 2px solid #003F5E;
+  background-color: #B0DBE7;
+  color: #003F5E;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #A0CAD8;
+}
+.archivo-nombre {
+  font-size: 14px;
+  color: #003F5E;
+  margin-top: 6px;
+}
