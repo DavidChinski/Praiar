@@ -117,6 +117,10 @@
   background-color: #fcfaf4;
   border: 2px solid #b9d4e4
 }
+.perfil-img {
+  background-color: transparent !important;
+  border: none !important;
+}
 
 .auth-buttons button a {
   text-decoration: none;
@@ -150,6 +154,12 @@
 
 .spacer-general {
   height: 80px;
+}
+
+img{
+  width: 60px;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Responsive si querés que cambie en móviles también */
@@ -252,3 +262,4 @@
     border: 2px solid #b9d4e4;
   }
 }
+

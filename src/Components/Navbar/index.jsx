@@ -2,6 +2,8 @@ import './Navbar.css';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
+import PerfilNab from '../../assets/PerfilNab.png';
+
 import { supabase } from '../../supabaseClient';
 
 function NavLinks({ usuario }) {
@@ -35,8 +37,8 @@ function AuthButtons({ usuario, handleLogout }) {
   if (usuario) {
     return (
       <>
-        <button className="login">
-          <Link to="/perfil">Mi Cuenta</Link>
+        <button className="perfil-img">
+          <Link to="/perfil"><img src={PerfilNab} alt=""/></Link>
         </button>
         <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
           Cerrar sesión
