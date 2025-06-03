@@ -17,6 +17,7 @@ function RegistrarComponent() {
     esPropietario: false,
   });
 
+  const [imagenFile, setImagenFile] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -46,7 +47,7 @@ function RegistrarComponent() {
       return;
     }
 
-    // Paso 2: Obtener el usuario autenticado (esperar a que la sesión esté activa)
+    // Paso 2: Obtener el usuario autenticado
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     const userId = userData?.user?.id;
@@ -58,7 +59,34 @@ function RegistrarComponent() {
       return;
     }
 
-    // Paso 3: Insertar en la tabla 'usuarios'
+    // Paso 3: Subir imagen al bucket 'usuarios'
+    let imageUrl = null;
+
+    if (imagenFile) {
+      const fileExt = imagenFile.name.split('.').pop();
+      const fileName = `${userId}.${fileExt}`;
+      const filePath = fileName;
+
+      const { error: uploadError } = await supabase.storage
+        .from('usuarios')
+        .upload(filePath, imagenFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Error al subir imagen:', uploadError.message);
+        setErrorMsg('Error al subir imagen de perfil.');
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('usuarios')
+        .getPublicUrl(filePath);
+
+      imageUrl = publicUrlData.publicUrl;
+    }
+    // Paso 4: Insertar en tabla 'usuarios'
     const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
       .insert([{
@@ -68,7 +96,8 @@ function RegistrarComponent() {
         email: userEmail,
         telefono: perfilData.telefono,
         esPropietario: perfilData.esPropietario,
-        dni: perfilData.dni
+        dni: perfilData.dni,
+        imagen: imageUrl
       }])
       .select()
       .single();
@@ -83,7 +112,6 @@ function RegistrarComponent() {
     setSuccessMsg('Usuario registrado correctamente.');
     navigate('/');
   };
-
 
   return (
     <div className="registrar-background">
@@ -140,6 +168,11 @@ function RegistrarComponent() {
                 <label className="subtitulo">DNI</label>
                 <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="subtitulo">Imagen de perfil</label>
+              <input type="file" accept="image/*" onChange={(e) => setImagenFile(e.target.files[0])} />
             </div>
 
             <div className="form-group checkbox-group">
