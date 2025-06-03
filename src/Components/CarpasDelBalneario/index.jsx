@@ -267,57 +267,61 @@ function CarpasDelBalneario() {
           <p><strong>Teléfono:</strong> {balnearioInfo.telefono}</p>
         </div>
       )}
-      {balnearioInfo?.servicios?.length > 0 ? (
-        <div className="iconos-servicios">
-          <h3>Servicios</h3>
-          <div className="servicios-lista">
-            {balnearioInfo.servicios.map((servicio) => (
-              <div key={servicio.id_servicio} className="servicio-icono">
-                <img src={servicio.imagen} className="icono-imagen" />
-                <span>{servicio.nombre}</span>
-              </div>
-            ))}
-            {esDuenio && (
-              <button
-                className="boton-agregar-servicio"
-                onClick={() => setMostrarModalServicios(true)}
-              >
-                Agrega un Servicio
-              </button>
+      <div className="iconos-servicios">
+  <h3>Servicios</h3>
 
-            )}
-            {mostrarModalServicios && (
-              <div className="modal-servicios">
-                <div className="modal-content-servicios">
-                  <h3>Editar Servicios del Balneario</h3>
-                  <div className="servicios-lista">
-                    {todosLosServicios.map(serv => {
-                      const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
-                      return (
-                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
-                          <img src={serv.imagen} className="icono-imagen" />
-                          <span>{serv.nombre}</span>
-                          <button
-                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
-                          >
-                            {tieneServicio ? "Quitar" : "Agregar"}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="modal-buttons-servicios">
-                    <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
-                  </div>
-                </div>
-              </div>
-            )}
+  {balnearioInfo?.servicios?.length > 0 ? (
+    <div className="servicios-lista">
+      {balnearioInfo.servicios.map((servicio) => (
+        <div key={servicio.id_servicio} className="servicio-icono">
+          <img src={servicio.imagen} className="icono-imagen" />
+          <span>{servicio.nombre}</span>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p>No hay servicios cargados para este balneario.</p>
+  )}
 
+  {esDuenio && (
+    <>
+      <button
+        className="boton-agregar-servicio"
+        onClick={() => setMostrarModalServicios(true)}
+      >
+        Agrega un Servicio
+      </button>
+
+      {mostrarModalServicios && (
+        <div className="modal-servicios">
+          <div className="modal-content-servicios">
+            <h3>Editar Servicios del Balneario</h3>
+            <div className="servicios-lista">
+              {todosLosServicios.map(serv => {
+                const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
+                return (
+                  <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
+                    <img src={serv.imagen} className="icono-imagen" />
+                    <span>{serv.nombre}</span>
+                    <button
+                      onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
+                    >
+                      {tieneServicio ? "Quitar" : "Agregar"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="modal-buttons-servicios">
+              <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
+            </div>
           </div>
         </div>
-      ) : (
-        <p>No hay servicios cargados para este balneario.</p>
       )}
+    </>
+  )}
+</div>
+
 
 
 
