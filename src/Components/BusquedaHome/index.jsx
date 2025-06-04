@@ -80,7 +80,7 @@ function BusquedaHome() {
       <div className="hero">
         <div className="hero-darken"></div>
         <div className="overlay">
-          <h1 className="hero-title">Encontrá tu próximo lugar en la playa</h1>
+          <h1 className="titulo-busqueda">Encontrá tu próximo lugar en la playa</h1>
           <div className="busqueda-form">
 
             {/* Localidades */}

@@ -38,8 +38,8 @@
   z-index: 1;
 }
 
-.hero-title {
-  color: white !important;
+.titulo-busqueda {
+  color: white;
   font-size: 3rem !important;
   font-weight: 500 !important;
   margin-bottom: 2rem !important;
