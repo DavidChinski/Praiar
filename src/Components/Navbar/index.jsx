@@ -38,7 +38,7 @@ function AuthButtons({ usuario, handleLogout }) {
     return (
       <>
         <button className="perfil-img">
-          <Link to="/perfil"><img src={PerfilNab} alt=""/></Link>
+          <Link to="/perfil"><img src={PerfilNab} alt="" style={{width: '60px', height: 'auto', objectFit: 'contain'}}/></Link>
         </button>
         <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
           Cerrar sesión

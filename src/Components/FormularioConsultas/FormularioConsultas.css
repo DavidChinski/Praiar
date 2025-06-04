@@ -24,6 +24,7 @@
   max-width: 960px;   /* más estrecho */
   margin: 0 auto;
   text-align: center; /* Centra texto dentro del formulario */
+  min-height: 0 !important;
 }
 
 /* FORMULARIO Y CAMPOS EN COLUMNA CENTRADA */

@@ -156,11 +156,6 @@
   height: 80px;
 }
 
-img{
-  width: 60px;
-  height: auto;
-  object-fit: contain;
-}
 
 /* Responsive si querés que cambie en móviles también */
 @media (max-width: 1005px) {

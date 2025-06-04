@@ -61,22 +61,24 @@ function ReservaComponent() {
 
     const id_balneario = ubicacionInfo?.id_balneario;
 
-    // Verificar reservas existentes que se solapen
+    // Verificar reservas existentes para esa ubicación y balneario
     const { data: reservasExistentes, error: reservasError } = await supabase
       .from("reservas")
       .select("*")
       .eq("id_ubicacion", id_ubicacion)
-      .eq("id_balneario", id_balneario)
-      .lte("fecha_inicio", fechaSalida)
-      .gte("fecha_salida", fechaInicio);
-
+      .eq("id_balneario", id_balneario);
 
     if (reservasError) {
       setError("Error verificando reservas.");
       return;
     }
 
-    if (reservasExistentes.length > 0) {
+    // Validar solapamiento de fechas
+    const conflicto = reservasExistentes.some(r =>
+      fechaInicio <= r.fecha_salida && fechaSalida >= r.fecha_inicio
+    );
+
+    if (conflicto) {
       setError("Ya hay una reserva para esas fechas.");
       return;
     }
@@ -95,7 +97,7 @@ function ReservaComponent() {
       setError("Error al realizar la reserva.");
     } else {
       setExito("Reserva realizada con éxito.");
-      setTimeout(() => navigate("/tusreservas"), 2000);
+      setTimeout(() => navigate("/tusreservas/null"), 2000);
     }
   };
 
