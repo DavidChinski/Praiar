@@ -268,73 +268,75 @@ function CarpasDelBalneario() {
         </div>
       )}
       <div className="iconos-servicios">
-  <h3>Servicios</h3>
+        <h3>Servicios</h3>
 
-  {balnearioInfo?.servicios?.length > 0 ? (
-    <div className="servicios-lista">
-      {balnearioInfo.servicios.map((servicio) => (
-        <div key={servicio.id_servicio} className="servicio-icono">
-          <img src={servicio.imagen} className="icono-imagen" />
-          <span>{servicio.nombre}</span>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p>No hay servicios cargados para este balneario.</p>
-  )}
-
-  {esDuenio && (
-    <>
-      <button
-        className="boton-agregar-servicio"
-        onClick={() => setMostrarModalServicios(true)}
-      >
-        Agrega un Servicio
-      </button>
-
-      {mostrarModalServicios && (
-        <div className="modal-servicios">
-          <div className="modal-content-servicios">
-            <h3>Editar Servicios del Balneario</h3>
-            <div className="servicios-lista">
-              {todosLosServicios.map(serv => {
-                const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
-                return (
-                  <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
-                    <img src={serv.imagen} className="icono-imagen" />
-                    <span>{serv.nombre}</span>
-                    <button
-                      onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
-                    >
-                      {tieneServicio ? "Quitar" : "Agregar"}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="modal-buttons-servicios">
-              <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
-            </div>
+        {balnearioInfo?.servicios?.length > 0 ? (
+          <div className="servicios-lista">
+            {balnearioInfo.servicios.map((servicio) => (
+              <div key={servicio.id_servicio} className="servicio-icono">
+                <img src={servicio.imagen} className="icono-imagen" />
+                <span>{servicio.nombre}</span>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-    </>
-  )}
-</div>
+        ) : (
+          <p>No hay servicios cargados para este balneario.</p>
+        )}
+
+        {esDuenio && (
+          <>
+            <button
+              className="boton-agregar-servicio"
+              onClick={() => setMostrarModalServicios(true)}
+            >
+              Agrega un Servicio
+            </button>
+
+            {mostrarModalServicios && (
+              <div className="modal-servicios">
+                <div className="modal-content-servicios">
+                  <h3>Editar Servicios del Balneario</h3>
+                  <div className="servicios-lista">
+                    {todosLosServicios.map(serv => {
+                      const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
+                      return (
+                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
+                          <img src={serv.imagen} className="icono-imagen" />
+                          <span>{serv.nombre}</span>
+                          <button
+                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
+                          >
+                            {tieneServicio ? "Quitar" : "Agregar"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="modal-buttons-servicios">
+                    <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+    </div>
 
 
 
 
       {esDuenio && (
-        <div className="toolbar-dropdown">
-          <button className="dropdown-toggle">Agregar elemento ▾</button>
-          <div className="dropdown-menu">
-            <button onClick={() => agregarElemento("pasillo")}>Pasillo</button>
-            <button onClick={() => agregarElemento("pileta")}>Pileta</button>
-            <button onClick={() => agregarElemento("quincho")}>Quincho</button>
+        <>
+          <div className="toolbar-dropdown">
+            <button className="dropdown-toggle">Agregar elemento ▾</button>
+            <div className="dropdown-menu">
+              <button onClick={() => agregarElemento("pasillo")}>Pasillo</button>
+              <button onClick={() => agregarElemento("pileta")}>Pileta</button>
+              <button onClick={() => agregarElemento("quincho")}>Quincho</button>
+            </div>
           </div>
           <Link to={`/tusreservas/${balnearioInfo.id_balneario}`}>Tus Reservas</Link>
-        </div>
+        </>
       )}
 
       <div

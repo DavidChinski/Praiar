@@ -146,8 +146,8 @@ h2 {
 .ver-mas-circular:hover,
 .ver-mas-circular:focus,
 .ver-mas-circular:active {
-  background-color: #003F5E; /* entorno */
-  color: #002537; /* flecha */
+  background-color: #20536d; /* entorno */
+  color: #3b708a; /* flecha */
   transform: scale(1.05);
 }
 

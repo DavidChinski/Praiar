@@ -1,8 +1,8 @@
 /* ---------- Fondo y título ---------- */ 
 .tus-reservas {
-  min-height: 80vh;
+  min-height: 40vh;
   font-family: 'El Messiri', sans-serif;
-  padding: 0.5rem 6vw;
+  padding: 2.5rem 6vw;
   max-width: 960px;
   margin: 0 auto;
 }

@@ -17,7 +17,7 @@ function BanerTusBalnearios() {
       <img src={BannerImage} alt="Fondo Hero" className="hero-background" />
       <div className="hero-darken"></div>
       <div className="overlay">
-        <h1 className="hero-title">Praiar</h1>
+        <h1 className="titulo-banner">Praiar</h1>
         <h3 className="hero-subtitle">Donde tus balnearios crecen</h3>
         <button className="flecha-abajo" onClick={scrollToSection}>
           <FaChevronDown />
