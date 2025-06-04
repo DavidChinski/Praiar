@@ -11,6 +11,8 @@ import TusBalnearios from "./Pages/TusBalnearios";
 import TusReservas from "./Pages/TusReservas";
 import VistaBalneario from "./Pages/VistaBalneario";
 import Reserva from "./Pages/Reserva";
+import ProtectedRoute from "./components/ProtectedRoute"; // nuevo import
+
 function App() {
   return (
     <Router>
@@ -20,12 +22,24 @@ function App() {
           <Route path="/ciudades" element={<Ciudades />} /> 
           <Route path="/nosotros" element={<Contactanos />} /> 
           <Route path="/login" element={<Login />} /> 
-          <Route path="/perfil" element={<Perfil />} /> 
           <Route path="/registrar" element={<Registrar />} /> 
-          <Route path="/tusbalnearios" element={<TusBalnearios />} /> 
-          <Route path="/tusreservas/:id" element={<TusReservas />} /> 
-          <Route path="/balneario/:id" element={<VistaBalneario />} />
-          <Route path="/reservaubicacion/:id" element={<Reserva />} /> 
+
+          {/* Rutas protegidas */}
+          <Route path="/perfil" element={
+            <ProtectedRoute><Perfil /></ProtectedRoute>
+          } />
+          <Route path="/tusbalnearios" element={
+            <ProtectedRoute><TusBalnearios /></ProtectedRoute>
+          } />
+          <Route path="/tusreservas/:id" element={
+            <ProtectedRoute><TusReservas /></ProtectedRoute>
+          } />
+          <Route path="/balneario/:id" element={
+            <ProtectedRoute><VistaBalneario /></ProtectedRoute>
+          } />
+          <Route path="/reservaubicacion/:id" element={
+            <ProtectedRoute><Reserva /></ProtectedRoute>
+          } />
         </Routes>
       </div>
     </Router>
