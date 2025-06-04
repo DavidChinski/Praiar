@@ -137,7 +137,7 @@ function BusquedaHome() {
               />
               <div className="input-wrapper">
                 <label className='subtitulo'>Fecha</label>
-                <div className="date-summary input-estandar">
+                <div className="date-summary input-estandar" onClick={() => setShowCalendario(!showCalendario)}>
                   {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
                 </div>
                 {showCalendario && (

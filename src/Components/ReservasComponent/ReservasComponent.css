@@ -8,7 +8,7 @@
 }
 
 .hero-title {
-  color: #003f5e;
+  color: #003f5e !important;
   font-size: 2.5rem;
   font-weight: 600;
   text-align: center;
@@ -166,7 +166,7 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 768px) {
+@media (max-width: 1005px) {
   .busqueda-form {
     flex-direction: column;
     align-items: stretch;
