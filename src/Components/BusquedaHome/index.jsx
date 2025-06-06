@@ -79,7 +79,15 @@ function BusquedaHome() {
   return (
     <div className="busqueda-home">
       <div className="hero">
-        <video src={VideoBanner}></video>
+        <video
+          src={VideoBanner}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="video-background"
+        />
+
         <div className="hero-darken"></div>
         <div className="overlay">
           <h1 className="titulo-busqueda">Encontrá tu próximo lugar en la playa</h1>
