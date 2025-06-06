@@ -1,6 +1,7 @@
 import './BanerContactos.css';
 import BannerImage from '../../assets/ImagenBusquedaHome.png';
 import { FaChevronDown } from 'react-icons/fa';
+import VideoBanner from '../../assets/VideoBusqueda.mp4';
 
 function BanerContactos() {
   const scrollToSection = () => {
@@ -14,10 +15,17 @@ function BanerContactos() {
 
   return (
     <div className="hero-container">
-      <img src={BannerImage} alt="Fondo Hero" className="hero-background" />
+      <video
+        src={VideoBanner}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="video-background"
+      />
       <div className="hero-darken"></div>
       <div className="overlay">
-        <h1 className="hero-title">Praiar</h1>
+        <h1 className="hero-titulo-banner">Praiar</h1>
         <h3 className="hero-subtitle">Más que una simple página de reservas</h3>
         <button className="flecha-abajo" onClick={scrollToSection}>
           <FaChevronDown />

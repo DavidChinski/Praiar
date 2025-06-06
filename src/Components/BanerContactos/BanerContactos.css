@@ -42,7 +42,7 @@
   z-index: 2;
 }
 
-.hero-title {
+.hero-titulo-banner {
   color: white;
   font-size: 3rem;
   font-weight: 500;
@@ -58,6 +58,18 @@
   text-align: center;
   font-family: "El Messiri", sans-serif;
 }
+
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none; /* evita que el video bloquee clics */
+}
+
 
 .flecha-abajo {
   margin-top: 1.5rem;
