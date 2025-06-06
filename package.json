@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
     "date-fns": "^4.1.0",
+    "intl-tel-input": "^25.3.1",
     "react": "^19.1.0",
     "react-date-range": "^2.0.1",
     "react-dom": "^19.1.0",

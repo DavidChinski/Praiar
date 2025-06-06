@@ -223,3 +223,24 @@ button {
   color: #003F5E;
   margin-top: 6px;
 }
+
+
+.telefono-wrapper {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.telefono-wrapper select {
+  padding: 12px;
+  border: 2px solid #003F5E;
+  border-radius: 10px;
+  background-color: white;
+  font-size: 14px;
+  color: black;
+  height: 100%;
+}
+
+.dni-reducido input {
+  max-width: 160px; /* achica el ancho del input DNI */
+}

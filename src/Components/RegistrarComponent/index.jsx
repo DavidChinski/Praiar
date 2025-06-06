@@ -20,6 +20,7 @@ function RegistrarComponent() {
   const [imagenFile, setImagenFile] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [codigoPais, setCodigoPais] = useState('+54');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,7 +37,6 @@ function RegistrarComponent() {
 
     const { email, contraseña, ...perfilData } = formData;
 
-    // Paso 1: Crear cuenta en Supabase Auth
     const { error: signUpError } = await supabase.auth.signUp({
       email: email,
       password: contraseña,
@@ -47,19 +47,16 @@ function RegistrarComponent() {
       return;
     }
 
-    // Paso 2: Obtener el usuario autenticado
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     const userId = userData?.user?.id;
     const userEmail = userData?.user?.email;
 
     if (!userId || userError) {
-      console.error('Usuario no autenticado:', userError);
       setErrorMsg('No se pudo autenticar al usuario.');
       return;
     }
 
-    // Paso 3: Subir imagen al bucket 'usuarios'
     let imageUrl = null;
 
     if (imagenFile) {
@@ -71,11 +68,10 @@ function RegistrarComponent() {
         .from('usuarios')
         .upload(filePath, imagenFile, {
           cacheControl: '3600',
-          upsert: true
+          upsert: true,
         });
 
       if (uploadError) {
-        console.error('Error al subir imagen:', uploadError.message);
         setErrorMsg('Error al subir imagen de perfil.');
         return;
       }
@@ -86,24 +82,25 @@ function RegistrarComponent() {
 
       imageUrl = publicUrlData.publicUrl;
     }
-    // Paso 4: Insertar en tabla 'usuarios'
+
     const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
-      .insert([{
-        auth_id: userId,
-        nombre: perfilData.nombre,
-        apellido: perfilData.apellido,
-        email: userEmail,
-        telefono: perfilData.telefono,
-        esPropietario: perfilData.esPropietario,
-        dni: perfilData.dni,
-        imagen: imageUrl
-      }])
+      .insert([
+        {
+          auth_id: userId,
+          nombre: perfilData.nombre,
+          apellido: perfilData.apellido,
+          email: userEmail,
+          telefono: codigoPais + perfilData.telefono,
+          esPropietario: perfilData.esPropietario,
+          dni: perfilData.dni,
+          imagen: imageUrl,
+        },
+      ])
       .select()
       .single();
 
     if (insertError) {
-      console.error('Insert Error:', insertError);
       setErrorMsg('Error al guardar los datos del usuario: ' + insertError.message);
       return;
     }
@@ -160,13 +157,31 @@ function RegistrarComponent() {
             </div>
 
             <div className="input-row">
-              <div className="form-group">
+              <div className="form-group telefono-group">
                 <label className="subtitulo">Teléfono</label>
-                <input type="number" name="telefono" value={formData.telefono} onChange={handleChange} required />
+                <div className="telefono-wrapper">
+                  <select value={codigoPais} onChange={(e) => setCodigoPais(e.target.value)}>
+                    <option value="+54">🇦🇷 +54</option>
+                  </select>
+                  <input
+                    type="number"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-group">
+
+              <div className="form-group dni-reducido">
                 <label className="subtitulo">DNI</label>
-                <input type="number" name="dni" value={formData.dni} onChange={handleChange} required />
+                <input
+                  type="number"
+                  name="dni"
+                  value={formData.dni}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
@@ -183,8 +198,6 @@ function RegistrarComponent() {
               />
               {imagenFile && <p className="archivo-nombre">Archivo: {imagenFile.name}</p>}
             </div>
-
-
 
             <div className="form-group checkbox-group">
               <label htmlFor="esPropietario" className="checkbox-label subtitulo">
