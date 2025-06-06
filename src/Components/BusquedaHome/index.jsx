@@ -10,7 +10,7 @@ import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
 import LocalizacionBusquedaHome from '../../assets/LocalizacionBusquedaHome.png';
 import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
 import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
-import VideoBanner from '.../assets/praiar-banner-index - Hecho con ClipChamp.mp4';
+import VideoBanner from '../../assets/VideoBusqueda.mp4';
 
 function BusquedaHome() {
   const [ciudades, setCiudades] = useState([]);
