@@ -1,0 +1,100 @@
+.balnearios-container {
+  padding: 0.5rem 6vw;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.card-grid-balnearios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px; /* mayor separación entre cards */
+  margin-top: 24px;
+}
+
+.card-detalle {
+  width: 100%;
+  max-width: 320px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid #007b99;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  position: relative;
+  padding: 0;
+}
+
+.card-detalle:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-detalle img {
+  width: 100%;
+  height: 160px; /* fija la altura de la imagen */
+  object-fit: cover; /* recorta y ajusta */
+  display: block;
+}
+
+.detalle-card {
+  font-family: Arial, sans-serif;
+  padding: 16px;
+}
+
+.info-contenido {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.info-izquierda h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #003F5E;
+  font-weight: 600;
+}
+
+.info-izquierda p {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  color: #444;
+  font-weight: 400;
+}
+
+.iconoCard {
+  width: 20px !important;
+  height: auto !important;
+  margin-right: 8px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+.mirar-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: linear-gradient(90deg, #007b99, #00b4d8);
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.mirar-btn:hover {
+  background: linear-gradient(90deg, #003F5E, #007b99);
+  transform: scale(1.05);
+}
+h1{
+  font-family: "El Messiri";
+}

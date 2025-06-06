@@ -11,8 +11,8 @@ import TusBalnearios from "./Pages/TusBalnearios";
 import TusReservas from "./Pages/TusReservas";
 import VistaBalneario from "./Pages/VistaBalneario";
 import Reserva from "./Pages/Reserva";
-import ProtectedRoute from "./components/ProtectedRoute"; // nuevo import
-
+import ProtectedRoute from "./Components/ProtectedRoute"; // nuevo import
+import BalneariosPorCiudad from "./Components/BalneariosPorCiudad";
 function App() {
   return (
     <Router>
@@ -23,6 +23,7 @@ function App() {
           <Route path="/nosotros" element={<Contactanos />} /> 
           <Route path="/login" element={<Login />} /> 
           <Route path="/registrar" element={<Registrar />} /> 
+          <Route path="/ciudades/:idCiudad/balnearios" element={<BalneariosPorCiudad />} />
 
           {/* Rutas protegidas */}
           <Route path="/perfil" element={

@@ -3,8 +3,8 @@ import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
 import './Ciudades.css';
-import Mapa from '../../assets/LocalizacionBusquedaHome.png'
-import Carpa from '../../assets/Carpa.png'
+import Mapa from '../../assets/LocalizacionBusquedaHome.png';
+import Carpa from '../../assets/Carpa.png';
 
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
@@ -48,7 +48,6 @@ function Ciudades() {
     fetchCiudadesConBalnearios();
   }, [isPaginaCiudades]);
 
-
   const abrirMapa = (nombreCiudad) => {
     setCiudadConMapa(nombreCiudad);
   };
@@ -63,7 +62,7 @@ function Ciudades() {
       <div className="card-grid">
         {ciudades.map((ciudad) => (
           <div key={ciudad.id_ciudad} className={`ciudad-card ${isPaginaCiudades ? 'card-detalle' : ''}`}>
-            <img src={Logo} alt={ciudad.nombre} className={`imgCiudad ${isPaginaCiudades ? 'imgCiudades-margin' : ''}`}  />
+            <img src={Logo} alt={ciudad.nombre} className={`imgCiudad ${isPaginaCiudades ? 'imgCiudades-margin' : ''}`} />
             
             {isPaginaCiudades ? (
               <div className="detalle-card">
@@ -83,14 +82,18 @@ function Ciudades() {
                       {ciudad.cantidadBalnearios} Balnearios
                     </p>
                   </div>
-                  <button className="mirar-btn" onClick={<Link to="/ciudades">Ciudades</Link>}>Mirar<br />catálogo</button>
+                  <Link to={`/ciudades/${ciudad.id_ciudad}/balnearios`}>
+                    <button className="mirar-btn">Mirar<br />catálogo</button>
+                  </Link>
                 </div>
               </div>
             ) : (
               <div className="card-content">
                 <h3>{ciudad.nombre}</h3>
                 <p>{ciudad.cantidadBalnearios} balnearios</p>
-                <button>Ver balnearios</button>
+                <Link to={`/ciudades/${ciudad.id_ciudad}/balnearios`}>
+                  <button>Ver balnearios</button>
+                </Link>
               </div>
             )}
           </div>
