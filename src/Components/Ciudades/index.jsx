@@ -83,7 +83,7 @@ function Ciudades() {
                       {ciudad.cantidadBalnearios} Balnearios
                     </p>
                   </div>
-                  <button className="mirar-btn">Mirar<br />catálogo</button>
+                  <button className="mirar-btn" onClick={<Link to="/ciudades">Ciudades</Link>}>Mirar<br />catálogo</button>
                 </div>
               </div>
             ) : (

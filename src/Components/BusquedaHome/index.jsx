@@ -10,6 +10,7 @@ import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
 import LocalizacionBusquedaHome from '../../assets/LocalizacionBusquedaHome.png';
 import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
 import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
+import VideoBanner from '.../assets/praiar-banner-index - Hecho con ClipChamp.mp4';
 
 function BusquedaHome() {
   const [ciudades, setCiudades] = useState([]);
@@ -78,6 +79,7 @@ function BusquedaHome() {
   return (
     <div className="busqueda-home">
       <div className="hero">
+        <video src={VideoBanner}></video>
         <div className="hero-darken"></div>
         <div className="overlay">
           <h1 className="titulo-busqueda">Encontrá tu próximo lugar en la playa</h1>
