@@ -13,6 +13,7 @@ import VistaBalneario from "./Pages/VistaBalneario";
 import Reserva from "./Pages/Reserva";
 import ProtectedRoute from "./Components/ProtectedRoute"; // nuevo import
 import BalneariosPorCiudad from "./Components/BalneariosPorCiudad";
+import Error from "./Pages/Error";
 function App() {
   return (
     <Router>
@@ -24,6 +25,7 @@ function App() {
           <Route path="/login" element={<Login />} /> 
           <Route path="/registrar" element={<Registrar />} /> 
           <Route path="/ciudades/:idCiudad/balnearios" element={<BalneariosPorCiudad />} />
+          <Route path="*" element={<Error />} />
 
           {/* Rutas protegidas */}
           <Route path="/perfil" element={

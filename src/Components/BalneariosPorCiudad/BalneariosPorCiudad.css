@@ -98,3 +98,8 @@
 h1{
   font-family: "El Messiri";
 }
+@media (max-width: 1005px) {
+  h1 {
+    margin-top: 5rem;
+  }
+}

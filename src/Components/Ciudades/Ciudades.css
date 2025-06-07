@@ -119,6 +119,12 @@ h2 {
     font-family: "El Messiri", sans-serif;
     color: #000;
     font-size: 50px;
+    
+}
+@media (max-width: 1005px) {
+  .titulo-ciudades {
+    margin-top: 5rem;
+  }
 }
 
 .ver-mas-card {

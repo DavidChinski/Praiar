@@ -58,7 +58,7 @@ function Ciudades() {
 
   return (
     <div className="ciudades-container">
-      <h2>Ciudades</h2>
+      <h2 className={isPaginaCiudades ? 'titulo-ciudades' : ''}>Ciudades</h2>
       <div className="card-grid">
         {ciudades.map((ciudad) => (
           <div key={ciudad.id_ciudad} className={`ciudad-card ${isPaginaCiudades ? 'card-detalle' : ''}`}>
