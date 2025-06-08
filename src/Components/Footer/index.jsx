@@ -6,12 +6,15 @@ import LinkedinFooter from "../../assets/LinkedinFooter.png";
 import GanchoFooter from "../../assets/GanchoFooter.png";
 import TelefonoFooter from "../../assets/TelefonoFooter.png";
 import MailFooter from "../../assets/MailFooter.png";
+import { Link } from 'react-router-dom'; 
+const linkedinPraiar = "https://www.linkedin.com/company/praiararg";
+
 function Footer() {
   return (
     <footer>
       <div className="footer_main">
         <div className="logo_section">
-          <img src={Logo} alt="LogoPraiarFooter" className="logo_footer" />
+          <Link to="/"><img src={Logo} alt="LogoPraiarFooter" className="logo_footer" /></Link>
           <p className="slogan_footer">
             Empezá el verano realmente <span>Praiando</span>
           </p>
@@ -20,21 +23,20 @@ function Footer() {
         <div className="enlaces_section">
           <h4>Enlaces</h4>
           <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Reservar</a></li>
-            <li><a href="#">Balnearios</a></li>
-            <li><a href="#">Beneficios</a></li>
-            <li><a href="#">Contacto</a></li>
+            <li><Link to="/">Inicio</Link></li>
+            <li><Link to="/ciudades">Ciudades</Link></li>
+            <li><Link to="/beneficios">Beneficios</Link></li>
+            <li><Link to="/nosotros">Contactos</Link></li>
           </ul>
         </div>
 
         <div className="balnearios_section">
           <h4>Para Balnearios</h4>
           <ul>
-            <li><a href="#">¿Cómo funciona?</a></li>
-            <li><a href="#">Sumá tu balneario</a></li>
-            <li><a href="#">Estadísticas</a></li>
-            <li><a href="#">Iniciar sesión</a></li>
+            <li><Link to="/comofunciona">¿Cómo funciona?</Link></li>
+            <li><Link to="/estadisticas">Estadísticas</Link></li>
+            <li><Link to="/tusbalnearios">Suma tu balneario</Link></li>
+            <li><Link to="/login">Iniciar sesión</Link></li>
           </ul>
         </div>
 
@@ -47,7 +49,7 @@ function Footer() {
             <li className="social_icons">
               <img src={TwitterFooter} alt="Twitter" />
               <img src={InstaFooter} alt="Instagram" />
-              <img src={LinkedinFooter} alt="LinkedIn" />
+              <a href={linkedinPraiar} target="_blank" rel="noopener noreferrer"><img src={LinkedinFooter} alt="LinkedIn" /></a>
             </li>
           </ul>
         </div>

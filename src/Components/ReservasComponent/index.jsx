@@ -166,7 +166,7 @@ function ReservasComponent() {
                   onChange={(item) => setRangoFechas([item.selection])}
                   moveRangeOnFirstSelection={false}
                   ranges={rangoFechas}
-                  months={1}
+                  months={2}
                   direction="horizontal"
                   rangeColors={["#005984"]}
                   minDate={new Date()}

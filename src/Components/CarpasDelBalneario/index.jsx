@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"; 
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import { Link } from "react-router-dom";
@@ -64,9 +64,9 @@ function CarpasDelBalneario() {
       setCiudad(ciudadNombre);
 
       const { data: todos } = await supabase
-      .from("servicios")
-      .select("id_servicio, nombre, imagen");
-    setTodosLosServicios(todos || []);
+        .from("servicios")
+        .select("id_servicio, nombre, imagen");
+      setTodosLosServicios(todos || []);
 
 
       // 🔄 Obtener servicios
@@ -82,7 +82,7 @@ function CarpasDelBalneario() {
         .from("servicios")
         .select("id_servicio, nombre, imagen")
         .in("id_servicio", idsServicios);
-      
+
 
       if (balnearioData?.id_usuario === usuario.auth_id) {
         setEsDuenio(true);
@@ -118,13 +118,13 @@ function CarpasDelBalneario() {
   async function toggleServicio(servicioId, tiene) {
     if (tiene) {
       await supabase
-      .from("balnearios_servicios")
-      .delete()
-      .match({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+        .from("balnearios_servicios")
+        .delete()
+        .match({ id_balneario: Number(id), id_servicio: Number(servicioId) });
     } else {
       await supabase
-      .from("balnearios_servicios")
-      .insert({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+        .from("balnearios_servicios")
+        .insert({ id_balneario: Number(id), id_servicio: Number(servicioId) });
     }
 
     // Volver a cargar servicios actualizados
@@ -320,7 +320,7 @@ function CarpasDelBalneario() {
             )}
           </>
         )}
-    </div>
+      </div>
 
 
 

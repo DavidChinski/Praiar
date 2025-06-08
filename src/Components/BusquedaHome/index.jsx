@@ -151,13 +151,13 @@ function BusquedaHome() {
                   {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
                 </div>
                 {showCalendario && (
-                  <div className="calendario-container" style={{ position: 'absolute', zIndex: 999 }}>
-                    <DateRange
+                  <div className="calendario-container" style={{ position: 'absolute', zIndex: 999, left: '-330px' }}>
+                    <DateRange 
                       editableDateInputs={true}
                       onChange={item => setRangoFechas([item.selection])}
                       moveRangeOnFirstSelection={false}
                       ranges={rangoFechas}
-                      months={1}
+                      months={2}
                       direction="horizontal"
                       rangeColors={["#004080"]}
                       minDate={new Date()}
