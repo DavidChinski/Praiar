@@ -62,7 +62,8 @@ function PerfilComponent() {
         dni: parseInt(formData.dni),
         telefono: parseInt(formData.telefono),
       })
-      .eq('id_usuario', usuario.id_usuario);
+      .eq('auth_id', usuario.auth_id)
+
 
     if (error) {
       console.error('Error actualizando usuario:', error.message, error.details);
