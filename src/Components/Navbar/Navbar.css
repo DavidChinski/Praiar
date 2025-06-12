@@ -26,6 +26,8 @@
 }
 
 .logo-link {
+  display: flex;
+  gap: 1rem;
   flex: 1;
   min-width: 180px;
 }
@@ -63,6 +65,10 @@
   display: flex;
   justify-content: center;
   gap: 2rem;
+  max-width: 800px; /* ✅ Limita el ancho máximo del bloque de navegación */
+  flex-wrap: wrap;   /* ✅ Permite que los links pasen a otra línea si hay muchos */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nav a {
@@ -73,6 +79,10 @@
   text-decoration: none;
   position: relative;
   padding: 2px 5px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav a:hover {
@@ -97,11 +107,13 @@
 
 /* --------- Botones de autenticación --------- */
 .auth-buttons {
-  flex: 1;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 180px;
 }
+
 
 .auth-buttons button {
   border: 2px solid #B0DBE7;
@@ -120,6 +132,27 @@
 .perfil-img {
   background-color: transparent !important;
   border: none !important;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+
+.img-logo-perfil{
+  width: 45px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .auth-buttons button a {

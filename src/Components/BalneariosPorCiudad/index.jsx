@@ -7,14 +7,14 @@ import Carpa from '../../assets/Carpa.png';
 import Layout from '../../Layout/';
 
 function BalneariosPorCiudad() {
-  const { idCiudad } = useParams(); // ID de la ciudad desde la URL
+  const { idCiudad } = useParams();
   const [balnearios, setBalnearios] = useState([]);
-  const [nombreCiudad, setNombreCiudad] = useState(""); // Estado para el nombre de la ciudad
+  const [nombreCiudad, setNombreCiudad] = useState("");
   const [loading, setLoading] = useState(true);
+  const [mapaDireccion, setMapaDireccion] = useState(null); // Dirección actual para mostrar en el iframe
 
   useEffect(() => {
     async function fetchData() {
-      // Obtener nombre de la ciudad
       const { data: ciudadData, error: ciudadError } = await supabase
         .from("ciudades")
         .select("nombre")
@@ -28,7 +28,6 @@ function BalneariosPorCiudad() {
         setNombreCiudad(ciudadData.nombre);
       }
 
-      // Obtener balnearios de esa ciudad
       const { data: balneariosData, error: balneariosError } = await supabase
         .from("balnearios")
         .select("*")
@@ -46,6 +45,15 @@ function BalneariosPorCiudad() {
 
     fetchData();
   }, [idCiudad]);
+
+  const abrirMapa = (direccionBalneario) => {
+    const direccionCompleta = `${direccionBalneario}, ${nombreCiudad}`;
+    setMapaDireccion(direccionCompleta);
+  };
+
+  const cerrarMapa = () => {
+    setMapaDireccion(null);
+  };
 
   if (loading) {
     return <p>Cargando balnearios...</p>;
@@ -71,7 +79,7 @@ function BalneariosPorCiudad() {
                   <div className="info-contenido">
                     <div className="info-izquierda">
                       <h3>{balneario.nombre}</h3>
-                      <p>
+                      <p className="mapa" style={{ cursor: 'pointer' }} onClick={() => abrirMapa(balneario.direccion)}>
                         <img src={Mapa} alt="mapa" className="iconoCard" />
                         {balneario.direccion}
                       </p>
@@ -90,6 +98,25 @@ function BalneariosPorCiudad() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Modal de Mapa */}
+        {mapaDireccion && (
+          <div className="modal-mapa-overlay">
+            <div className="modal-mapa-contenido">
+              <button className="cerrar-mapa-btn" onClick={cerrarMapa}>✕</button>
+              <h3>{mapaDireccion}</h3>
+              <iframe
+                title={`Mapa de ${mapaDireccion}`}
+                width="100%"
+                height="400"
+                style={{ border: 0, borderRadius: '12px' }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps?q=${encodeURIComponent(mapaDireccion)}&output=embed`}
+              ></iframe>
+            </div>
           </div>
         )}
       </div>

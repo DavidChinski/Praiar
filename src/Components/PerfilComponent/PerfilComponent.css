@@ -57,7 +57,7 @@
 }
 
 .btn-editar {
-  border-color: #646cff;
+  border-color: #00055f;
 }
 
 .btn-logout:hover {
@@ -128,12 +128,13 @@
 
 .modal-perfil-botones {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* o space-between */
+  gap: 20px; /* Aumentá este valor según lo que necesites */
   margin-top: 10px;
 }
 
 .btn-guardar {
-  background-color: #646cff;
+  background-color: #000899;
   color: white;
   padding: 8px 14px;
   border: none;
@@ -147,10 +148,11 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   cursor: pointer;
+  gap: 10px;
 }
 
 .btn-guardar:hover {
-  background-color: #4b55c4;
+  background-color: #000753;
 }
 
 .btn-cancelar:hover {

@@ -126,7 +126,7 @@ function PerfilComponent() {
               Teléfono:
               <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} />
             </label>
-            <div className="modal-botones">
+            <div className="modal-perfil-botones">
               <button className="btn-guardar" onClick={handleSave}>Guardar</button>
               <button className="btn-cancelar" onClick={() => setShowEditModal(false)}>Cancelar</button>
             </div>

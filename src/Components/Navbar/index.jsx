@@ -38,11 +38,9 @@ function AuthButtons({ usuario, handleLogout }) {
     return (
       <>
         <button className="perfil-img">
-          <Link to="/perfil"><img src={PerfilNab} alt="" style={{position:'relative', width: '40px', height: 'auto', objectFit: 'contain'}}/></Link>
+          <Link to="/perfil"><img src={PerfilNab} alt="" className='img-logo-perfil'/></Link>
         </button>
-        <button className="registrar" onClick={handleLogout} style={{ color: 'black', fontWeight: 'normal' }}>
-          Cerrar sesión
-        </button>
+
       </>
     );
   }
@@ -103,12 +101,12 @@ function Navbar() {
     <>
       <header className="header">
         <div className="header-container">
-          <Link to="/" className='logo-link'>
-            <div className="logo-container">
+          <div className="logo-container">
+            <Link to="/" className='logo-link'>
               <img src={Logo} alt="Logo Praiar" className="logo" />
               <span className="brand">Praiar</span>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
           <nav className="nav">
             <NavLinks usuario={usuario} />
