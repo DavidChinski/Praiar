@@ -172,7 +172,12 @@ function BusquedaHome() {
               className="search-button"
               onClick={() => {
                 if (balnearioSeleccionado) {
-                  navigate(`/balneario/${balnearioSeleccionado}`);
+                  navigate(`/balneario/${balnearioSeleccionado}`, {
+                    state: {
+                      fechaInicio: rangoFechas[0].startDate.toISOString(),
+                      fechaFin: rangoFechas[0].endDate.toISOString()
+                    }
+                  });                  
                 }
               }}
               disabled={!balnearioSeleccionado}

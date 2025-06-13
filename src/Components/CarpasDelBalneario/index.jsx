@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,9 @@ import Carpa from '../../assets/Carpa.png';
 
 function CarpasDelBalneario() {
   const { id } = useParams();
+  const location = useLocation();
+  const { fechaInicio, fechaFin } = location.state || {};
+
   const containerRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
   const [elementos, setElementos] = useState([]);
@@ -21,8 +24,49 @@ function CarpasDelBalneario() {
   const [Ciudad, setCiudad] = useState(null);
   const [mostrarModalServicios, setMostrarModalServicios] = useState(false);
   const [todosLosServicios, setTodosLosServicios] = useState([]);
+  const [reservas, setReservas] = useState([]);
 
   const navigate = useNavigate();
+
+  // NUEVO: Obtener reservas que se solapan con las fechas recibidas usando el filtro correcto
+  useEffect(() => {
+    const fetchReservas = async () => {
+      if (!fechaInicio || !fechaFin) return;
+
+      // IMPORTANTE: aquí usamos el filtro robusto igual que en ReservasComponent
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("id_carpa, fecha_inicio, fecha_fin, fecha_salida")
+        .eq("id_balneario", id)
+        .lte("fecha_inicio", fechaFin)
+        .gte("fecha_salida", fechaInicio);
+
+      if (error) {
+        console.error("Error al obtener reservas:", error.message);
+        return;
+      }
+
+      setReservas(data);
+    };
+
+    fetchReservas();
+  }, [id, fechaInicio, fechaFin]);
+
+  // NUEVO: Función para verificar si una carpa está reservada en las fechas seleccionadas
+  const carpaReservada = (idCarpa) => {
+    if (!fechaInicio || !fechaFin) return false;
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+
+    return reservas.some(res => {
+      if (res.id_carpa !== idCarpa) return false;
+      // Usar fecha_salida si existe, sino usar fecha_fin
+      const resInicio = new Date(res.fecha_inicio);
+      const resFin = new Date(res.fecha_salida || res.fecha_fin);
+      // ¿Se superponen los intervalos?
+      return resInicio <= fin && resFin >= inicio;
+    });
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -68,13 +112,11 @@ function CarpasDelBalneario() {
         .select("id_servicio, nombre, imagen");
       setTodosLosServicios(todos || []);
 
-
       // 🔄 Obtener servicios
       const { data: relaciones } = await supabase
         .from("balnearios_servicios")
         .select("id_servicio")
         .eq("id_balneario", id);
-
 
       const idsServicios = relaciones?.map(r => r.id_servicio) || [];
 
@@ -82,7 +124,6 @@ function CarpasDelBalneario() {
         .from("servicios")
         .select("id_servicio, nombre, imagen")
         .in("id_servicio", idsServicios);
-
 
       if (balnearioData?.id_usuario === usuario.auth_id) {
         setEsDuenio(true);
@@ -141,7 +182,6 @@ function CarpasDelBalneario() {
 
     setBalnearioInfo(prev => ({ ...prev, servicios: serviciosActualizados }));
   }
-
 
   async function agregarElemento(tipo) {
     const x = 100, y = 100;
@@ -258,7 +298,7 @@ function CarpasDelBalneario() {
 
   return (
     <div className="carpas-del-balneario">
-      <h2>{balnearioInfo.nombre}</h2>
+      <h2>{balnearioInfo?.nombre || 'Carpas del Balneario'}</h2>
 
       {balnearioInfo && (
         <div className="balneario-info">
@@ -267,9 +307,17 @@ function CarpasDelBalneario() {
           <p><strong>Teléfono:</strong> {balnearioInfo.telefono}</p>
         </div>
       )}
+
+      {/* NUEVO: Mostrar el rango de fechas de disponibilidad */}
+      {fechaInicio && fechaFin && (
+        <p>
+          Mostrando disponibilidad del {new Date(fechaInicio).toLocaleDateString()} al{" "}
+          {new Date(fechaFin).toLocaleDateString()}
+        </p>
+      )}
+
       <div className="iconos-servicios">
         <h3>Servicios</h3>
-
         {balnearioInfo?.servicios?.length > 0 ? (
           <div className="servicios-lista">
             {balnearioInfo.servicios.map((servicio) => (
@@ -322,9 +370,6 @@ function CarpasDelBalneario() {
         )}
       </div>
 
-
-
-
       {esDuenio && (
         <>
           <div className="toolbar-dropdown">
@@ -348,13 +393,16 @@ function CarpasDelBalneario() {
         {carpas.map((carpa) => (
           <div
             key={carpa.id_carpa}
-            className={`carpa ${carpa.reservado ? "reservada" : "libre"}`}
-            style={{ left: `${carpa.x}px`, top: `${carpa.y}px` }}
+            className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"}`}
+            style={{
+              left: `${carpa.x}px`,
+              top: `${carpa.y}px`
+            }}
             onMouseDown={() =>
               esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
             }
             onClick={() => {
-              if (!esDuenio && usuarioLogueado) {
+              if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
                 navigate(`/reservaubicacion/${carpa.id_carpa}`);
               }
             }}
@@ -365,6 +413,7 @@ function CarpasDelBalneario() {
               src={Carpa}
               alt={`Carpa ${carpa.posicion}`}
               className="carpa-imagen"
+              style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
             />
             <div className="acciones">
               {esDuenio && (

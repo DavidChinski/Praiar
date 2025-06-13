@@ -35,14 +35,19 @@
   border: none;
   background: none;
   padding: 0;
+  /* Añadir transición para cambios de color */
+  transition: background-color 0.2s, border 0.2s;
 }
 
-.carpa:hover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+/* Colores para carpas */
+.carpa.libre {
+  background-color: #d5ffcc; /* Verde claro */
+  border: 2px solid #3aa856;
 }
 
 .carpa.reservada {
-  background-color: #ffa8a8;
+  background-color: #ffa8a8; /* Rojo claro */
+  border: 2px solid #e35050;
 }
 
 .carpa.reservada .carpa-imagen {
@@ -54,6 +59,11 @@
   height: auto;
   pointer-events: none; /* para que no interfiera con el drag */
 }
+
+.carpa:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
 .elemento {
   position: absolute;
   padding: 10px 16px;
@@ -61,8 +71,17 @@
   color: white;
   font-weight: bold;
   cursor: grab;
+  z-index: 1;
+  min-width: 60px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Animación de rotación suave */
+  transition: background-color 0.2s, transform 0.2s;
 }
 
+/* Elementos por tipo */
 .tipo-pasillo {
   background-color: #6c757d;
 }
@@ -75,7 +94,7 @@
   background-color: #8b4513;
 }
 
-/* Acciones dentro de la carpa */
+/* Acciones dentro de la carpa y elemento */
 .carpa .acciones,
 .elemento .acciones {
   position: absolute;
@@ -84,8 +103,14 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
+.carpa:hover .acciones,
+.elemento:hover .acciones {
+  opacity: 1;
+}
 
 .carpa .acciones button,
 .elemento .acciones button {
@@ -102,7 +127,6 @@
 .carpa .acciones button:hover {
   transform: scale(1.2);
 }
-
 
 /* Modal */
 .modal {
@@ -164,17 +188,6 @@
   background-color: #b00020;
 }
 
-.carpa .acciones,
-.elemento .acciones {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.carpa:hover .acciones,
-.elemento:hover .acciones {
-  opacity: 1;
-}
-
 .toolbar-dropdown {
   position: relative;
   display: inline-block;
@@ -218,6 +231,7 @@
 .dropdown-menu button:hover {
   background-color: #f0f0f0;
 }
+
 .carpa-posicion {
   position: absolute;
   top: -20px;
@@ -230,6 +244,8 @@
   font-size: 12px;
   border: 1px solid #ccc;
 }
+
+/* Servicios */
 .servicios-lista {
   display: flex;
   flex-wrap: wrap;
@@ -251,7 +267,6 @@
   object-fit: contain; /* o 'cover', según el diseño que prefieras */
   border-radius: 4px; /* opcional: bordes redondeados */
 }
-
 
 .boton-agregar-servicio {
   background-color: #004A68;
