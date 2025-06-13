@@ -36,18 +36,21 @@
   background: none;
   padding: 0;
   /* Añadir transición para cambios de color */
-  transition: background-color 0.2s, border 0.2s;
+  transition: background-color 0.2s, border 0.2s, box-shadow 0.2s;
 }
 
 /* Colores para carpas */
 .carpa.libre {
-  background-color: #d5ffcc; /* Verde claro */
-  border: 2px solid #3aa856;
+  background-color: #33ff5e; /* Verde más fuerte */
+  border: 2.5px solid #1aab27;
+  /* puedes usar box-shadow para un glow verde */
+  box-shadow: 0 0 10px #33ff5e55, 0 0 4px #1aab2755;
 }
 
 .carpa.reservada {
-  background-color: #ffa8a8; /* Rojo claro */
-  border: 2px solid #e35050;
+  background-color: #ff3c3c; /* Rojo intenso */
+  border: 2.5px solid #a80021;
+  box-shadow: 0 0 10px #ff3c3c55, 0 0 4px #a8002155;
 }
 
 .carpa.reservada .carpa-imagen {
@@ -61,7 +64,7 @@
 }
 
 .carpa:hover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .elemento {

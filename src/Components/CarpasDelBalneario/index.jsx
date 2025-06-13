@@ -28,45 +28,38 @@ function CarpasDelBalneario() {
 
   const navigate = useNavigate();
 
-  // NUEVO: Obtener reservas que se solapan con las fechas recibidas usando el filtro correcto
-  useEffect(() => {
-    const fetchReservas = async () => {
-      if (!fechaInicio || !fechaFin) return;
+useEffect(() => {
+  const fetchReservas = async () => {
+    if (!fechaInicio || !fechaFin) return;
 
-      // IMPORTANTE: aquí usamos el filtro robusto igual que en ReservasComponent
-      const { data, error } = await supabase
-        .from("reservas")
-        .select("id_carpa, fecha_inicio, fecha_fin, fecha_salida")
-        .eq("id_balneario", id)
-        .lte("fecha_inicio", fechaFin)
-        .gte("fecha_salida", fechaInicio);
+    const { data, error } = await supabase
+      .from("reservas")
+      .select("id_ubicacion, fecha_inicio, fecha_salida")
+      .eq("id_balneario", id);
 
-      if (error) {
-        console.error("Error al obtener reservas:", error.message);
-        return;
-      }
-
-      setReservas(data);
-    };
-
-    fetchReservas();
-  }, [id, fechaInicio, fechaFin]);
-
-  // NUEVO: Función para verificar si una carpa está reservada en las fechas seleccionadas
-  const carpaReservada = (idCarpa) => {
-    if (!fechaInicio || !fechaFin) return false;
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    return reservas.some(res => {
-      if (res.id_carpa !== idCarpa) return false;
-      // Usar fecha_salida si existe, sino usar fecha_fin
-      const resInicio = new Date(res.fecha_inicio);
-      const resFin = new Date(res.fecha_salida || res.fecha_fin);
-      // ¿Se superponen los intervalos?
-      return resInicio <= fin && resFin >= inicio;
-    });
+    if (error) {
+      console.error("Error al obtener reservas:", error.message);
+      return;
+    }
+    setReservas(data || []);
   };
+
+  fetchReservas();
+}, [id, fechaInicio, fechaFin]);
+
+const carpaReservada = (idUbicacion) => {
+  console.log("Verificando reservas para la carpa:", idUbicacion);
+  if (!fechaInicio || !fechaFin) return false;
+  const inicio = new Date(fechaInicio);
+  const fin = new Date(fechaFin);
+
+  return reservas.some(res => {
+    if (res.id_ubicacion !== idUbicacion) return false;
+    const resInicio = new Date(res.fecha_inicio);
+    const resFin = new Date(res.fecha_salida);
+    return resInicio <= fin && resFin >= inicio;
+  });
+};
 
   useEffect(() => {
     async function fetchData() {
@@ -112,7 +105,6 @@ function CarpasDelBalneario() {
         .select("id_servicio, nombre, imagen");
       setTodosLosServicios(todos || []);
 
-      // 🔄 Obtener servicios
       const { data: relaciones } = await supabase
         .from("balnearios_servicios")
         .select("id_servicio")
@@ -129,9 +121,9 @@ function CarpasDelBalneario() {
         setEsDuenio(true);
       }
 
-      // 🔄 Guardamos balneario con servicios incluidos
       setBalnearioInfo({ ...balnearioData, servicios });
 
+      // "carpas" = ubicaciones
       const { data: carpasData } = await supabase
         .from("ubicaciones")
         .select("*")
@@ -308,7 +300,6 @@ function CarpasDelBalneario() {
         </div>
       )}
 
-      {/* NUEVO: Mostrar el rango de fechas de disponibilidad */}
       {fechaInicio && fechaFin && (
         <p>
           Mostrando disponibilidad del {new Date(fechaInicio).toLocaleDateString()} al{" "}
@@ -413,7 +404,7 @@ function CarpasDelBalneario() {
               src={Carpa}
               alt={`Carpa ${carpa.posicion}`}
               className="carpa-imagen"
-              style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
+              style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
             />
             <div className="acciones">
               {esDuenio && (
