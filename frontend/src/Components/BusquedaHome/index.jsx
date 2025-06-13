@@ -35,46 +35,39 @@ function BusquedaHome() {
   }
 
   useEffect(() => {
-    async function fetchCiudades() {
-      const { data, error } = await supabase
-        .from('ciudades')
-        .select('id_ciudad, nombre')
-        .order('nombre', { ascending: true });
-
-      if (error) {
-        console.error('Error al obtener ciudades:', error.message);
-        return;
-      }
-
+  async function fetchCiudades() {
+    try {
+      const res = await fetch('http://localhost:3000/api/ciudades');
+      const data = await res.json();
       setCiudades(data);
+    } catch (err) {
+      console.error('Error al obtener ciudades:', err);
+    }
+  }
+
+  fetchCiudades();
+}, []);
+
+useEffect(() => {
+  async function fetchBalnearios() {
+    if (!ciudadSeleccionada) {
+      setBalnearios([]);
+      return;
     }
 
-    fetchCiudades();
-  }, []);
-
-  useEffect(() => {
-    async function fetchBalnearios() {
-      if (!ciudadSeleccionada) {
-        setBalnearios([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('balnearios')
-        .select('id_balneario, nombre')
-        .eq('id_ciudad', ciudadSeleccionada);
-
-      if (error) {
-        console.error('Error al obtener balnearios:', error.message);
-        setBalnearios([]);
-        return;
-      }
-
+    try {
+      const res = await fetch(`http://localhost:3000/api/balnearios?ciudad_id=${ciudadSeleccionada}`);
+      const data = await res.json();
       setBalnearios(data);
+    } catch (err) {
+      console.error('Error al obtener balnearios:', err);
+      setBalnearios([]);
     }
+  }
 
-    fetchBalnearios();
-  }, [ciudadSeleccionada]);
+  fetchBalnearios();
+}, [ciudadSeleccionada]);
+
 
   return (
     <div className="busqueda-home">
