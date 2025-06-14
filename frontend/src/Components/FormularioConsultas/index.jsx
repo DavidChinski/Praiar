@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
 import "./FormularioConsultas.css";
 
 function FormularioConsultas() {
@@ -7,23 +6,17 @@ function FormularioConsultas() {
   const [mail, setMail] = useState("");
   const [problema, setProblema] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [usuario, setUsuario] = useState(null); // guardar objeto completo
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (user) {
-        const localUser = JSON.parse(localStorage.getItem("usuario"));
-        setUsuario(user); // contiene el user.id (UUID)
-        setNombre(localUser?.nombre || "");
-        setMail(localUser?.email || "");
-      } else {
-        setMensaje("Usuario no autenticado.");
-      }
-    };
-
-    fetchUserData();
+    const localUser = JSON.parse(localStorage.getItem("usuario"));
+    if (localUser && localUser.auth_id) {
+      setUsuario(localUser);
+      setNombre(localUser.nombre || "");
+      setMail(localUser.email || "");
+    } else {
+      setMensaje("Usuario no autenticado.");
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -34,20 +27,31 @@ function FormularioConsultas() {
       return;
     }
 
-    const { error } = await supabase.from("consultas").insert([
-      {
-        nombre_usuario: nombre,
-        mail_usuario: mail,
-        problema,
-        id_usuario: usuario.id, // este es el UUID
-      },
-    ]);
+    try {
+      const response = await fetch("http://localhost:3000/api/consultas", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access_token}`
+        },
+        body: JSON.stringify({
+          nombre,
+          mail,
+          problema,
+          id_usuario: usuario.auth_id,
+        }),
+      });
 
-    if (error) {
-      console.error("Error al agregar consulta:", error.message);
-      setMensaje("Error al guardar. Intente nuevamente.");
-    } else {
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Error al enviar la consulta.");
+      }
+
       window.location.href = "/";
+    } catch (err) {
+      console.error("Error al enviar consulta:", err.message);
+      setMensaje("Error al guardar. Intente nuevamente.");
     }
   };
 
@@ -58,26 +62,12 @@ function FormularioConsultas() {
         <form onSubmit={handleSubmit} className="formularioConsulta">
           <div className="grupoCampo">
             <label className="labelConsulta" htmlFor="nombre">Nombre</label>
-            <input
-              id="nombre"
-              type="text"
-              className="inputConsultas"
-              value={nombre}
-              placeholder="Ingrese su Nombre"
-              readOnly
-            />
+            <input id="nombre" type="text" className="inputConsultas" value={nombre} readOnly />
           </div>
 
           <div className="grupoCampo">
             <label className="labelConsulta" htmlFor="mail">Mail</label>
-            <input
-              id="mail"
-              type="text"
-              className="inputConsultas"
-              value={mail}
-              placeholder="Ingrese su Mail"
-              readOnly
-            />
+            <input id="mail" type="text" className="inputConsultas" value={mail} readOnly />
           </div>
 
           <div className="grupoCampo" style={{ gridColumn: "1 / -1" }}>

@@ -1,8 +1,6 @@
 import './PerfilComponent.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
-
 
 function PerfilComponent() {
   const [usuario, setUsuario] = useState(null);
@@ -19,24 +17,54 @@ function PerfilComponent() {
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('usuario'));
-    if (userData) {
-      setUsuario(userData);
-      setFormData({
-        nombre: userData.nombre || '',
-        apellido: userData.apellido || '',
-        email: userData.email || '',
-        dni: userData.dni || '',
-        telefono: userData.telefono || '',
-      });
+    if (userData && userData.auth_id) {
+      fetch(`http://localhost:3000/api/perfil/${userData.auth_id}`)
+        .then(res => res.json())
+        .then(data => {
+          setUsuario(data.usuario);
+          setFormData({
+            nombre: data.usuario.nombre || '',
+            apellido: data.usuario.apellido || '',
+            email: data.usuario.email || '',
+            dni: data.usuario.dni || '',
+            telefono: data.usuario.telefono || '',
+          });
+        })
+        .catch(() => navigate('/login'));
     } else {
       navigate('/login');
     }
-  }, []);
+  }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: localStorage.getItem('supabase.auth.token'), // opcional, si estás guardando token
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Error al cerrar sesión:', error);
+    }
+
     localStorage.removeItem('usuario');
+    // Opcional: eliminá el token de Supabase si lo estás usando
+    // localStorage.removeItem('supabase.auth.token');
+
     navigate('/');
-  };
+    window.location.reload(); // Forzá recarga si querés reiniciar estado global
+  } catch (error) {
+    console.error('Error inesperado en logout:', error);
+    alert('Error al cerrar sesión.');
+  }
+};
+
 
   const handleEditProfile = () => {
     setShowEditModal(true);
@@ -48,33 +76,30 @@ function PerfilComponent() {
   };
 
   const handleSave = async () => {
-    if (!usuario || !usuario.id_usuario) {
+    if (!usuario || !usuario.auth_id) {
       alert("No se encontró el ID del usuario.");
       return;
     }
 
-    const { error } = await supabase
-      .from('usuarios')
-      .update({
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        email: formData.email,
-        dni: parseInt(formData.dni),
-        telefono: parseInt(formData.telefono),
-      })
-      .eq('auth_id', usuario.auth_id)
+    try {
+      const response = await fetch(`http://localhost:3000/api/perfil/${usuario.auth_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
 
+      if (!response.ok) {
+        alert(`Error al guardar cambios: ${data.error}`);
+        return;
+      }
 
-    if (error) {
-      console.error('Error actualizando usuario:', error.message, error.details);
-      alert(`Error al guardar cambios: ${error.message}`);
-      return;
+      setUsuario(data.usuario);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      setShowEditModal(false);
+    } catch (error) {
+      alert('Error de conexión con el servidor.');
     }
-
-    const updatedUser = { ...usuario, ...formData };
-    setUsuario(updatedUser);
-    localStorage.setItem('usuario', JSON.stringify(updatedUser));
-    setShowEditModal(false);
   };
 
   if (!usuario) return null;

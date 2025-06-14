@@ -1,23 +1,19 @@
-// backend/server.js
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const { supabase } = require('./supabaseClient');
 const app = express();
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Multer para manejo de archivos (imagenes)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// === LOGIN ===
+// post /api/login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // 1. Login en Supabase Auth
   const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -29,7 +25,6 @@ app.post('/api/login', async (req, res) => {
 
   const userId = authData.user.id;
 
-  // 2. Obtener perfil usuario
   const { data: usuario, error: fetchError } = await supabase
     .from('usuarios')
     .select('*')
@@ -41,18 +36,16 @@ app.post('/api/login', async (req, res) => {
     return res.status(500).json({ error: 'No se pudo obtener el perfil del usuario' });
   }
 
-  // Opcional: puedes devolver el token del usuario aquí si lo necesitas para autenticación frontend
   res.json({ usuario });
 });
 
-// === REGISTRO ===
+// post /api/registrar
 app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
   try {
     const {
       nombre, apellido, email, dni, telefono, password, esPropietario, codigoPais
     } = req.body;
     
-    // Validaciones previas
     if (!nombre?.trim() || !apellido?.trim()) {
       return res.status(400).json({ error: 'Nombre y apellido son obligatorios.' });
     }
@@ -69,7 +62,6 @@ app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
       return res.status(400).json({ error: 'El DNI es obligatorio y debe ser válido.' });
     }
 
-    // Chequear duplicados
     const telefonoCompleto = (codigoPais || '+54') + telefono;
     const condiciones = [];
     if (email) condiciones.push(`email.eq.${encodeURIComponent(email)}`);
@@ -93,7 +85,6 @@ app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
       return res.status(400).json({ error: 'Ya existe un usuario registrado con este email, DNI o teléfono.' });
     }
 
-    // Registrar en Supabase Auth
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -106,14 +97,12 @@ app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
     const userId = signUpData.user.id;
     const userEmail = signUpData.user.email;
 
-    // Subida de imagen (opcional)
     let imageUrl = null;
     if (req.file) {
       const fileExt = req.file.originalname.split('.').pop();
       const fileName = `${userId}.${fileExt}`;
       const filePath = fileName;
 
-      // Subir imagen a Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('usuarios')
         .upload(filePath, req.file.buffer, {
@@ -132,7 +121,6 @@ app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
       imageUrl = publicUrlData.publicUrl;
     }
 
-    // Inserción en tabla usuarios
     const { data: perfil, error: insertError } = await supabase
       .from('usuarios')
       .insert([
@@ -163,7 +151,25 @@ app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
   }
 });
 
-// === CIUDADES y BALNEARIOS API (ya existente) ===
+// post /api/logout
+app.post('/api/logout', async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ error: 'Falta el token de sesión.' });
+  }
+
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    return res.status(500).json({ error: 'Error al cerrar sesión.' });
+  }
+
+  res.json({ success: true });
+});
+
+
+// get /api/ciudades
 app.get('/api/ciudades', async (req, res) => {
   const { data: ciudadesData, error: ciudadesError } = await supabase
     .from('ciudades')
@@ -202,6 +208,90 @@ app.get('/api/balnearios', async (req, res) => {
 
   res.json(data);
 });
+
+// get /api/perfil/:auth_id
+app.get('/api/perfil/:auth_id', async (req, res) => {
+  const { auth_id } = req.params;
+  console.log("Buscando perfil para auth_id:", auth_id);
+
+  const { data: usuario, error } = await supabase
+    .from('usuarios')
+    .select('*')
+    .eq('auth_id', auth_id)
+    .single();
+  console.log("Resultado de la query:", usuario, error);
+
+  if (error || !usuario) {
+    return res.status(404).json({ error: 'Usuario no encontrado.' });
+  }
+
+  res.json({ usuario });
+});
+
+// put /api/perfil/:auth_id
+app.put('/api/perfil/:auth_id', async (req, res) => {
+  const { auth_id } = req.params;
+  const { nombre, apellido, email, dni, telefono } = req.body;
+
+  if (!auth_id) return res.status(400).json({ error: 'Falta el auth_id.' });
+
+  const { data, error } = await supabase
+    .from('usuarios')
+    .update({
+      nombre,
+      apellido,
+      email,
+      dni,
+      telefono,
+    })
+    .eq('auth_id', auth_id)
+    .select()
+    .maybeSingle();
+
+  if (error || !data) {
+    return res.status(500).json({ error: error?.message || 'Error al actualizar usuario.' });
+  }
+
+  res.json({ usuario: data });
+});
+
+
+// post /api/consultas
+app.post('/api/consultas', async (req, res) => {
+  const { nombre, mail, problema, id_usuario } = req.body;
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Falta token de autenticación.' });
+  }
+
+  const supabaseUser = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    }
+  );
+
+  try {
+    const { error } = await supabaseUser
+      .from('consultas')
+      .insert([{ nombre_usuario: nombre, mail_usuario: mail, problema, id_usuario }]);
+
+    if (error) throw error;
+
+    res.status(200).json({ mensaje: 'Consulta enviada correctamente.' });
+  } catch (error) {
+    console.error('Error en /api/consultas:', error.message);
+    res.status(500).json({ error: 'Error al guardar la consulta.' });
+  }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

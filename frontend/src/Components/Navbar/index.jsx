@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import Logo from '../../assets/LogoPraiarSinNombre.png';
 import PerfilNab from '../../assets/PerfilNab.png';
 
-import { supabase } from '../../supabaseClient';
-
 function NavLinks({ usuario }) {
   if (!usuario) {
     return (
@@ -38,9 +36,10 @@ function AuthButtons({ usuario, handleLogout }) {
     return (
       <>
         <button className="perfil-img">
-          <Link to="/perfil"><img src={PerfilNab} alt="" className='img-logo-perfil'/></Link>
+          <Link to="/perfil">
+            <img src={PerfilNab} alt="" className="img-logo-perfil" />
+          </Link>
         </button>
-
       </>
     );
   }
@@ -89,20 +88,34 @@ function Navbar() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();  
-    localStorage.removeItem('usuario');
-    setUsuario(null);
-    navigate('/');
-    window.location.reload();
-  };
+    try {
+      const response = await fetch('http://localhost:3000/api/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: localStorage.getItem('supabase.auth.token') }) // opcional
+      });
 
+      if (response.ok) {
+        localStorage.removeItem('usuario');
+        setUsuario(null);
+        navigate('/');
+        window.location.reload();
+      } else {
+        const data = await response.json();
+        alert('Error al cerrar sesión: ' + (data?.error || ''));
+      }
+    } catch (err) {
+      console.error('Error en logout', err);
+      alert('Error inesperado al cerrar sesión.');
+    }
+  };
 
   return (
     <>
       <header className="header">
         <div className="header-container">
           <div className="logo-container">
-            <Link to="/" className='logo-link'>
+            <Link to="/" className="logo-link">
               <img src={Logo} alt="Logo Praiar" className="logo" />
               <span className="brand">Praiar</span>
             </Link>
@@ -118,7 +131,7 @@ function Navbar() {
 
           <button className="hamburger" onClick={toggleMenu}>☰</button>
         </div>
-        {/* Menú móvil solo se renderiza si isMobile */}
+
         {isMobile && (
           <div className={`menu${menuOpen ? ' open' : ''}`}>
             <nav className="nav-mobile">
