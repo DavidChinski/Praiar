@@ -1,12 +1,169 @@
 // backend/server.js
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const { supabase } = require('./supabaseClient');
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
+// Multer para manejo de archivos (imagenes)
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// === LOGIN ===
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  // 1. Login en Supabase Auth
+  const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (loginError || !authData.user) {
+    return res.status(401).json({ error: 'Email o contraseña incorrectos' });
+  }
+
+  const userId = authData.user.id;
+
+  // 2. Obtener perfil usuario
+  const { data: usuario, error: fetchError } = await supabase
+    .from('usuarios')
+    .select('*')
+    .eq('auth_id', userId)
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError || !usuario) {
+    return res.status(500).json({ error: 'No se pudo obtener el perfil del usuario' });
+  }
+
+  // Opcional: puedes devolver el token del usuario aquí si lo necesitas para autenticación frontend
+  res.json({ usuario });
+});
+
+// === REGISTRO ===
+app.post('/api/registrar', upload.single('imagen'), async (req, res) => {
+  try {
+    const {
+      nombre, apellido, email, dni, telefono, password, esPropietario, codigoPais
+    } = req.body;
+    
+    // Validaciones previas
+    if (!nombre?.trim() || !apellido?.trim()) {
+      return res.status(400).json({ error: 'Nombre y apellido son obligatorios.' });
+    }
+    if (!email?.trim() || !email.includes('@')) {
+      return res.status(400).json({ error: 'El email es obligatorio y debe ser válido.' });
+    }
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+    }
+    if (!telefono?.trim() || telefono.length < 6) {
+      return res.status(400).json({ error: 'El teléfono es obligatorio y debe ser válido.' });
+    }
+    if (!dni?.trim() || dni.length < 6) {
+      return res.status(400).json({ error: 'El DNI es obligatorio y debe ser válido.' });
+    }
+
+    // Chequear duplicados
+    const telefonoCompleto = (codigoPais || '+54') + telefono;
+    const condiciones = [];
+    if (email) condiciones.push(`email.eq.${encodeURIComponent(email)}`);
+    if (dni && !isNaN(dni)) condiciones.push(`dni.eq.${parseInt(dni, 10)}`);
+    if (telefono) condiciones.push(`telefono.eq.${telefonoCompleto}`);
+    const orString = condiciones.join(',');
+
+    if (orString === '') {
+      return res.status(400).json({ error: 'Debe ingresar email, dni o teléfono.' });
+    }
+
+    const { data: existeUsuario, error: existeError } = await supabase
+      .from('usuarios')
+      .select('id_usuario')
+      .or(orString);
+
+    if (existeError) {
+      return res.status(500).json({ error: 'Error verificando duplicados. Intente nuevamente.' });
+    }
+    if (existeUsuario && existeUsuario.length > 0) {
+      return res.status(400).json({ error: 'Ya existe un usuario registrado con este email, DNI o teléfono.' });
+    }
+
+    // Registrar en Supabase Auth
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (signUpError || !signUpData.user) {
+      return res.status(500).json({ error: 'Error al registrar usuario: ' + (signUpError?.message || '') });
+    }
+
+    const userId = signUpData.user.id;
+    const userEmail = signUpData.user.email;
+
+    // Subida de imagen (opcional)
+    let imageUrl = null;
+    if (req.file) {
+      const fileExt = req.file.originalname.split('.').pop();
+      const fileName = `${userId}.${fileExt}`;
+      const filePath = fileName;
+
+      // Subir imagen a Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('usuarios')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        return res.status(500).json({ error: 'Error al subir imagen de perfil.' });
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('usuarios')
+        .getPublicUrl(filePath);
+
+      imageUrl = publicUrlData.publicUrl;
+    }
+
+    // Inserción en tabla usuarios
+    const { data: perfil, error: insertError } = await supabase
+      .from('usuarios')
+      .insert([
+        {
+          auth_id: userId,
+          nombre,
+          apellido,
+          email: userEmail,
+          telefono: telefonoCompleto,
+          esPropietario: String(esPropietario) === 'true' || esPropietario === true,
+          dni,
+          imagen: imageUrl,
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      return res.status(500).json({
+        error: 'Error al guardar los datos del usuario. Por favor contacte a soporte. No intente registrarse nuevamente con el mismo email.'
+      });
+    }
+
+    res.json({ usuario: perfil });
+  } catch (err) {
+    console.error('Error en /api/registrar:', err);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
+// === CIUDADES y BALNEARIOS API (ya existente) ===
 app.get('/api/ciudades', async (req, res) => {
   const { data: ciudadesData, error: ciudadesError } = await supabase
     .from('ciudades')
@@ -45,41 +202,6 @@ app.get('/api/balnearios', async (req, res) => {
 
   res.json(data);
 });
-
-
-// Ruta para obtener el usuario autenticado (usa supabase)
-app.get('/api/usuario', async (req, res) => {
-  try {
-    const { data, error } = await supabase.auth.getUser();
-
-    if (error) return res.status(401).json({ error: error.message });
-
-    res.json({ user: data.user });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener usuario' });
-  }
-});
-
-// Ruta para guardar consulta
-app.post('/api/consultas', async (req, res) => {
-  const { nombre_usuario, mail_usuario, problema, id_usuario } = req.body;
-
-  if (!nombre_usuario || !mail_usuario || !problema || !id_usuario) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios' });
-  }
-
-  const { error } = await supabase.from("consultas").insert([
-    { nombre_usuario, mail_usuario, problema, id_usuario }
-  ]);
-
-  if (error) {
-    console.error("Error al insertar consulta:", error.message);
-    return res.status(500).json({ error: error.message });
-  }
-
-  res.status(200).json({ message: "Consulta guardada correctamente" });
-});
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
