@@ -12,10 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "nodemon": "^3.1.10",
     "dotenv": "^16.5.0",
-    "multer": "^2.0.1"
+    "express": "^5.1.0",
+    "multer": "^2.0.1",
+    "nodemon": "^3.1.10"
   }
 }

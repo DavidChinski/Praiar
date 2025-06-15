@@ -212,14 +212,12 @@ app.get('/api/balnearios', async (req, res) => {
 // get /api/perfil/:auth_id
 app.get('/api/perfil/:auth_id', async (req, res) => {
   const { auth_id } = req.params;
-  console.log("Buscando perfil para auth_id:", auth_id);
 
   const { data: usuario, error } = await supabase
     .from('usuarios')
     .select('*')
     .eq('auth_id', auth_id)
     .single();
-  console.log("Resultado de la query:", usuario, error);
 
   if (error || !usuario) {
     return res.status(404).json({ error: 'Usuario no encontrado.' });
@@ -257,29 +255,13 @@ app.put('/api/perfil/:auth_id', async (req, res) => {
 
 
 // post /api/consultas
+// post /api/consultas
 app.post('/api/consultas', async (req, res) => {
   const { nombre, mail, problema, id_usuario } = req.body;
-  const authHeader = req.headers.authorization || '';
-  const token = authHeader.replace('Bearer ', '');
 
-  if (!token) {
-    return res.status(401).json({ error: 'Falta token de autenticación.' });
-  }
-
-  const supabaseUser = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    {
-      global: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    }
-  );
-
+  // Ya NO requiere token ni Authorization
   try {
-    const { error } = await supabaseUser
+    const { error } = await supabase
       .from('consultas')
       .insert([{ nombre_usuario: nombre, mail_usuario: mail, problema, id_usuario }]);
 

@@ -31,8 +31,7 @@ function FormularioConsultas() {
       const response = await fetch("http://localhost:3000/api/consultas", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           nombre,
