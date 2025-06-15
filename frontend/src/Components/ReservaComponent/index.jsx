@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { supabase } from "../../supabaseClient";
 import './ReservaComponent.css';
 
 function ReservaComponent() {
@@ -17,23 +16,18 @@ function ReservaComponent() {
   const [balnearioInfo, setBalnearioInfo] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: ubicacion, error: ubicacionError } = await supabase
-        .from("ubicaciones")
-        .select("*, balnearios: id_balneario (nombre, direccion, ciudad: id_ciudad (nombre))")
-        .eq("id_carpa", id_ubicacion)
-        .single();
-
-      if (ubicacionError || !ubicacion) {
-        setError("Error al obtener datos de la ubicación.");
-        return;
-      }
-
-      setUbicacionInfo(ubicacion);
-      setBalnearioInfo(ubicacion.balnearios);
-    };
-
-    fetchData();
+    // Cargar info de la ubicación y balneario desde el backend
+    fetch(`http://localhost:3000/api/reserva/ubicacion/${id_ubicacion}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setUbicacionInfo(data.ubicacion);
+          setBalnearioInfo(data.balneario);
+        }
+      })
+      .catch(() => setError("Error al obtener datos de la ubicación."));
   }, [id_ubicacion]);
 
   const handleSubmit = async (e) => {
@@ -41,60 +35,41 @@ function ReservaComponent() {
     setError(null);
     setExito(null);
 
-    // Validación de fechas
     if (!fechaInicio || !fechaSalida) {
       setError("Debes seleccionar una fecha de inicio y una de salida.");
       return;
     }
-
     if (fechaInicio > fechaSalida) {
       setError("La fecha de inicio no puede ser posterior a la de salida.");
       return;
     }
 
-    // Autenticación del usuario
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (!user) {
+    // Usuario del localStorage
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || !usuario.auth_id) {
       setError("Debes iniciar sesión para reservar.");
       return;
     }
 
     const id_balneario = ubicacionInfo?.id_balneario;
-
-    // Verificar reservas existentes para esa ubicación y balneario
-    const { data: reservasExistentes, error: reservasError } = await supabase
-      .from("reservas")
-      .select("*")
-      .eq("id_ubicacion", id_ubicacion)
-      .eq("id_balneario", id_balneario);
-
-    if (reservasError) {
-      setError("Error verificando reservas.");
-      return;
-    }
-
-    // Validar solapamiento de fechas
-    const conflicto = reservasExistentes.some(r =>
-      fechaInicio <= r.fecha_salida && fechaSalida >= r.fecha_inicio
-    );
-
-    if (conflicto) {
-      setError("Ya hay una reserva para esas fechas.");
-      return;
-    }
-
-    // Insertar nueva reserva
-    const { error: insertError } = await supabase.from("reservas").insert({
-      id_usuario: user.id,
-      id_ubicacion: id_ubicacion,
-      id_balneario: id_balneario,
+    const body = {
+      id_usuario: usuario.auth_id,
+      id_ubicacion,
+      id_balneario,
       fecha_inicio: fechaInicio,
       fecha_salida: fechaSalida,
       metodo_pago: metodoPago
-    });
+    };
 
-    if (insertError) {
-      setError("Error al realizar la reserva.");
+    const response = await fetch("http://localhost:3000/api/reserva", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      setError(result.error || "Error al realizar la reserva.");
     } else {
       setExito("Reserva realizada con éxito.");
       setTimeout(() => navigate("/tusreservas/null"), 2000);
@@ -110,7 +85,7 @@ function ReservaComponent() {
           <p><strong>Ubicación capacidad:</strong> {ubicacionInfo.capacidad}</p>
           <p><strong>Balneario:</strong> {balnearioInfo.nombre}</p>
           <p><strong>Dirección:</strong> {balnearioInfo.direccion}</p>
-          <p><strong>Ciudad:</strong> {balnearioInfo.ciudad?.nombre}</p>
+          <p><strong>Ciudad:</strong> {balnearioInfo.ciudad_nombre}</p>
         </div>
       )}
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient.js";
 import { Link, useNavigate } from "react-router-dom";
 import './BalneariosComponent.css';
 import Mapa from '../../assets/LocalizacionBusquedaHome.png'
@@ -11,29 +10,27 @@ function BalneariosComponent() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || !usuario.auth_id) {
+      navigate("/login");
+      return;
+    }
+
     async function fetchBalnearios() {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      try {
+        const response = await fetch(`http://localhost:3000/api/mis-balnearios?auth_id=${usuario.auth_id}`);
+        const result = await response.json();
 
-      if (authError || !user) {
-        console.error("Usuario no autenticado:", authError?.message);
-        navigate("/login");
-        return;
-      }
-
-      // Obtené los balnearios directamente usando el user.id (uuid del auth)
-      const { data: balneariosData, error: balneariosError } = await supabase
-        .from("balnearios")
-        .select("*")
-        .eq("id_usuario", user.id); // 🔑 Usa el uuid directamente
-
-      if (balneariosError) {
-        console.error("Error cargando balnearios:", balneariosError.message);
+        if (!response.ok) {
+          setBalnearios([]);
+        } else {
+          setBalnearios(result.balnearios || []);
+        }
+      } catch (err) {
         setBalnearios([]);
-      } else {
-        setBalnearios(balneariosData);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
 
     fetchBalnearios();

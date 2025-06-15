@@ -1,8 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "../../supabaseClient";
-import { Link } from "react-router-dom";
-
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import Carpa from '../../assets/Carpa.png';
 
@@ -28,166 +25,101 @@ function CarpasDelBalneario() {
 
   const navigate = useNavigate();
 
-useEffect(() => {
-  const fetchReservas = async () => {
-    if (!fechaInicio || !fechaFin) return;
-
-    const { data, error } = await supabase
-      .from("reservas")
-      .select("id_ubicacion, fecha_inicio, fecha_salida")
-      .eq("id_balneario", id);
-
-    if (error) {
-      console.error("Error al obtener reservas:", error.message);
-      return;
-    }
-    setReservas(data || []);
-  };
-
-  fetchReservas();
-}, [id, fechaInicio, fechaFin]);
-
-const carpaReservada = (idUbicacion) => {
-  console.log("Verificando reservas para la carpa:", idUbicacion);
-  if (!fechaInicio || !fechaFin) return false;
-  const inicio = new Date(fechaInicio);
-  const fin = new Date(fechaFin);
-
-  return reservas.some(res => {
-    if (res.id_ubicacion !== idUbicacion) return false;
-    const resInicio = new Date(res.fecha_inicio);
-    const resFin = new Date(res.fecha_salida);
-    return resInicio <= fin && resFin >= inicio;
-  });
-};
-
+  // Obtener usuario logueado
   useEffect(() => {
-    async function fetchData() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setUsuarioLogueado(false);
-        setLoading(false);
-        return;
-      }
-
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (usuario && usuario.auth_id) {
       setUsuarioLogueado(true);
-
-      const { data: usuario } = await supabase
-        .from("usuarios")
-        .select("*")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (!usuario) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: balnearioData } = await supabase
-        .from("balnearios")
-        .select("*")
-        .eq("id_balneario", id)
-        .single();
-
-      let ciudadNombre = "";
-      if (balnearioData?.id_ciudad) {
-        const { data: ciudadData } = await supabase
-          .from("ciudades")
-          .select("nombre")
-          .eq("id_ciudad", balnearioData.id_ciudad)
-          .single();
-        ciudadNombre = ciudadData?.nombre || "";
-      }
-      setCiudad(ciudadNombre);
-
-      const { data: todos } = await supabase
-        .from("servicios")
-        .select("id_servicio, nombre, imagen");
-      setTodosLosServicios(todos || []);
-
-      const { data: relaciones } = await supabase
-        .from("balnearios_servicios")
-        .select("id_servicio")
-        .eq("id_balneario", id);
-
-      const idsServicios = relaciones?.map(r => r.id_servicio) || [];
-
-      const { data: servicios } = await supabase
-        .from("servicios")
-        .select("id_servicio, nombre, imagen")
-        .in("id_servicio", idsServicios);
-
-      if (balnearioData?.id_usuario === usuario.auth_id) {
-        setEsDuenio(true);
-      }
-
-      setBalnearioInfo({ ...balnearioData, servicios });
-
-      // "carpas" = ubicaciones
-      const { data: carpasData } = await supabase
-        .from("ubicaciones")
-        .select("*")
-        .eq("id_balneario", id);
-
-      const carpasConPos = carpasData.map((c, i) => ({
-        ...c,
-        x: c.x ?? i * 100,
-        y: c.y ?? 0,
-      }));
-      setCarpas(carpasConPos);
-
-      const { data: elementosData } = await supabase
-        .from("elementos_ubicacion")
-        .select("*")
-        .eq("id_balneario", id);
-
-      setElementos(elementosData);
-      setLoading(false);
+      fetch(`http://localhost:3000/api/balneario/${id}/info`)
+        .then(res => res.json())
+        .then(info => {
+          setBalnearioInfo(info);
+          setCiudad(info.ciudad || "");
+          if (info.id_usuario === usuario.auth_id) setEsDuenio(true);
+        });
+    } else {
+      setUsuarioLogueado(false);
     }
-
-    fetchData();
   }, [id]);
 
+  // Cargar carpas, elementos y servicios
+  useEffect(() => {
+    setLoading(true);
+
+    fetch(`http://localhost:3000/api/balneario/${id}/carpas`)
+      .then(res => res.json())
+      .then(data => {
+        setCarpas(data.map((c, i) => ({
+          ...c,
+          x: c.x ?? i * 100,
+          y: c.y ?? 0,
+        })));
+      });
+
+    fetch(`http://localhost:3000/api/balneario/${id}/elementos`)
+      .then(res => res.json())
+      .then(setElementos);
+
+    fetch(`http://localhost:3000/api/balneario/${id}/servicios-todos`)
+      .then(res => res.json())
+      .then(setTodosLosServicios);
+
+    setLoading(false);
+  }, [id]);
+
+  // Cargar reservas
+  useEffect(() => {
+    if (!fechaInicio || !fechaFin) return;
+    fetch(`http://localhost:3000/api/balneario/${id}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
+      .then(res => res.json())
+      .then(setReservas);
+  }, [id, fechaInicio, fechaFin]);
+
+  const carpaReservada = (idUbicacion) => {
+    if (!fechaInicio || !fechaFin) return false;
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+
+    return reservas.some(res => {
+      if (res.id_ubicacion !== idUbicacion) return false;
+      const resInicio = new Date(res.fecha_inicio);
+      const resFin = new Date(res.fecha_salida);
+      return resInicio <= fin && resFin >= inicio;
+    });
+  };
+
+  // Servicios toggle
   async function toggleServicio(servicioId, tiene) {
     if (tiene) {
-      await supabase
-        .from("balnearios_servicios")
-        .delete()
-        .match({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+      await fetch(`http://localhost:3000/api/balneario/${id}/servicio/${servicioId}`, {
+        method: "DELETE"
+      });
     } else {
-      await supabase
-        .from("balnearios_servicios")
-        .insert({ id_balneario: Number(id), id_servicio: Number(servicioId) });
+      await fetch(`http://localhost:3000/api/balneario/${id}/servicio`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_servicio: servicioId }),
+      });
     }
 
-    // Volver a cargar servicios actualizados
-    const { data: relacionesActualizadas } = await supabase
-      .from("balnearios_servicios")
-      .select("id_servicio")
-      .eq("id_balneario", id);
-    const idsServicios = relacionesActualizadas?.map(r => r.id_servicio) || [];
-
-    const { data: serviciosActualizados } = await supabase
-      .from("servicios")
-      .select("id_servicio, nombre, imagen")
-      .in("id_servicio", idsServicios);
-
-    setBalnearioInfo(prev => ({ ...prev, servicios: serviciosActualizados }));
+    // Refrescar info balneario
+    fetch(`http://localhost:3000/api/balneario/${id}/info`)
+      .then(res => res.json())
+      .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
   }
 
+  // Agregar elemento
   async function agregarElemento(tipo) {
-    const x = 100, y = 100;
-    const { data } = await supabase
-      .from("elementos_ubicacion")
-      .insert({ id_balneario: id, tipo, x, y })
-      .select()
-      .single();
-
-    if (data) {
-      setElementos((prev) => [...prev, data]);
-    }
+    const res = await fetch(`http://localhost:3000/api/balneario/${id}/elemento`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tipo }),
+    });
+    const data = await res.json();
+    setElementos((prev) => [...prev, data]);
   }
 
+  // Drag & drop
   function onMouseMove(e) {
     if (!dragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -215,29 +147,30 @@ const carpaReservada = (idUbicacion) => {
     if (dragging.tipo === "carpa") {
       const carpa = carpas.find((c) => c.id_carpa === dragging.id);
       if (carpa) {
-        await supabase
-          .from("ubicaciones")
-          .update({ x: carpa.x, y: carpa.y })
-          .eq("id_carpa", carpa.id_carpa);
+        await fetch(`http://localhost:3000/api/balneario/carpas/${carpa.id_carpa}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ x: carpa.x, y: carpa.y }),
+        });
       }
     } else if (dragging.tipo === "elemento") {
       const el = elementos.find((el) => el.id_elemento === dragging.id);
       if (el) {
-        await supabase
-          .from("elementos_ubicacion")
-          .update({ x: el.x, y: el.y })
-          .eq("id_elemento", el.id_elemento);
+        await fetch(`http://localhost:3000/api/balneario/elementos/${el.id_elemento}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ x: el.x, y: el.y }),
+        });
       }
     }
 
     setDragging(null);
   }
 
+  // Eliminar carpa
   async function eliminarCarpa(id_carpa) {
-    const { error } = await supabase.from("ubicaciones").delete().eq("id_carpa", id_carpa);
-    if (!error) {
-      setCarpas((prev) => prev.filter((carpa) => carpa.id_carpa !== id_carpa));
-    }
+    await fetch(`http://localhost:3000/api/balneario/carpas/${id_carpa}`, { method: "DELETE" });
+    setCarpas((prev) => prev.filter((carpa) => carpa.id_carpa !== id_carpa));
   }
 
   function handleEditarCarpa(carpa) {
@@ -254,17 +187,15 @@ const carpaReservada = (idUbicacion) => {
 
   async function guardarCambios() {
     const { id_carpa, ...datos } = carpaEditando;
-    const { error } = await supabase
-      .from("ubicaciones")
-      .update(datos)
-      .eq("id_carpa", id_carpa);
-
-    if (!error) {
-      setCarpas((prev) =>
-        prev.map((c) => (c.id_carpa === id_carpa ? { ...c, ...datos } : c))
-      );
-      setCarpaEditando(null);
-    }
+    await fetch(`http://localhost:3000/api/balneario/carpas/${id_carpa}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    });
+    setCarpas((prev) =>
+      prev.map((c) => (c.id_carpa === id_carpa ? { ...c, ...datos } : c))
+    );
+    setCarpaEditando(null);
   }
 
   function rotarElemento(id_elemento) {
@@ -278,10 +209,11 @@ const carpaReservada = (idUbicacion) => {
 
     const el = elementos.find((e) => e.id_elemento === id_elemento);
     if (el) {
-      supabase
-        .from("elementos_ubicacion")
-        .update({ rotado: (el.rotado || 0) + 90 })
-        .eq("id_elemento", id_elemento);
+      fetch(`http://localhost:3000/api/balneario/elementos/${id_elemento}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rotado: (el.rotado || 0) + 90 }),
+      });
     }
   }
 
@@ -337,7 +269,7 @@ const carpaReservada = (idUbicacion) => {
                   <h3>Editar Servicios del Balneario</h3>
                   <div className="servicios-lista">
                     {todosLosServicios.map(serv => {
-                      const tieneServicio = balnearioInfo.servicios.some(s => s.id_servicio === serv.id_servicio);
+                      const tieneServicio = balnearioInfo.servicios?.some(s => s.id_servicio === serv.id_servicio);
                       return (
                         <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
                           <img src={serv.imagen} className="icono-imagen" />
@@ -371,7 +303,7 @@ const carpaReservada = (idUbicacion) => {
               <button onClick={() => agregarElemento("quincho")}>Quincho</button>
             </div>
           </div>
-          <Link to={`/tusreservas/${balnearioInfo.id_balneario}`}>Tus Reservas</Link>
+          <Link to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
         </>
       )}
 

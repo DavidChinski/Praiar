@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { supabase } from "../../supabaseClient";
+import { useParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
@@ -22,108 +21,67 @@ function ReservasComponent() {
     },
   ]);
   const [showCalendario, setShowCalendario] = useState(false);
-  const [searchParams] = useSearchParams();
   const { id } = useParams();
   const idBalneario = Number.isNaN(parseInt(id)) ? null : parseInt(id);
 
-  const fetchUsuarios = async (reservasData) => {
-    const ids = [...new Set(reservasData.map((r) => r.id_usuario).filter(Boolean))];
+  // Obtener usuario logueado del localStorage
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    if (ids.length === 0) return;
-
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select("id_usuario, nombre, apellido")
-      .in("id_usuario", ids);
-
-    if (!error && data) {
-      const map = {};
-      data.forEach((user) => {
-        map[user.id_usuario] = user;
-      });
-      setUsuarios(map);
-    }
-  };
-
+  // Traer reservas desde el backend
   const fetchReservas = async (filtrarPorFechas = false) => {
     setLoading(true);
     setError(null);
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      setError("Error obteniendo usuario o no hay sesión activa.");
+    if (!usuario) {
+      setError("No hay usuario logueado.");
       setLoading(false);
       return;
     }
 
-    let query = null;
+    let url = "";
+    let body = null;
+    let method = "POST";
 
-    if (idBalneario) {
-      const { data: usuario, error: usuarioError } = await supabase
-        .from("usuarios")
-        .select("esPropietario")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (usuarioError || !usuario) {
-        setError("No se pudo verificar si el usuario es propietario.");
-        setLoading(false);
-        return;
-      }
-
-      if (usuario.esPropietario) {
-        query = supabase
-          .from("reservas")
-          .select(`
-            *,
-            ubicaciones (
-              id_carpa,
-              posicion
-            ),
-            balnearios (
-              nombre
-            )
-          `)
-          .eq("id_balneario", idBalneario);
-      } else {
-        setError("No tenés permisos para ver reservas de este balneario.");
-        setLoading(false);
-        return;
-      }
+    if (idBalneario && usuario.esPropietario) {
+      // Reservas de propietarios (todas las reservas del balneario)
+      url = "http://localhost:3000/api/reservas-balneario";
+      body = {
+        idBalneario,
+      };
     } else {
-      query = supabase
-        .from("reservas")
-        .select(`
-          *,
-          ubicaciones (
-            id_carpa,
-            posicion
-          ),
-          balnearios (
-            nombre
-          )
-        `)
-        .eq("id_usuario", user.id);
+      // Reservas del usuario
+      url = "http://localhost:3000/api/reservas-usuario";
+      body = {
+        auth_id: usuario.auth_id,
+      };
     }
 
-    if (filtrarPorFechas && query) {
+    if (filtrarPorFechas) {
       const { startDate, endDate } = rangoFechas[0];
-      query = query
-        .lte("fecha_inicio", format(endDate, "yyyy-MM-dd"))
-        .gte("fecha_salida", format(startDate, "yyyy-MM-dd"));
+      body.fechaInicio = format(startDate, "yyyy-MM-dd");
+      body.fechaFin = format(endDate, "yyyy-MM-dd");
     }
 
-    const { data, error: reservasError } = await query;
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const result = await response.json();
 
-    if (reservasError) {
-      console.error("Error al obtener reservas:", reservasError);
-      setError("Error cargando reservas.");
-    } else {
-      setReservas(data);
-      if (idBalneario) {
-        await fetchUsuarios(data); // Solo cuando es propietario
+      if (!response.ok) {
+        setError(result.error || "Error cargando reservas.");
+        setReservas([]);
+      } else {
+        setReservas(result.reservas || []);
+        if (idBalneario && result.usuarios) {
+          setUsuarios(result.usuarios);
+        }
       }
+    } catch (e) {
+      setError("Error cargando reservas.");
+      setReservas([]);
     }
 
     setLoading(false);
@@ -131,6 +89,7 @@ function ReservasComponent() {
 
   useEffect(() => {
     fetchReservas();
+    // eslint-disable-next-line
   }, []);
 
   const handleBuscar = () => {
@@ -202,10 +161,10 @@ function ReservasComponent() {
                 <td>
                   {idBalneario && usuarios[reserva.id_usuario]
                     ? `${usuarios[reserva.id_usuario].nombre} ${usuarios[reserva.id_usuario].apellido}`
-                    : reserva.balnearios?.nombre}
+                    : reserva.balneario_nombre}
                 </td>
                 <td>
-                  {reserva.ubicaciones?.posicion || reserva.ubicaciones?.id_carpa}
+                  {reserva.ubicacion_posicion || reserva.ubicacion_id_carpa}
                 </td>
                 <td>{format(new Date(reserva.fecha_inicio), "dd/MM/yyyy")}</td>
                 <td>{format(new Date(reserva.fecha_salida), "dd/MM/yyyy")}</td>
