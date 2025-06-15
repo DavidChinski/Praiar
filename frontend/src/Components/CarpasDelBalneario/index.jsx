@@ -295,6 +295,7 @@ function CarpasDelBalneario() {
 
       {esDuenio && (
         <>
+        <div className="toolbar">
           <div className="toolbar-dropdown">
             <button className="dropdown-toggle">Agregar elemento ▾</button>
             <div className="dropdown-menu">
@@ -304,6 +305,7 @@ function CarpasDelBalneario() {
             </div>
           </div>
           <Link to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
+        </div>
         </>
       )}
 

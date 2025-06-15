@@ -191,48 +191,99 @@
   background-color: #b00020;
 }
 
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  background: #f7fafc;
+  border-radius: 14px;
+  box-shadow: 0 2px 14px 0 rgba(0,0,0,0.07);
+  padding: 16px 24px;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+}
+
 .toolbar-dropdown {
   position: relative;
-  display: inline-block;
-  margin-bottom: 1rem;
 }
 
 .dropdown-toggle {
-  padding: 8px 16px;
-  background-color: #0077cc;
-  color: white;
+  background: linear-gradient(90deg, #0088c6 0%, #00d8a7 100%);
+  color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,0.05);
+}
+
+.dropdown-toggle:hover, .dropdown-toggle:focus {
+  background: linear-gradient(90deg, #0078b6 0%, #00c897 100%);
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
 }
 
 .dropdown-menu {
   display: none;
   position: absolute;
-  background-color: white;
-  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-  border-radius: 5px;
-  z-index: 1;
-  margin-top: 5px;
-  min-width: 150px;
+  left: 0;
+  top: 110%;
+  min-width: 170px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.13);
+  padding: 8px 0;
+  z-index: 10;
+  flex-direction: column;
+  gap: 4px;
+  animation: fadeIn 0.18s;
 }
 
-.toolbar-dropdown:hover .dropdown-menu {
-  display: block;
+.toolbar-dropdown:hover .dropdown-menu,
+.toolbar-dropdown:focus-within .dropdown-menu {
+  display: flex;
 }
 
 .dropdown-menu button {
-  display: block;
-  width: 100%;
-  padding: 10px 15px;
-  border: none;
   background: none;
+  border: none;
+  color: #222;
+  padding: 10px 22px;
   text-align: left;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: background 0.17s, color 0.17s;
   cursor: pointer;
 }
 
 .dropdown-menu button:hover {
-  background-color: #f0f0f0;
+  background: #e6f7fa;
+  color: #0088c6;
+}
+
+.toolbar a {
+  margin-left: 10px;
+  background: #0088c6;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.06);
+}
+
+.toolbar a:hover {
+  background: #00d8a7;
+  color: #fff;
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-12px);}
+  to   { opacity: 1; transform: translateY(0);}
 }
 
 .carpa-posicion {
