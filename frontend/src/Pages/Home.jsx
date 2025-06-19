@@ -20,15 +20,17 @@ function Home() {
   return (
     <Layout>
       <BusquedaHome />
-      <ElegirPraiarHome /> 
-      <OpcionBalneariosHome />
+      <div id="seccion-inferior">
+        <ElegirPraiarHome /> 
+        <OpcionBalneariosHome />
 
-      {/* Aquí condicionamos qué componente mostrar */}
-      {user && user.esPropietario ? (
-        <FormularioConsultas />
-      ) : (
-        <Ciudades />
-      )}
+        {/* Aquí condicionamos qué componente mostrar */}
+        {user && user.esPropietario ? (
+          <FormularioConsultas />
+        ) : (
+          <Ciudades />
+        )}
+      </div>
     </Layout>
   );
 }

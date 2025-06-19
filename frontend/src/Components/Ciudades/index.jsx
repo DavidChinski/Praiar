@@ -102,11 +102,11 @@ function Ciudades() {
       {isPaginaCiudades && ciudades.length > ciudadesPorPagina && (
         <div className="paginacion">
           <button onClick={paginaAnterior} disabled={paginaActual === 1}>
-            ◀ Anterior
+            ◀
           </button>
           <span>Página {paginaActual} de {totalPaginas}</span>
           <button onClick={siguientePagina} disabled={paginaActual === totalPaginas}>
-            Siguiente ▶
+            ▶
           </button>
         </div>
       )}
