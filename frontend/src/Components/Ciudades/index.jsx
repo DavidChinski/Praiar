@@ -8,53 +8,62 @@ import Carpa from '../../assets/Carpa.png';
 
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
-  const [ciudadConMapa, setCiudadConMapa] = useState(null); // ciudad activa para mostrar el mapa
+  const [ciudadConMapa, setCiudadConMapa] = useState(null);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const ciudadesPorPagina = 9;
+
   const location = useLocation();
   const isPaginaCiudades = location.pathname === "/ciudades";
 
   useEffect(() => {
-  async function fetchCiudadesConBalnearios() {
-    try {
-      const res = await fetch('http://localhost:3000/api/ciudades');
-      const data = await res.json();
-
-      const ciudadesAMostrar = isPaginaCiudades ? data : data.slice(0, 8);
-      setCiudades(ciudadesAMostrar);
-    } catch (error) {
-      console.error('Error al obtener ciudades:', error);
+    async function fetchCiudadesConBalnearios() {
+      try {
+        const res = await fetch('http://localhost:3000/api/ciudades');
+        const data = await res.json();
+        const ciudadesAMostrar = isPaginaCiudades ? data : data.slice(0, 8);
+        setCiudades(ciudadesAMostrar);
+      } catch (error) {
+        console.error('Error al obtener ciudades:', error);
+      }
     }
-  }
 
-  fetchCiudadesConBalnearios();
-}, [isPaginaCiudades]);
+    fetchCiudadesConBalnearios();
+  }, [isPaginaCiudades]);
 
+  const abrirMapa = (nombreCiudad) => setCiudadConMapa(nombreCiudad);
+  const cerrarMapa = () => setCiudadConMapa(null);
 
-  const abrirMapa = (nombreCiudad) => {
-    setCiudadConMapa(nombreCiudad);
+  // Paginación: obtener ciudades actuales
+  const indiceUltimaCiudad = paginaActual * ciudadesPorPagina;
+  const indicePrimeraCiudad = indiceUltimaCiudad - ciudadesPorPagina;
+  const ciudadesPaginadas = isPaginaCiudades
+    ? ciudades.slice(indicePrimeraCiudad, indiceUltimaCiudad)
+    : ciudades;
+
+  const totalPaginas = Math.ceil(ciudades.length / ciudadesPorPagina);
+
+  const siguientePagina = () => {
+    if (paginaActual < totalPaginas) setPaginaActual(paginaActual + 1);
   };
 
-  const cerrarMapa = () => {
-    setCiudadConMapa(null);
+  const paginaAnterior = () => {
+    if (paginaActual > 1) setPaginaActual(paginaActual - 1);
   };
 
   return (
     <div className="ciudades-container">
       <h2 className={isPaginaCiudades ? 'titulo-ciudades' : ''}>Ciudades</h2>
       <div className="card-grid">
-        {ciudades.map((ciudad) => (
+        {ciudadesPaginadas.map((ciudad) => (
           <div key={ciudad.id_ciudad} className={`ciudad-card ${isPaginaCiudades ? 'card-detalle' : ''}`}>
             <img src={Logo} alt={ciudad.nombre} className={`imgCiudad ${isPaginaCiudades ? 'imgCiudades-margin' : ''}`} />
-            
+
             {isPaginaCiudades ? (
               <div className="detalle-card">
                 <div className="info-contenido">
                   <div className="info-izquierda">
                     <h3>{ciudad.nombre}</h3>
-                    <p
-                      className="mapa"
-                      onClick={() => abrirMapa(ciudad.nombre)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <p className="mapa" onClick={() => abrirMapa(ciudad.nombre)} style={{ cursor: 'pointer' }}>
                       <img src={Mapa} alt="mapa" className="iconoCard" />
                       Ver Mapa
                     </p>
@@ -88,6 +97,19 @@ function Ciudades() {
           </div>
         )}
       </div>
+
+      {/* Botones de paginación */}
+      {isPaginaCiudades && ciudades.length > ciudadesPorPagina && (
+        <div className="paginacion">
+          <button onClick={paginaAnterior} disabled={paginaActual === 1}>
+            ◀ Anterior
+          </button>
+          <span>Página {paginaActual} de {totalPaginas}</span>
+          <button onClick={siguientePagina} disabled={paginaActual === totalPaginas}>
+            Siguiente ▶
+          </button>
+        </div>
+      )}
 
       {/* Modal de Mapa */}
       {ciudadConMapa && (
