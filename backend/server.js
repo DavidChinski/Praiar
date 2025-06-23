@@ -615,7 +615,7 @@ app.post('/api/reservas-balneario', async (req, res) => {
     return res.status(500).json({ error: "Error cargando reservas." });
   }
 
-  // Mapear reservas para devolver nombre de cliente y ubicación
+  // Obtener los ids de usuario de todas las reservas
   const usuarioIds = [...new Set(data.map(r => r.id_usuario).filter(Boolean))];
   let usuarios = {};
   if (usuarioIds.length > 0) {
@@ -628,9 +628,13 @@ app.post('/api/reservas-balneario', async (req, res) => {
     }
   }
 
+  // Siempre devolver cliente_nombre en cada reserva
   const reservas = data.map(r => ({
     id_reserva: r.id_reserva,
     id_usuario: r.id_usuario,
+    cliente_nombre: usuarios[r.id_usuario]
+      ? `${usuarios[r.id_usuario].nombre} ${usuarios[r.id_usuario].apellido}`
+      : "Cliente desconocido",
     ubicacion_posicion: r.ubicaciones?.posicion,
     ubicacion_id_carpa: r.ubicaciones?.id_carpa,
     balneario_nombre: r.balnearios?.nombre,
@@ -638,7 +642,7 @@ app.post('/api/reservas-balneario', async (req, res) => {
     fecha_salida: r.fecha_salida,
   }));
 
-  res.json({ reservas, usuarios });
+  res.json({ reservas });
 });
 
 // POST /api/reservas-usuario  (Cliente: ver sus reservas)
