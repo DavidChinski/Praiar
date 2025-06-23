@@ -303,13 +303,9 @@ app.post('/api/crear-balneario', async (req, res) => {
     direccion,
     telefono,
     imagenUrl,
-    cantidadCarpas,
-    cantSillas,
-    cantMesas,
-    cantReposeras,
-    capacidad,
     ciudadSeleccionada,
-    idUsuario // auth_id del usuario (UUID)
+    idUsuario,
+    tandasCarpas // <-- [{ id_tipo_ubicacion, cantidadCarpas, ... }]
   } = req.body;
 
   if (!idUsuario) {
@@ -317,6 +313,9 @@ app.post('/api/crear-balneario', async (req, res) => {
   }
   if (!ciudadSeleccionada) {
     return res.status(400).json({ error: 'Debe seleccionar una ciudad.' });
+  }
+  if (!Array.isArray(tandasCarpas) || tandasCarpas.length === 0) {
+    return res.status(400).json({ error: 'Debe agregar al menos una tanda de carpas.' });
   }
 
   try {
@@ -340,30 +339,41 @@ app.post('/api/crear-balneario', async (req, res) => {
 
     const nuevoBalnearioId = balnearioData.id_balneario;
 
-    // 2. Crear carpas con posiciones x, y calculadas
-    const carpas = Array.from({ length: cantidadCarpas }, (_, i) => {
-      const maxPorFila = 10;
-      const anchoCarpa = 100;
-      const altoCarpa = 100;
-      const fila = Math.floor(i / maxPorFila);
-      const columna = i % maxPorFila;
-      return {
-        id_balneario: nuevoBalnearioId,
-        posicion: i + 1,
-        reservado: false,
-        cant_sillas: cantSillas,
-        cant_mesas: cantMesas,
-        cant_reposeras: cantReposeras,
-        capacidad: capacidad,
-        id_usuario: idUsuario,
-        x: columna * anchoCarpa,
-        y: fila * altoCarpa,
-      };
+    // 2. Crear todas las carpas de todas las tandas
+    let ubicaciones = [];
+    let pos = 1;
+    tandasCarpas.forEach((tanda) => {
+      const {
+        id_tipo_ubicacion,
+        cantidadCarpas,
+        cantSillas,
+        cantMesas,
+        cantReposeras,
+        capacidad
+      } = tanda;
+      const maxPorFila = 10, anchoCarpa = 100, altoCarpa = 100;
+      for (let i = 0; i < cantidadCarpas; i++, pos++) {
+        const fila = Math.floor((pos-1) / maxPorFila);
+        const columna = (pos-1) % maxPorFila;
+        ubicaciones.push({
+          id_balneario: nuevoBalnearioId,
+          id_tipo_ubicacion: id_tipo_ubicacion,
+          posicion: pos,
+          reservado: false,
+          cant_sillas: cantSillas,
+          cant_mesas: cantMesas,
+          cant_reposeras: cantReposeras,
+          capacidad: capacidad,
+          id_usuario: idUsuario,
+          x: columna * anchoCarpa,
+          y: fila * altoCarpa,
+        });
+      }
     });
 
     const { error: carpasError } = await supabase
       .from("ubicaciones")
-      .insert(carpas);
+      .insert(ubicaciones);
 
     if (carpasError) {
       return res.status(500).json({ error: "Balneario creado, pero ocurrió un error al crear las carpas." });
@@ -373,6 +383,17 @@ app.post('/api/crear-balneario', async (req, res) => {
   } catch (err) {
     console.error("Error en /api/crear-balneario:", err);
     res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
+// Nuevo endpoint sugerido para traer tipos de ubicaciones
+app.get('/api/tipos-ubicaciones', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from("tipos_ubicaciones").select("*");
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener tipos de ubicaciones" });
   }
 });
 

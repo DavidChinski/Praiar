@@ -2,42 +2,86 @@ import { useEffect, useState } from "react";
 import "./CrearBalneario.css";
 
 function CrearBalneario() {
+  // Balneario
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
   const [telefono, setTelefono] = useState("");
   const [imagenUrl, setImagenUrl] = useState("");
-  const [cantidadCarpas, setCantidadCarpas] = useState(0);
+  const [ciudadSeleccionada, setCiudadSeleccionada] = useState("");
+  const [ciudades, setCiudades] = useState([]);
+  const [mensaje, setMensaje] = useState("");
 
+  // Carpa (tanda actual)
+  const [cantidadCarpas, setCantidadCarpas] = useState(0);
   const [cantSillas, setCantSillas] = useState(2);
   const [cantMesas, setCantMesas] = useState(1);
   const [cantReposeras, setCantReposeras] = useState(2);
   const [capacidad, setCapacidad] = useState(4);
+  const [tipoUbicacion, setTipoUbicacion] = useState("");
+  const [tiposUbicacion, setTiposUbicacion] = useState([]);
 
-  const [ciudades, setCiudades] = useState([]);
-  const [ciudadSeleccionada, setCiudadSeleccionada] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  // Todas las tandas cargadas
+  const [tandasCarpas, setTandasCarpas] = useState([]);
 
   useEffect(() => {
-    // Traer ciudades desde el backend (no desde supabase directo)
     fetch("http://localhost:3000/api/ciudades")
       .then(res => res.json())
       .then(data => setCiudades(data))
-      .catch(err => setMensaje("Error al obtener ciudades."));
+      .catch(() => setMensaje("Error al obtener ciudades."));
+
+    fetch("http://localhost:3000/api/tipos-ubicaciones")
+      .then(res => res.json())
+      .then(data => setTiposUbicacion(data))
+      .catch(() => setMensaje("Error al obtener tipos de ubicación."));
   }, []);
 
-  const handleSubmit = async (e) => {
+  // 1. Agregar una tanda de carpas a la lista local
+  const handleAgregarTanda = (e) => {
+    e.preventDefault();
+    if (!tipoUbicacion) {
+      setMensaje("Debe seleccionar un tipo de carpa.");
+      return;
+    }
+    if (cantidadCarpas <= 0) {
+      setMensaje("Debe ingresar la cantidad de carpas.");
+      return;
+    }
+    setTandasCarpas([
+      ...tandasCarpas,
+      {
+        id_tipo_ubicacion: tipoUbicacion,
+        cantidadCarpas,
+        cantSillas,
+        cantMesas,
+        cantReposeras,
+        capacidad
+      }
+    ]);
+    // Resetear form de carpas para cargar otra tanda
+    setTipoUbicacion("");
+    setCantidadCarpas(0);
+    setCantSillas(2);
+    setCantMesas(1);
+    setCantReposeras(2);
+    setCapacidad(4);
+    setMensaje("");
+  };
+
+  // 2. Enviar todo al backend
+  const handleFinalizar = async (e) => {
     e.preventDefault();
     setMensaje("");
-
-    // Traer usuario del localStorage
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || !usuario.auth_id) {
       setMensaje("Sesión no válida.");
       return;
     }
-
     if (!ciudadSeleccionada) {
       setMensaje("Debe seleccionar una ciudad.");
+      return;
+    }
+    if (tandasCarpas.length === 0) {
+      setMensaje("Debe agregar al menos una tanda de carpas.");
       return;
     }
 
@@ -46,13 +90,9 @@ function CrearBalneario() {
       direccion,
       telefono,
       imagenUrl,
-      cantidadCarpas,
-      cantSillas,
-      cantMesas,
-      cantReposeras,
-      capacidad,
       ciudadSeleccionada,
-      idUsuario: usuario.auth_id
+      idUsuario: usuario.auth_id,
+      tandasCarpas // array de todas las tandas
     };
 
     try {
@@ -62,12 +102,10 @@ function CrearBalneario() {
         body: JSON.stringify(body)
       });
       const result = await res.json();
-
       if (!res.ok) {
         setMensaje(result.error || "Error al guardar. Intente nuevamente.");
         return;
       }
-
       window.location.href = "/tusbalnearios";
     } catch (err) {
       setMensaje("Error al guardar. Intente nuevamente.");
@@ -79,7 +117,9 @@ function CrearBalneario() {
       <div className="form-layout">
         <div className="form-container-consultas">
           <h1 className="titulo">Agregar nuevo Balneario</h1>
-          <form onSubmit={handleSubmit} className="formulario">
+
+          {/* Formulario datos del balneario */}
+          <form onSubmit={handleFinalizar} className="formulario">
             <div className="form-section">
               <h3>Configuración del balneario</h3>
               <label htmlFor="nombre">Nombre</label>
@@ -98,8 +138,16 @@ function CrearBalneario() {
                 ))}
               </select>
             </div>
+            {/* Formulario de carpa (tanda) */}
             <div className="form-section">
-              <h3>Configuración de carpas</h3>
+              <h3>Agregar tanda de carpas</h3>
+              <label htmlFor="tipoUbicacion">Tipo de carpa</label>
+              <select id="tipoUbicacion" value={tipoUbicacion} onChange={(e) => setTipoUbicacion(e.target.value)} required>
+                <option value="">Seleccione tipo</option>
+                {tiposUbicacion.map((tipo) => (
+                  <option key={tipo.id_tipo_ubicaciones} value={tipo.id_tipo_ubicaciones}>{tipo.nombre}</option>
+                ))}
+              </select>
               <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
               <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value) || 0)} required />
               <label htmlFor="sillas">Cantidad de sillas</label>
@@ -110,9 +158,23 @@ function CrearBalneario() {
               <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value) || 0)} required />
               <label htmlFor="capacidad">Capacidad por carpa</label>
               <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value) || 0)} required />
+              <button type="button" onClick={handleAgregarTanda}>Agregar tanda</button>
             </div>
+            {/* Mostrar las tandas cargadas */}
+            {tandasCarpas.length > 0 && (
+              <div>
+                <h4>Tandas agregadas</h4>
+                <ul>
+                  {tandasCarpas.map((t, idx) => (
+                    <li key={idx}>
+                      {tiposUbicacion.find(x => x.id_tipo_ubicaciones == t.id_tipo_ubicacion)?.nombre || "Tipo"}: {t.cantidadCarpas} carpas
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="boton-contenedor">
-              <button className="enviar" type="submit">Enviar</button>
+              <button className="enviar" type="submit">Finalizar y crear balneario</button>
             </div>
           </form>
           {mensaje && <p className="mensaje">{mensaje}</p>}

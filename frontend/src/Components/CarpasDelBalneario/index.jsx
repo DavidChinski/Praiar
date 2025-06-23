@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import Carpa from '../../assets/Carpa.png';
+import Sombrilla from '../../assets/BalneariosBusquedaHome.png';
 
 function CarpasDelBalneario() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ function CarpasDelBalneario() {
   const [mostrarModalServicios, setMostrarModalServicios] = useState(false);
   const [todosLosServicios, setTodosLosServicios] = useState([]);
   const [reservas, setReservas] = useState([]);
+  const [tiposUbicacion, setTiposUbicacion] = useState([]);
 
   const navigate = useNavigate();
 
@@ -64,6 +66,11 @@ function CarpasDelBalneario() {
       .then(res => res.json())
       .then(setTodosLosServicios);
 
+    // Traer tipos de ubicaciones
+    fetch("http://localhost:3000/api/tipos-ubicaciones")
+      .then(res => res.json())
+      .then(setTiposUbicacion);
+
     setLoading(false);
   }, [id]);
 
@@ -74,6 +81,11 @@ function CarpasDelBalneario() {
       .then(res => res.json())
       .then(setReservas);
   }, [id, fechaInicio, fechaFin]);
+
+  // Obtener el tipo de carpa por id_tipo_ubicacion
+  const getTipoCarpa = (carpa) => {
+    return tiposUbicacion.find(t => t.id_tipo_ubicaciones === carpa.id_tipo_ubicacion)?.nombre || "simple";
+  };
 
   const carpaReservada = (idUbicacion) => {
     if (!fechaInicio || !fechaFin) return false;
@@ -315,41 +327,67 @@ function CarpasDelBalneario() {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        {carpas.map((carpa) => (
-          <div
-            key={carpa.id_carpa}
-            className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"}`}
-            style={{
-              left: `${carpa.x}px`,
-              top: `${carpa.y}px`
-            }}
-            onMouseDown={() =>
-              esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
-            }
-            onClick={() => {
-              if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
-                navigate(`/reservaubicacion/${carpa.id_carpa}`);
+        {carpas.map((carpa) => {
+          const tipo = getTipoCarpa(carpa);
+          const left = carpa.x;
+          const top = carpa.y;
+          return (
+            <div
+              key={carpa.id_carpa}
+              className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
+              style={{ left: `${left}px`, top: `${top}px` }}
+              onMouseDown={() =>
+                esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
               }
-            }}
-            title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
-          >
-            <div className="carpa-posicion">{carpa.posicion}</div>
-            <img
-              src={Carpa}
-              alt={`Carpa ${carpa.posicion}`}
-              className="carpa-imagen"
-              style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-            />
-            <div className="acciones">
-              {esDuenio && (
-                <>
-                  <button onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
-                  <button onClick={() => handleEditarCarpa(carpa)}>✏️</button>
-                </>
+              onClick={() => {
+                if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
+                  navigate(`/reservaubicacion/${carpa.id_carpa}`);
+                }
+              }}
+              title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
+            >
+              <div className="carpa-posicion">{carpa.posicion}</div>
+              {tipo === "doble" ? (
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <img
+                    src={Carpa}
+                    alt={`Carpa doble ${carpa.posicion}`}
+                    className="carpa-imagen"
+                    style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+                  />
+                  <img
+                    src={Carpa}
+                    alt={`Carpa doble ${carpa.posicion}`}
+                    className="carpa-imagen"
+                    style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+                  />
+                </div>
+              ) : tipo === "sombrilla" ? (
+                <img
+                  src={Sombrilla}
+                  alt={`Sombrilla ${carpa.posicion}`}
+                  className="carpa-imagen"
+                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+                />
+              ) : (
+                <img
+                  src={Carpa}
+                  alt={`Carpa ${carpa.posicion}`}
+                  className="carpa-imagen"
+                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+                />
               )}
+              <div className="acciones">
+                {esDuenio && (
+                  <>
+                    <button onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
+                    <button onClick={() => handleEditarCarpa(carpa)}>✏️</button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {elementos.map((el) => (
           <div

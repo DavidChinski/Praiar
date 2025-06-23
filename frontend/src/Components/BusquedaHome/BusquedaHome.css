@@ -236,3 +236,35 @@ input[type="text"]:focus,
     transform: translateY(8px);
   }
 }
+
+.input-autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-autocomplete-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  width: 100%;
+  padding-left: 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  z-index: 3;
+  /* background: transparent;  opcional, si quieres overlay visible */
+}
+
+.input-autocomplete-overlay span {
+  font-size: inherit;
+  line-height: 1.1;
+}
+
+.input-autocomplete-wrapper input.input-estandar {
+  background: none;
+  position: relative;
+  z-index: 2;
+}
