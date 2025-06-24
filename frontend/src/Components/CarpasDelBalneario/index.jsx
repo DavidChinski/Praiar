@@ -24,6 +24,14 @@ function CarpasDelBalneario() {
   const [todosLosServicios, setTodosLosServicios] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [tiposUbicacion, setTiposUbicacion] = useState([]);
+  const [mostrarAgregarCarpa, setMostrarAgregarCarpa] = useState(false);
+  const [nuevaCarpa, setNuevaCarpa] = useState({
+    id_tipo_ubicacion: "",
+    cant_sillas: 2,
+    cant_mesas: 1,
+    cant_reposeras: 2,
+    capacidad: 4,
+  });
 
   const navigate = useNavigate();
 
@@ -229,6 +237,42 @@ function CarpasDelBalneario() {
     }
   }
 
+  // AGREGAR CARPA/SOMBRILLA
+  async function handleAgregarCarpa() {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!nuevaCarpa.id_tipo_ubicacion) return alert("Seleccione el tipo");
+    const res = await fetch(`http://localhost:3000/api/balneario/${id}/carpas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...nuevaCarpa,
+        id_usuario: usuario.auth_id
+      })
+    });
+    if (res.ok) {
+      setMostrarAgregarCarpa(false);
+      setNuevaCarpa({
+        id_tipo_ubicacion: "",
+        cant_sillas: 2,
+        cant_mesas: 1,
+        cant_reposeras: 2,
+        capacidad: 4,
+      });
+      // Recargar carpas
+      fetch(`http://localhost:3000/api/balneario/${id}/carpas`)
+        .then(res => res.json())
+        .then(data => {
+          setCarpas(data.map((c, i) => ({
+            ...c,
+            x: c.x ?? i * 100,
+            y: c.y ?? 0,
+          })));
+        });
+    } else {
+      alert("Hubo un error al agregar la carpa/sombrilla");
+    }
+  }
+
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
@@ -273,6 +317,9 @@ function CarpasDelBalneario() {
               onClick={() => setMostrarModalServicios(true)}
             >
               Agrega un Servicio
+            </button>
+            <button onClick={() => setMostrarAgregarCarpa(true)}>
+              + Agregar carpa/sombrilla
             </button>
 
             {mostrarModalServicios && (
@@ -414,6 +461,51 @@ function CarpasDelBalneario() {
           </div>
         ))}
       </div>
+
+      {/* MODAL AGREGAR CARPA/SOMBRILLA */}
+      {mostrarAgregarCarpa && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Agregar carpa o sombrilla</h3>
+            <label>
+              Tipo:
+              <select
+                value={nuevaCarpa.id_tipo_ubicacion}
+                onChange={e => setNuevaCarpa(nc => ({ ...nc, id_tipo_ubicacion: e.target.value }))}
+              >
+                <option value="">Seleccione tipo</option>
+                {tiposUbicacion.map(t =>
+                  <option key={t.id_tipo_ubicaciones} value={t.id_tipo_ubicaciones}>{t.nombre}</option>
+                )}
+              </select>
+            </label>
+            <label>
+              Sillas:
+              <input type="number" value={nuevaCarpa.cant_sillas} min={0}
+                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_sillas: +e.target.value }))} />
+            </label>
+            <label>
+              Mesas:
+              <input type="number" value={nuevaCarpa.cant_mesas} min={0}
+                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_mesas: +e.target.value }))} />
+            </label>
+            <label>
+              Reposeras:
+              <input type="number" value={nuevaCarpa.cant_reposeras} min={0}
+                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_reposeras: +e.target.value }))} />
+            </label>
+            <label>
+              Capacidad:
+              <input type="number" value={nuevaCarpa.capacidad} min={1}
+                onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
+            </label>
+            <div className="modal-buttons">
+              <button onClick={handleAgregarCarpa}>Agregar</button>
+              <button onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {carpaEditando && (
         <div className="modal">

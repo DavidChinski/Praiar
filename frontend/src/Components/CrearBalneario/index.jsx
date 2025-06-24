@@ -142,22 +142,22 @@ function CrearBalneario() {
             <div className="form-section">
               <h3>Agregar tanda de carpas</h3>
               <label htmlFor="tipoUbicacion">Tipo de carpa</label>
-              <select id="tipoUbicacion" value={tipoUbicacion} onChange={(e) => setTipoUbicacion(e.target.value)} required>
+              <select id="tipoUbicacion" value={tipoUbicacion} onChange={(e) => setTipoUbicacion(e.target.value)}>
                 <option value="">Seleccione tipo</option>
                 {tiposUbicacion.map((tipo) => (
                   <option key={tipo.id_tipo_ubicaciones} value={tipo.id_tipo_ubicaciones}>{tipo.nombre}</option>
                 ))}
               </select>
               <label htmlFor="cantidadCarpas">Cantidad de carpas</label>
-              <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value) || 0)} required />
+              <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={(e) => setCantidadCarpas(parseInt(e.target.value) || 0)} />
               <label htmlFor="sillas">Cantidad de sillas</label>
-              <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value) || 0)} required />
+              <input id="sillas" type="number" value={cantSillas} onChange={(e) => setCantSillas(parseInt(e.target.value) || 0)} />
               <label htmlFor="mesas">Cantidad de mesas</label>
-              <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value) || 0)} required />
+              <input id="mesas" type="number" value={cantMesas} onChange={(e) => setCantMesas(parseInt(e.target.value) || 0)} />
               <label htmlFor="reposeras">Cantidad de reposeras</label>
-              <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value) || 0)} required />
+              <input id="reposeras" type="number" value={cantReposeras} onChange={(e) => setCantReposeras(parseInt(e.target.value) || 0)} />
               <label htmlFor="capacidad">Capacidad por carpa</label>
-              <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value) || 0)} required />
+              <input id="capacidad" type="number" value={capacidad} onChange={(e) => setCapacidad(parseInt(e.target.value) || 0)} />
               <button type="button" onClick={handleAgregarTanda}>Agregar tanda</button>
             </div>
             {/* Mostrar las tandas cargadas */}

@@ -800,3 +800,57 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+// POST /api/balneario/:id/carpas
+app.post('/api/balneario/:id/carpas', async (req, res) => {
+  const { id } = req.params;
+  const {
+    id_tipo_ubicacion, // 1=simple, 2=doble, 3=sombrilla
+    cant_sillas,
+    cant_mesas,
+    cant_reposeras,
+    capacidad,
+    id_usuario,
+    x = 0,
+    y = 0
+  } = req.body;
+
+  if (!id || !id_tipo_ubicacion || !id_usuario) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios.' });
+  }
+
+  try {
+    // Calcular posicion (mayor existente + 1)
+    const { data: ubicaciones } = await supabase
+      .from("ubicaciones")
+      .select("posicion")
+      .eq("id_balneario", id)
+      .order("posicion", { ascending: false })
+      .limit(1);
+
+    const nuevaPosicion = (ubicaciones?.[0]?.posicion || 0) + 1;
+
+    const { data, error } = await supabase
+      .from("ubicaciones")
+      .insert([{
+        id_balneario: id,
+        id_tipo_ubicacion,
+        cant_sillas,
+        cant_mesas,
+        cant_reposeras,
+        capacidad,
+        id_usuario,
+        reservado: false,
+        posicion: nuevaPosicion,
+        x,
+        y,
+      }])
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ error: "Error agregando carpa o sombrilla." });
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: "Error interno al agregar carpa." });
+  }
+});
