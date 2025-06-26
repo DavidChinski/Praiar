@@ -13,23 +13,23 @@
 
 /* Contenedor principal */
 .header-container {
-  max-width: 1920px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
+  padding: 1rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  justify-content: space-between;
   font-family: 'Arial', sans-serif;
-  flex-wrap: nowrap;
   box-sizing: border-box;
-  gap: 2rem; /* Añade separación entre los tres bloques */
+  gap: 3rem;
+  min-height: 80px;
 }
 
 .logo-link {
   display: flex;
-  gap: 1rem;
-  flex: 1;
-  min-width: 180px;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
 }
 
 /* --------- Logo y marca --------- */
@@ -38,6 +38,7 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
+  justify-self: start;
 }
 
 .logo {
@@ -61,12 +62,12 @@
 
 /* --------- Navegación --------- */
 .nav {
-  flex: 2;
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 2rem;
-  max-width: 800px; /* ✅ Limita el ancho máximo del bloque de navegación */
-  flex-wrap: wrap;   /* ✅ Permite que los links pasen a otra línea si hay muchos */
+  justify-self: center;
+  flex-wrap: wrap;
   width: 100%;
   box-sizing: border-box;
 }
@@ -109,8 +110,9 @@
 .auth-buttons {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.5rem;
-  flex: 1;
+  justify-self: end;
   min-width: 180px;
 }
 
@@ -140,11 +142,7 @@
   flex-shrink: 0;
 }
 
-.nav {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
+
 
 
 .img-logo-perfil{
@@ -205,8 +203,8 @@
 /* --------- Responsive --------- */
 @media (max-width: 1005px) {
   .header-container {
-    flex-wrap: wrap;
-    gap: 0;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
   }
   .nav,
   .auth-buttons {
@@ -214,7 +212,7 @@
   }
   .hamburger {
     display: block;
-    margin-left: auto;
+    justify-self: end;
   }
   .menu {
     display: flex;
