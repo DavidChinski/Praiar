@@ -200,8 +200,8 @@ function ReservasComponent() {
         : `${usuario?.nombre || ""} ${usuario?.apellido || ""}`;
     const balneario = reserva.balneario_nombre || "Sin nombre";
     const ubicacion = reserva.ubicacion_posicion || reserva.ubicacion_id_carpa || "Sin ubicación";
-    const entrada = format(new Date(reserva.fecha_inicio), "dd/MM/yyyy");
-    const salida = format(new Date(reserva.fecha_salida), "dd/MM/yyyy");
+    const entrada = format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy");
+    const salida = format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy");
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     doc.addImage(iconosBase64.logo, "PNG", 15, 10, 25, 25);
@@ -290,7 +290,9 @@ function ReservasComponent() {
             </tr>
           </thead>
           <tbody>
-            {reservas.map((reserva) => (
+            {reservas
+              .sort((a, b) => new Date(b.fecha_inicio + 'T00:00:00') - new Date(a.fecha_inicio + 'T00:00:00'))
+              .map((reserva) => (
               <tr key={reserva.id_reserva}>
                 <td>
                   {idBalneario
@@ -300,8 +302,8 @@ function ReservasComponent() {
                 <td>
                   {reserva.ubicacion_posicion || reserva.ubicacion_id_carpa}
                 </td>
-                <td>{format(new Date(reserva.fecha_inicio), "dd/MM/yyyy")}</td>
-                <td>{format(new Date(reserva.fecha_salida), "dd/MM/yyyy")}</td>
+                <td>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                <td>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
                 <td>
                   <button
                     className="ver-button"

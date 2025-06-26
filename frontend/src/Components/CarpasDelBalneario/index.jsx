@@ -97,13 +97,13 @@ function CarpasDelBalneario() {
 
   const carpaReservada = (idUbicacion) => {
     if (!fechaInicio || !fechaFin) return false;
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
+    const inicio = new Date(fechaInicio + 'T00:00:00');
+    const fin = new Date(fechaFin + 'T00:00:00');
 
     return reservas.some(res => {
       if (res.id_ubicacion !== idUbicacion) return false;
-      const resInicio = new Date(res.fecha_inicio);
-      const resFin = new Date(res.fecha_salida);
+      const resInicio = new Date(res.fecha_inicio + 'T00:00:00');
+      const resFin = new Date(res.fecha_salida + 'T00:00:00');
       return resInicio <= fin && resFin >= inicio;
     });
   };
@@ -290,8 +290,8 @@ function CarpasDelBalneario() {
 
       {fechaInicio && fechaFin && (
         <p>
-          Mostrando disponibilidad del {new Date(fechaInicio).toLocaleDateString()} al{" "}
-          {new Date(fechaFin).toLocaleDateString()}
+          Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString()} al{" "}
+          {new Date(fechaFin + 'T00:00:00').toLocaleDateString()}
         </p>
       )}
 
