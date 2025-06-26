@@ -26,14 +26,31 @@ function BusquedaHome() {
 
   // Autocompletado
   const [ciudadInput, setCiudadInput] = useState('');
-  const [ciudadMatch, setCiudadMatch] = useState(null);
+  const [ciudadMatches, setCiudadMatches] = useState([]);
 
   const [balnearioInput, setBalnearioInput] = useState('');
-  const [balnearioMatch, setBalnearioMatch] = useState(null);
+  const [balnearioMatches, setBalnearioMatches] = useState([]);
 
   const inputRef = useRef(null);
   const balnearioInputRef = useRef(null);
+  const ciudadDropdownRef = useRef(null);
+  const balnearioDropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Cerrar dropdowns al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (ciudadDropdownRef.current && !ciudadDropdownRef.current.contains(event.target)) {
+        setCiudadMatches([]);
+      }
+      if (balnearioDropdownRef.current && !balnearioDropdownRef.current.contains(event.target)) {
+        setBalnearioMatches([]);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const usuarioLS = localStorage.getItem("usuario");
@@ -54,24 +71,28 @@ function BusquedaHome() {
   // Coincidencia que SOLO EMPIEZA por el input, case-insensitive y sin acentos
   useEffect(() => {
     if (!ciudadInput) {
-      setCiudadMatch(null);
+      setCiudadMatches([]);
       setCiudadSeleccionada(null);
       return;
     }
     const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const inputNorm = normalizar(ciudadInput);
-    const match = ciudades.find(c =>
+    const matches = ciudades.filter(c =>
       normalizar(c.nombre).startsWith(inputNorm)
-    );
-    setCiudadMatch(match || null);
-    if (match && normalizar(match.nombre) === inputNorm) {
-      setCiudadSeleccionada(match.id_ciudad);
+    ).slice(0, 3); // Máximo 3 resultados
+    
+    setCiudadMatches(matches);
+    
+    // Verificar si hay coincidencia exacta
+    const exactMatch = matches.find(c => normalizar(c.nombre) === inputNorm);
+    if (exactMatch) {
+      setCiudadSeleccionada(exactMatch.id_ciudad);
     } else {
       setCiudadSeleccionada(null);
     }
     setBalnearioSeleccionado(null);
     setBalnearioInput('');
-    setBalnearioMatch(null);
+    setBalnearioMatches([]);
   }, [ciudadInput, ciudades]);
 
   useEffect(() => {
@@ -95,32 +116,33 @@ function BusquedaHome() {
   // Autocompletado balneario
   useEffect(() => {
     if (!balnearioInput) {
-      setBalnearioMatch(null);
+      setBalnearioMatches([]);
       setBalnearioSeleccionado(null);
       return;
     }
     const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const inputNorm = normalizar(balnearioInput);
-    const match = balnearios.find(b =>
+    const matches = balnearios.filter(b =>
       normalizar(b.nombre).startsWith(inputNorm)
-    );
-    setBalnearioMatch(match || null);
-    if (match && normalizar(match.nombre) === inputNorm) {
-      setBalnearioSeleccionado(match.id_balneario);
+    ).slice(0, 3); // Máximo 3 resultados
+    
+    setBalnearioMatches(matches);
+    
+    // Verificar si hay coincidencia exacta
+    const exactMatch = matches.find(b => normalizar(b.nombre) === inputNorm);
+    if (exactMatch) {
+      setBalnearioSeleccionado(exactMatch.id_balneario);
     } else {
       setBalnearioSeleccionado(null);
     }
   }, [balnearioInput, balnearios]);
 
-  // Overlay sólo si hay match que EMPIEZA por el input y no es igual
+  // Componente para mostrar múltiples sugerencias
   function renderCiudadMatch() {
-    const showOverlay =
-      ciudadInput.length > 0 &&
-      ciudadMatch &&
-      ciudadInput !== ciudadMatch.nombre.slice(0, ciudadInput.length);
+    const showSuggestions = ciudadInput.length > 0 && ciudadMatches.length > 0;
 
     return (
-      <div className="input-autocomplete-wrapper">
+      <div className="input-autocomplete-wrapper" ref={ciudadDropdownRef}>
         <input
           ref={inputRef}
           id="localidad"
@@ -131,22 +153,28 @@ function BusquedaHome() {
           onChange={e => setCiudadInput(e.target.value)}
           autoComplete="off"
         />
-        {showOverlay && (
-          <div
-            className="input-autocomplete-overlay"
-            onMouseDown={e => {
-              setCiudadInput(ciudadMatch.nombre);
-              setCiudadSeleccionada(ciudadMatch.id_ciudad);
-              setTimeout(() => inputRef.current && inputRef.current.blur(), 0);
-            }}
-          >
-            <span style={{ opacity: 0 }}>{ciudadInput}</span>
-            <span style={{ color: "#005A84", fontWeight: 500 }}>
-              <span>{ciudadInput}</span>
-              <span style={{ color: "#bbb" }}>
-                {ciudadMatch.nombre.slice(ciudadInput.length)}
-              </span>
-            </span>
+        {showSuggestions && (
+          <div className="autocomplete-dropdown">
+            {ciudadMatches.map((ciudad, index) => (
+              <div
+                key={ciudad.id_ciudad}
+                className="autocomplete-option"
+                onMouseDown={e => {
+                  e.preventDefault();
+                  setCiudadInput(ciudad.nombre);
+                  setCiudadSeleccionada(ciudad.id_ciudad);
+                  setCiudadMatches([]);
+                  setTimeout(() => inputRef.current && inputRef.current.blur(), 0);
+                }}
+              >
+                <span className="suggestion-text">
+                  <span className="typed-text">{ciudadInput}</span>
+                  <span className="completion-text">
+                    {ciudad.nombre.slice(ciudadInput.length)}
+                  </span>
+                </span>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -154,13 +182,10 @@ function BusquedaHome() {
   }
 
   function renderBalnearioMatch() {
-    const showOverlay =
-      balnearioInput.length > 0 &&
-      balnearioMatch &&
-      balnearioInput !== balnearioMatch.nombre.slice(0, balnearioInput.length);
+    const showSuggestions = balnearioInput.length > 0 && balnearioMatches.length > 0;
 
     return (
-      <div className="input-autocomplete-wrapper">
+      <div className="input-autocomplete-wrapper" ref={balnearioDropdownRef}>
         <input
           ref={balnearioInputRef}
           id="balneario"
@@ -172,22 +197,28 @@ function BusquedaHome() {
           autoComplete="off"
           disabled={!ciudadSeleccionada}
         />
-        {showOverlay && (
-          <div
-            className="input-autocomplete-overlay"
-            onMouseDown={e => {
-              setBalnearioInput(balnearioMatch.nombre);
-              setBalnearioSeleccionado(balnearioMatch.id_balneario);
-              setTimeout(() => balnearioInputRef.current && balnearioInputRef.current.blur(), 0);
-            }}
-          >
-            <span style={{ opacity: 0 }}>{balnearioInput}</span>
-            <span style={{ color: "#005A84", fontWeight: 500 }}>
-              <span>{balnearioInput}</span>
-              <span style={{ color: "#bbb" }}>
-                {balnearioMatch.nombre.slice(balnearioInput.length)}
-              </span>
-            </span>
+        {showSuggestions && (
+          <div className="autocomplete-dropdown">
+            {balnearioMatches.map((balneario, index) => (
+              <div
+                key={balneario.id_balneario}
+                className="autocomplete-option"
+                onMouseDown={e => {
+                  e.preventDefault();
+                  setBalnearioInput(balneario.nombre);
+                  setBalnearioSeleccionado(balneario.id_balneario);
+                  setBalnearioMatches([]);
+                  setTimeout(() => balnearioInputRef.current && balnearioInputRef.current.blur(), 0);
+                }}
+              >
+                <span className="suggestion-text">
+                  <span className="typed-text">{balnearioInput}</span>
+                  <span className="completion-text">
+                    {balneario.nombre.slice(balnearioInput.length)}
+                  </span>
+                </span>
+              </div>
+            ))}
           </div>
         )}
       </div>

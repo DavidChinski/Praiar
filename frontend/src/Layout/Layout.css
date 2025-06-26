@@ -1,3 +1,11 @@
-.layout{
-    padding: 0 100px !important;
+/* Layout principal con sticky footer */
+.layout-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  /* Esto hace que el contenido principal tome todo el espacio disponible */
 }

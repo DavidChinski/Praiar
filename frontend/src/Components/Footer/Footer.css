@@ -4,6 +4,7 @@ footer {
   font-family: sans-serif;
   padding: 30px 20px 10px; /* más corto */
   border-top: 1px solid #ccc;
+  margin-top: auto; /* Esto empuja el footer hacia abajo */
 }
 
 .footer_main {
