@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
 import { useParams } from "react-router-dom";
 import './BalneariosPorCiudad.css';
-import Mapa from '../../assets/LocalizacionBusquedaHome.png';
-import Carpa from '../../assets/Carpa.png';
-import Layout from '../../Layout/';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosPorCiudad() {
   const { idCiudad } = useParams();
@@ -60,7 +58,7 @@ function BalneariosPorCiudad() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="balnearios-container">
         <h1>Balnearios en {nombreCiudad}</h1>
 
@@ -80,11 +78,11 @@ function BalneariosPorCiudad() {
                     <div className="info-izquierda">
                       <h3>{balneario.nombre}</h3>
                       <p className="mapa" style={{ cursor: 'pointer' }} onClick={() => abrirMapa(balneario.direccion)}>
-                        <img src={Mapa} alt="mapa" className="iconoCard" />
+                        <FontAwesomeIcon icon="fa-solid fa-location-dot" alt="mapa" className="iconoCard" />
                         {balneario.direccion}
                       </p>
                       <p>
-                        <img src={Carpa} alt="carpa" className="iconoCard" />
+                        <FontAwesomeIcon icon="fa-solid fa-tent" className="iconoCard"/>
                         Cantidad de carpas
                       </p>
                     </div>
@@ -120,7 +118,7 @@ function BalneariosPorCiudad() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   );
 }
 

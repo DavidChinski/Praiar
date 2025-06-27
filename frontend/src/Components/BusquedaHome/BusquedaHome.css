@@ -119,8 +119,7 @@
 .icon, .iconFecha {
   width: 36px;
   height: 36px;
-  object-fit: contain;
-  display: block;
+  color: #005A84;
 }
 
 /* Wrapper de inputs */

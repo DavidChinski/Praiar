@@ -3,10 +3,8 @@ import Logo from "../../assets/LogoPraiar.png";
 import TwitterFooter from "../../assets/TwitterFooter.png";
 import InstaFooter from "../../assets/InstaFooter.png";
 import LinkedinFooter from "../../assets/LinkedinFooter.png";
-import GanchoFooter from "../../assets/GanchoFooter.png";
-import TelefonoFooter from "../../assets/TelefonoFooter.png";
-import MailFooter from "../../assets/MailFooter.png";
 import { Link } from 'react-router-dom'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const linkedinPraiar = "https://www.linkedin.com/company/praiararg";
 
 function Footer() {
@@ -43,9 +41,9 @@ function Footer() {
         <div className="contacto_section">
           <h4>Contacto</h4>
           <ul>
-            <li><img src={GanchoFooter} className="iconFooter"/> ORT Argentina, CABA</li>
-            <li><img src={MailFooter} className="iconFooter"/> contacto@praiar.com</li>
-            <li><img src={TelefonoFooter} className="iconFooter"/> +54 911 0000-0000</li>
+            <li><FontAwesomeIcon icon="fa-solid fa-thumbtack" className="iconFooter"/> ORT Argentina, CABA</li>
+            <li><FontAwesomeIcon icon="fa-solid fa-envelope" className="iconFooter"/> contacto@praiar.com</li>
+            <li><FontAwesomeIcon icon="fa-solid fa-phone" className="iconFooter"/> +54 911 0000-0000</li>
             <li className="social_icons">
               <img src={TwitterFooter} alt="Twitter" />
               <img src={InstaFooter} alt="Instagram" />

@@ -303,8 +303,9 @@
 }
 
 .carpa-imagen {
-  width: 100%;
+  width: 90%;
   height: auto;
+  color:#005A84;
   pointer-events: none;
 }
 

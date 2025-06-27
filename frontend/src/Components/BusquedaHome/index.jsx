@@ -6,12 +6,11 @@ import { DateRange } from 'react-date-range';
 import { format, max } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
-import LocalizacionBusquedaHome from '../../assets/LocalizacionBusquedaHome.png';
 import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
 import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
 import VideoBanner from '../../assets/VideoBusqueda.mp4';
 import { FaChevronDown } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BusquedaHome() {
   const [ciudades, setCiudades] = useState([]);
@@ -270,7 +269,7 @@ function BusquedaHome() {
 
                 {/* Localidades */}
                 <div className="input-group" style={{ position: "relative" }}>
-                  <img src={LocalizacionBusquedaHome} className="icon" alt="Localización" />
+                  <FontAwesomeIcon icon="fa-solid fa-location-dot" className='icon'/>
                   <div className="input-wrapper">
                     <label htmlFor="localidad" className='subtitulo'>Localidades</label>
                     {renderCiudadMatch()}
@@ -279,7 +278,7 @@ function BusquedaHome() {
 
                 {/* Balnearios */}
                 <div className="input-group" style={{ position: "relative" }}>
-                  <img src={BalneariosBusquedaHome} className="icon" alt="Balnearios" />
+                  <FontAwesomeIcon icon="fa-solid fa-umbrella-beach" className="icon"/>
                   <div className="input-wrapper">
                     <label htmlFor="balneario" className='subtitulo'>Balnearios</label>
                     {renderBalnearioMatch()}

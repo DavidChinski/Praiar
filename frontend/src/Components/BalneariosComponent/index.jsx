@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import './BalneariosComponent.css';
-import Mapa from '../../assets/LocalizacionBusquedaHome.png'
-import Carpa from '../../assets/Carpa.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosComponent() {
   const [balnearios, setBalnearios] = useState([]);
@@ -60,11 +59,11 @@ function BalneariosComponent() {
                   <div className="info-izquierda">
                     <h3>{balneario.nombre}</h3>
                     <p>
-                      <img src={Mapa} alt="mapa" className="iconoCard" />
+                      <FontAwesomeIcon icon="fa-solid fa-location-dot" className="iconoCard"/>
                       {balneario.direccion}
                     </p>
                     <p>
-                      <img src={Carpa} alt="carpa" className="iconoCard" />
+                      <FontAwesomeIcon icon="fa-solid fa-tent" className="iconoCard" />
                       Cantidad de carpas
                     </p>
                   </div>

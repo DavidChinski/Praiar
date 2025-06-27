@@ -64,6 +64,10 @@ ul {
 
 ul li {
   font-size: 14px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 ul li a {
@@ -81,12 +85,11 @@ ul li a:active {
 
 
 .iconFooter {
-  display: inline-block;
-  width: 24px;
-  height: auto;
-  background-size: contain;
-  background-repeat: no-repeat;
+  width: auto;
+  height: 20px;
   margin-right: 8px;
+  color: white;
+  font-size: 16px;
   vertical-align: middle;
 }
 

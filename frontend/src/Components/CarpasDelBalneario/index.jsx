@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
-import Carpa from '../../assets/Carpa.png';
-import Sombrilla from '../../assets/BalneariosBusquedaHome.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function CarpasDelBalneario() {
   const { id } = useParams();
@@ -354,30 +353,22 @@ function CarpasDelBalneario() {
             >
               <div className="carpa-posicion">{carpa.posicion}</div>
               {tipo === "doble" ? (
-                <div style={{ display: "flex", gap: "5px" }}>
-                  <img
-                    src={Carpa}
+                  <FontAwesomeIcon 
+                    icon="fa-solid fa-tents" 
                     alt={`Carpa doble ${carpa.posicion}`}
                     className="carpa-imagen"
                     style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
                   />
-                  <img
-                    src={Carpa}
-                    alt={`Carpa doble ${carpa.posicion}`}
-                    className="carpa-imagen"
-                    style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-                  />
-                </div>
               ) : tipo === "sombrilla" ? (
-                <img
-                  src={Sombrilla}
+                <FontAwesomeIcon 
+                  icon="fa-solid fa-umbrella-beach"
                   alt={`Sombrilla ${carpa.posicion}`}
                   className="carpa-imagen"
                   style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
                 />
               ) : (
-                <img
-                  src={Carpa}
+                <FontAwesomeIcon 
+                  icon="fa-solid fa-tent"
                   alt={`Carpa ${carpa.posicion}`}
                   className="carpa-imagen"
                   style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}

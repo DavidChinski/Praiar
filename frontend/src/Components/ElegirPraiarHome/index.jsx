@@ -1,7 +1,5 @@
 import './ElegirPraiarHome.css';
-import ElegirPraiarTiempo from '../../assets/ElegirPraiarTiempo.png';
-import ElegirPraiarCarpa from '../../assets/ElegirPraiarCarpa.png';
-import ElegirPraiarReloj from '../../assets/ElegirPraiarReloj.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ElegirPraiarHome() {
   return (
@@ -9,7 +7,9 @@ function ElegirPraiarHome() {
       <h2>¿Por qué elegir Praiar?</h2>
       <div className="features">
         <div className="feature">
-          <img src={ElegirPraiarReloj} alt="Ícono de reloj" />
+          <div className="ElegirPraiarIcon">
+            <FontAwesomeIcon icon="fa-regular fa-clock" />
+          </div>
           <p>
             Ahorrá tiempo
             con una reserva
@@ -17,7 +17,9 @@ function ElegirPraiarHome() {
           </p>
         </div>
         <div className="feature">
-          <img src={ElegirPraiarCarpa} alt="Ícono de carpa" />
+          <div className="ElegirPraiarIcon">
+            <FontAwesomeIcon icon="fa-solid fa-tent" />
+          </div>
           <p>
             Elegí tu carpa
             o sombrilla favorita<br />
@@ -25,7 +27,9 @@ function ElegirPraiarHome() {
           </p>
         </div>
         <div className="feature">
-          <img src={ElegirPraiarTiempo} alt="Ícono de bandeja" />
+          <div className="ElegirPraiarIcon">
+            <FontAwesomeIcon icon="fa-solid fa-bell-concierge" />
+          </div>
           <p>
             Pedí tus<br />
             servicios del balneario<br />

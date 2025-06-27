@@ -3,8 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import Logo from '../../assets/mar-del-plata.png';
 import './Ciudades.css';
-import Mapa from '../../assets/LocalizacionBusquedaHome.png';
-import Carpa from '../../assets/Carpa.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function Ciudades() {
   const [ciudades, setCiudades] = useState([]);
@@ -64,11 +63,11 @@ function Ciudades() {
                   <div className="info-izquierda">
                     <h3>{ciudad.nombre}</h3>
                     <p className="mapa" onClick={() => abrirMapa(ciudad.nombre)} style={{ cursor: 'pointer' }}>
-                      <img src={Mapa} alt="mapa" className="iconoCard" />
+                      <FontAwesomeIcon icon="fa-solid fa-location-dot" alt="mapa" className="iconoCard"/>
                       Ver Mapa
                     </p>
                     <p className="estrella">
-                      <img src={Carpa} alt="estrella" className="iconoCard" />
+                      <FontAwesomeIcon icon="fa-solid fa-tent" alt="balnearios" className="iconoCard"/>
                       {ciudad.cantidadBalnearios} Balnearios
                     </p>
                   </div>

@@ -71,7 +71,7 @@
   width: 20px !important;
   height: auto !important;
   margin-right: 8px;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  color:#005A84;
 }
 
 .mirar-btn {
