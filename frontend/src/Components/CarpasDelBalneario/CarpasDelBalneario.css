@@ -391,3 +391,48 @@
   margin-top: 1rem;
   text-align: right;
 }
+
+/* ...resto de estilos... */
+.precios-balneario-tabla {
+  width: 100%;
+  margin-top: 2em;
+}
+.tabla-precios-reserva {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  font-size: 1.1rem;
+  margin-top: 16px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.05);
+}
+.tabla-precios-reserva thead tr {
+  background: #87c9db;
+}
+.tabla-precios-reserva th,
+.tabla-precios-reserva td {
+  padding: 16px 10px;
+  text-align: center;
+}
+.tabla-precios-reserva th {
+  font-weight: bold;
+  font-size: 1.03rem;
+  color: #0c2233;
+  border-bottom: 2.5px solid #5497ab;
+}
+.tabla-precios-reserva tr {
+  border-bottom: 1px solid #b5d6e2;
+}
+.tabla-precios-reserva td {
+  color: #222;
+  font-size: 1rem;
+  min-width: 120px;
+}
+@media (max-width: 600px) {
+  .tabla-precios-reserva th,
+  .tabla-precios-reserva td {
+    padding: 7px 4px;
+    font-size: 0.93rem;
+    min-width: 80px;
+  }
+}

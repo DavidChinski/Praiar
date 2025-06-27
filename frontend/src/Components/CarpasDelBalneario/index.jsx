@@ -40,8 +40,8 @@ function CarpasDelBalneario() {
     cant_reposeras: 2,
     capacidad: 4,
   });
-  const [precios, setPrecios] = useState(null);
-
+  const [precios, setPrecios] = useState([]);
+  console.log(precios, precios.length) // devuleve un array y el length es undefined
   const navigate = useNavigate();
 
   // Obtener usuario logueado y balneario info
@@ -546,17 +546,33 @@ function CarpasDelBalneario() {
       )}
 
       {/* PRECIOS DEL BALNEARIO */}
-      {precios && (
-        <div className="precios-balneario" style={{ marginTop: "2em" }}>
-          <h3>Precios</h3>
-          <ul>
-            <li><strong>Día:</strong> ${precios.dia}</li>
-            <li><strong>Semana:</strong> ${precios.semana}</li>
-            <li><strong>Quincena:</strong> ${precios.quincena}</li>
-            <li><strong>Mes:</strong> ${precios.mes}</li>
-          </ul>
-        </div>
-      )}
+      {precios && precios.length > 0 && (
+      <div className="precios-balneario-tabla" style={{ marginTop: "2em" }}>
+        <h3>Disponibilidad</h3>
+        <table className="tabla-precios-reserva">
+          <thead>
+            <tr>
+              <th>Tipo de reserva</th>
+              <th>Precio por día</th>
+              <th>Precio por semana</th>
+              <th>Precio por quincena</th>
+              <th>Precio por mes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {precios.map(p => (
+              <tr key={p.id_tipo_ubicacion}>
+                <td>{p.nombre}</td>
+                <td>${p.dia}</td>
+                <td>${p.semana}</td>
+                <td>${p.quincena}</td>
+                <td>${p.mes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
     </div>
   );
 }

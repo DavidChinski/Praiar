@@ -420,13 +420,25 @@ app.get('/api/tipos-ubicaciones', async (req, res) => {
 // GET /api/balneario/:id/precios
 app.get('/api/balneario/:id/precios', async (req, res) => {
   const { id } = req.params;
+  // Join con tipos_ubicaciones para traer el nombre
   const { data, error } = await supabase
     .from("precios")
-    .select("dia, semana, quincena, mes")
-    .eq("id_balneario", id)
-    .single();
-  if (error || !data) return res.status(404).json({ error: "Precios no encontrados" });
-  res.json(data);
+    .select("id_tipo_ubicacion, dia, semana, quincena, mes, tipos_ubicaciones(nombre)")
+    .eq("id_balneario", id);
+
+  if (error) return res.status(500).json({ error: "Error trayendo precios." });
+
+  // Mapear para que sea { id_tipo_ubicacion, nombre, dia, semana, ... }
+  const precios = (data || []).map(p => ({
+    id_tipo_ubicacion: p.id_tipo_ubicacion,
+    nombre: p.tipos_ubicaciones?.nombre || "Desconocido",
+    dia: p.dia,
+    semana: p.semana,
+    quincena: p.quincena,
+    mes: p.mes,
+  }));
+
+  res.json(precios);
 });
 
 // --------- ENDPOINTS PARA CarpasDelBalneario ------------
