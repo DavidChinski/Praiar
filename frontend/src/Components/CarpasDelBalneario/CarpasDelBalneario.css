@@ -1,206 +1,170 @@
 .carpas-del-balneario {
   padding: 2rem;
   font-family: sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.carpa-container {
-  position: relative;
-  width: 90%;
-  height: 500px;
-  margin: auto;
-  border-radius: 12px;
-  border: 1px solid #aaa;
-  overflow: hidden;
-}
-
-.carpa-grid {
-  width: 90%;
-  height: 500px;
-  margin: 20px auto;
-  background: #ddd;
-  position: relative;
-  border-radius: 12px;
-  padding: 10px;
-  overflow: hidden;
-}
-
-.carpa {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  cursor: grab;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-  padding: 0;
-  /* Añadir transición para cambios de color */
-  transition: background-color 0.2s, border 0.2s, box-shadow 0.2s;
-}
-
-/* Colores para carpas */
-.carpa.libre {
-  background-color: #33ff5e; /* Verde más fuerte */
-  border: 2.5px solid #1aab27;
-  /* puedes usar box-shadow para un glow verde */
-  box-shadow: 0 0 10px #33ff5e55, 0 0 4px #1aab2755;
-}
-
-.carpa.reservada {
-  background-color: #ff3c3c; /* Rojo intenso */
-  border: 2.5px solid #a80021;
-  box-shadow: 0 0 10px #ff3c3c55, 0 0 4px #a8002155;
-}
-
-.carpa.reservada .carpa-imagen {
-  filter: grayscale(100%) brightness(0.7);
-}
-
-.carpa-imagen {
-  width: 100%;
-  height: auto;
-  pointer-events: none; /* para que no interfiera con el drag */
-}
-
-.carpa:hover {
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-}
-
-.elemento {
-  position: absolute;
-  padding: 10px 16px;
-  border-radius: 8px;
-  color: white;
+.carpas-del-balneario > h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  cursor: grab;
-  z-index: 1;
-  min-width: 60px;
-  min-height: 32px;
+}
+
+.balneario-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Animación de rotación suave */
-  transition: background-color 0.2s, transform 0.2s;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin: 0 auto 1.2rem auto;
+  max-width: 600px;
+  font-size: 1.08rem;
 }
 
-/* Elementos por tipo */
-.tipo-pasillo {
-  background-color: #6c757d;
+.balneario-info p {
+  margin: 0;
+  min-width: 180px;
 }
 
-.tipo-pileta {
-  background-color: #00bfff;
+.iconos-servicios {
+  margin: 1.2rem 0 2rem 0;
+  padding: 1.5rem;
+  border-radius: 14px;
 }
 
-.tipo-quincho {
-  background-color: #8b4513;
+.iconos-servicios > h3 {
+  margin-bottom: 0.7rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-/* Acciones dentro de la carpa y elemento */
-.carpa .acciones,
-.elemento .acciones {
-  position: absolute;
-  top: -10px;
-  left: -20px;
+.iconos-servicios > p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.servicios-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.servicio-icono {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  align-items: center;
+  border: 2px solid transparent;
+  padding: 0.6rem 0.5rem 0.3rem 0.5rem;
+  border-radius: 8px;
+  width: 110px;
+  text-align: center;
+  background: #fff;
+  min-height: 90px;
+  justify-content: space-between;
+  transition: box-shadow 0.15s;
 }
 
-.carpa:hover .acciones,
-.elemento:hover .acciones {
-  opacity: 1;
+.servicio-icono.activo {
+  background: #e9f2ff;
+  border-color: #339dff;
+  box-shadow: 0 2px 8px 0 #339dff22;
 }
 
-.carpa .acciones button,
-.elemento .acciones button {
-  background: none;
+.icono-imagen {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 0.3rem;
+  border-radius: 4px;
+}
+
+.boton-agregar-servicio {
+  background-color: #004A68;
+  color: white;
   border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  padding: 2px;
-  line-height: 1;
-  color: #333;
-  transition: transform 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-right: 10px;
+  margin-bottom: 7px;
+  display: inline-block;
+  text-align: center;
+}
+.boton-agregar-servicio:hover {
+  background-color: #003F5E;
 }
 
-.carpa .acciones button:hover {
-  transform: scale(1.2);
-}
-
-/* Modal */
-.modal {
+/* Modal Servicios */
+.modal-servicios {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 320px;
+.modal-content-servicios {
+  background-color: white;
+  padding: 2rem 2.5rem;
+  border-radius: 10px;
+  max-width: 700px;
+  width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 6px 32px 0 rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
-.modal-content h3 {
-  text-align: center;
-  margin-bottom: 1rem;
-  color: #003f5e;
+.modal-content-servicios h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
 }
 
-.modal-content label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95rem;
+.modal-buttons-servicios {
+  margin-top: 0.7rem;
+  text-align: right;
 }
 
-.modal-content input {
-  width: 60px;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.modal-buttons button {
-  flex: 1;
-  padding: 0.5rem;
+.modal-buttons-servicios button {
+  background: #004A68;
+  color: #fff;
+  padding: 7px 20px;
+  border-radius: 7px;
   border: none;
-  border-radius: 6px;
+  font-size: 0.98rem;
   cursor: pointer;
-  background-color: #0077b6;
-  color: white;
+  transition: background 0.17s;
 }
 
-.modal-buttons button:last-child {
-  background-color: #b00020;
+.modal-buttons-servicios button:hover {
+  background: #003F5E;
 }
 
+/* Toolbar */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 24px;
   margin-bottom: 24px;
-  background: #f7fafc;
   border-radius: 14px;
-  box-shadow: 0 2px 14px 0 rgba(0,0,0,0.07);
   padding: 16px 24px;
   font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .toolbar-dropdown {
@@ -247,36 +211,42 @@
 }
 
 .dropdown-menu button {
-  background: none;
+  background: #004A68;
+  color: white;
   border: none;
-  color: #222;
-  padding: 10px 22px;
-  text-align: left;
-  font-size: 1rem;
-  border-radius: 8px;
-  transition: background 0.17s, color 0.17s;
+  border-radius: 6px;
+  padding: 7px 16px;
   cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  margin-bottom: 7px;
+  display: inline-block;
+  text-align: center;
 }
-
 .dropdown-menu button:hover {
-  background: #e6f7fa;
-  color: #0088c6;
+  background: #003F5E;
 }
 
-.toolbar a {
+.toolbar a,
+.toolbar .boton-agregar-servicio {
   margin-left: 10px;
-  background: #0088c6;
+  background: #004A68;
   color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
+  padding: 7px 16px;
+  border-radius: 6px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.95rem;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 10px 0 rgba(0,0,0,0.06);
+  border: none;
+  display: inline-block;
+  text-align: center;
 }
-
-.toolbar a:hover {
-  background: #00d8a7;
+.toolbar a:hover,
+.toolbar .boton-agregar-servicio:hover {
+  background: #003F5E;
   color: #fff;
   text-decoration: underline;
 }
@@ -286,63 +256,153 @@
   to   { opacity: 1; transform: translateY(0);}
 }
 
+.carpa-container {
+  position: relative;
+  width: 96%;
+  height: 500px;
+  margin: 30px auto 12px auto;
+  border-radius: 12px;
+  border: 1px solid #aaa;
+  overflow: hidden;
+  background: #f0f7fa;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
+}
+
+/* Carpas orden y disposición */
+.carpa {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: background-color 0.2s, border 0.2s, box-shadow 0.2s;
+  z-index: 5;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.carpa.libre {
+  background-color: #33ff5e;
+  border: 2.5px solid #1aab27;
+  box-shadow: 0 0 10px #33ff5e55, 0 0 4px #1aab2755;
+}
+
+.carpa.reservada {
+  background-color: #ff3c3c;
+  border: 2.5px solid #a80021;
+  box-shadow: 0 0 10px #ff3c3c55, 0 0 4px #a8002155;
+}
+
+.carpa.reservada .carpa-imagen {
+  filter: grayscale(100%) brightness(0.7);
+}
+
+.carpa-imagen {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.carpa:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
 .carpa-posicion {
   position: absolute;
-  top: -20px;
+  top: -18px;
   left: 50%;
   transform: translateX(-50%);
   font-weight: bold;
   background: white;
-  padding: 2px 5px;
+  padding: 2px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 13px;
   border: 1px solid #ccc;
+  z-index: 15;
+  letter-spacing: 0.5px;
 }
 
-/* Servicios */
-.servicios-lista {
+/* Acciones dentro de la carpa y elemento */
+.carpa .acciones,
+.elemento .acciones {
+  position: absolute;
+  top: -10px;
+  left: -20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: left;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 99;
 }
 
-.servicio-icono {
-  display: flex;
-  align-items: left;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
+.carpa:hover .acciones,
+.elemento:hover .acciones {
+  opacity: 1;
 }
 
-.icono-imagen {
-  width: 30px;
-  height: 30px;
-  object-fit: contain; /* o 'cover', según el diseño que prefieras */
-  border-radius: 4px; /* opcional: bordes redondeados */
-}
-
-.boton-agregar-servicio {
-  background-color: #004A68;
+.carpa .acciones button,
+.elemento .acciones button {
+  background: #004A68;
   color: white;
   border: none;
-  padding: 6px 12px;
   border-radius: 6px;
+  padding: 7px 16px;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  margin-bottom: 7px;
+  display: inline-block;
+  text-align: center;
+}
+.carpa .acciones button:hover,
+.elemento .acciones button:hover {
+  background: #003F5E;
 }
 
-.boton-agregar-servicio:hover {
-  background-color: #003F5E;
+.elemento {
+  position: absolute;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: grab;
+  z-index: 2;
+  min-width: 60px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
-.modal-servicios {
+/* Elementos por tipo */
+.tipo-pasillo {
+  background-color: #6c757d;
+}
+
+.tipo-pileta {
+  background-color: #00bfff;
+}
+
+.tipo-quincho {
+  background-color: #8b4513;
+}
+
+/* Modal común */
+.modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -350,89 +410,156 @@
   z-index: 999;
 }
 
-.modal-content-servicios {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  max-width: 700px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
+.modal-content {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 14px;
+  min-width: 320px;
+  max-width: 97vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  box-shadow: 0 2px 24px 0 rgba(0,0,0,0.13);
 }
 
-.servicios-lista {
+.modal-content h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #003f5e;
+}
+
+.modal-content label {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 0.98rem;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.modal-content input, .modal-content select {
+  width: 65px;
+  border-radius: 5px;
+  border: 1px solid #b4e2f5;
+  padding: 3px 6px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.modal-content select {
+  width: 100px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
   gap: 1rem;
 }
 
-.servicio-icono {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 2px solid transparent;
-  padding: 0.5rem;
-  border-radius: 8px;
-  width: 120px;
-  text-align: center;
+.modal-buttons button {
+  flex: 1;
+  padding: 0.5rem 0;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  background-color: #004A68;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.17s;
+}
+.modal-buttons button:hover {
+  background-color: #003F5E;
 }
 
-.servicio-icono.activo {
-  background: #e9f2ff;
+.modal-buttons button:last-child {
+  background-color: #b00020;
 }
 
-.icono-imagen {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.modal-buttons-servicios {
-  margin-top: 1rem;
-  text-align: right;
-}
-
-/* ...resto de estilos... */
-.precios-balneario-tabla {
-  width: 100%;
-  margin-top: 2em;
-}
 .tabla-precios-reserva {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: white;
-  font-size: 1.1rem;
-  margin-top: 16px;
-  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.05);
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.04);
 }
-.tabla-precios-reserva thead tr {
-  background: #87c9db;
-}
+
 .tabla-precios-reserva th,
 .tabla-precios-reserva td {
-  padding: 16px 10px;
+  padding: 10px 8px;
   text-align: center;
+  border-bottom: 1px solid #e8e8e8;
 }
+
 .tabla-precios-reserva th {
+  background: #8AC9DC;
   font-weight: bold;
-  font-size: 1.03rem;
-  color: #0c2233;
-  border-bottom: 2.5px solid #5497ab;
 }
-.tabla-precios-reserva tr {
-  border-bottom: 1px solid #b5d6e2;
+
+.tabla-precios-reserva tr:last-child td {
+  border-bottom: none;
 }
-.tabla-precios-reserva td {
-  color: #222;
-  font-size: 1rem;
-  min-width: 120px;
+
+.precios-balneario-tabla h3, .titulo-servicio {
+  font-size: 2rem !important;
+  margin-bottom: 0.8rem;
+  font-weight: bold;
+  text-align: left;
+  font-family: 'El Messiri', sans-serif;
 }
-@media (max-width: 600px) {
-  .tabla-precios-reserva th,
-  .tabla-precios-reserva td {
-    padding: 7px 4px;
-    font-size: 0.93rem;
-    min-width: 80px;
+
+.precios-balneario-tabla{
+  margin: 1.2rem 0 2rem 0;
+  padding: 1.5rem;
+  border-radius: 14px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .carpa-container {
+    height: 340px;
   }
+  .carpa {
+    width: 56px;
+    height: 56px;
+  }
+  .elemento {
+    min-width: 48px;
+    min-height: 22px;
+    font-size: 0.93rem;
+    padding: 7px 11px;
+  }
+  .carpa-posicion {
+    font-size: 11px;
+    top: -15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .carpas-del-balneario {
+    padding: 0.7rem 0.15rem;
+  }
+  .balneario-info {
+    flex-direction: column;
+    padding: 1rem 0.5rem;
+    gap: 0.7rem;
+  }
+  .iconos-servicios {
+    padding: 1rem 0.25rem;
+  }
+  .toolbar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+  .carpa-container {
+    width: 99%;
+    height: 220px;
+  }
+}
+
+button {
+  cursor: pointer;
+  text-decoration: none;
 }

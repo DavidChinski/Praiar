@@ -41,7 +41,6 @@ function CarpasDelBalneario() {
     capacidad: 4,
   });
   const [precios, setPrecios] = useState([]);
-  console.log(precios, precios.length) // devuleve un array y el length es undefined
   const navigate = useNavigate();
 
   // Obtener usuario logueado y balneario info
@@ -309,76 +308,22 @@ function CarpasDelBalneario() {
         <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
       )}
 
-      <div className="iconos-servicios">
-        <h3>Servicios</h3>
-        {balnearioInfo?.servicios?.length > 0 ? (
-          <div className="servicios-lista">
-            {balnearioInfo.servicios.map((servicio) => (
-              <div key={servicio.id_servicio} className="servicio-icono">
-                <img src={servicio.imagen} className="icono-imagen" />
-                <span>{servicio.nombre}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No hay servicios cargados para este balneario.</p>
-        )}
-
-        {esDuenio && (
-          <>
-            <button
-              className="boton-agregar-servicio"
-              onClick={() => setMostrarModalServicios(true)}
-            >
-              Agrega un Servicio
-            </button>
-            <button onClick={() => setMostrarAgregarCarpa(true)}>
-              + Agregar carpa/sombrilla
-            </button>
-
-            {mostrarModalServicios && (
-              <div className="modal-servicios">
-                <div className="modal-content-servicios">
-                  <h3>Editar Servicios del Balneario</h3>
-                  <div className="servicios-lista">
-                    {todosLosServicios.map(serv => {
-                      const tieneServicio = balnearioInfo.servicios?.some(s => s.id_servicio === serv.id_servicio);
-                      return (
-                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
-                          <img src={serv.imagen} className="icono-imagen" />
-                          <span>{serv.nombre}</span>
-                          <button
-                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
-                          >
-                            {tieneServicio ? "Quitar" : "Agregar"}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="modal-buttons-servicios">
-                    <button onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
       {esDuenio && (
         <>
-        <div className="toolbar">
-          <div className="toolbar-dropdown">
-            <button className="dropdown-toggle">Agregar elemento ▾</button>
-            <div className="dropdown-menu">
-              <button onClick={() => agregarElemento("pasillo")}>Pasillo</button>
-              <button onClick={() => agregarElemento("pileta")}>Pileta</button>
-              <button onClick={() => agregarElemento("quincho")}>Quincho</button>
+          <div className="toolbar">
+            <div className="toolbar-dropdown">
+              <button className="boton-agregar-servicio dropdown-toggle">Agregar elemento ▾</button>
+              <div className="dropdown-menu">
+                <button className="boton-agregar-servicio" onClick={() => agregarElemento("pasillo")}>Pasillo</button>
+                <button className="boton-agregar-servicio" onClick={() => agregarElemento("pileta")}>Pileta</button>
+                <button className="boton-agregar-servicio" onClick={() => agregarElemento("quincho")}>Quincho</button>
+              </div>
             </div>
+            <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(true)}>
+              Agregar carpa/sombrilla
+            </button>
+            <Link className="boton-agregar-servicio" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
           </div>
-          <Link to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
-        </div>
         </>
       )}
 
@@ -441,8 +386,8 @@ function CarpasDelBalneario() {
               <div className="acciones">
                 {esDuenio && (
                   <>
-                    <button onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
-                    <button onClick={() => handleEditarCarpa(carpa)}>✏️</button>
+                    <button className="boton-agregar-servicio" onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
+                    <button className="boton-agregar-servicio" onClick={() => handleEditarCarpa(carpa)}>✏️</button>
                   </>
                 )}
               </div>
@@ -469,11 +414,67 @@ function CarpasDelBalneario() {
             {el.tipo}
             {esDuenio && (
               <div className="acciones">
-                <button onClick={() => rotarElemento(el.id_elemento)}>🔄</button>
+                <button className="boton-agregar-servicio" onClick={() => rotarElemento(el.id_elemento)}>🔄</button>
               </div>
             )}
           </div>
         ))}
+      </div>
+
+      {/* SERVICIOS - MOVER ABAJO DE CARPAS Y ARRIBA DE PRECIOS */}
+      <div className="iconos-servicios" style={{ marginTop: "2em" }}>
+        <h3 className="titulo-servicio">Servicios</h3>
+        {balnearioInfo?.servicios?.length > 0 ? (
+          <div className="servicios-lista">
+            {balnearioInfo.servicios.map((servicio) => (
+              <div key={servicio.id_servicio} className="servicio-icono">
+                <img src={servicio.imagen} className="icono-imagen" />
+                <span>{servicio.nombre}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No hay servicios cargados para este balneario.</p>
+        )}
+
+        {esDuenio && (
+          <>
+            <button
+              className="boton-agregar-servicio"
+              onClick={() => setMostrarModalServicios(true)}
+            >
+              Agrega un Servicio
+            </button>
+
+            {mostrarModalServicios && (
+              <div className="modal-servicios">
+                <div className="modal-content-servicios">
+                  <h3>Editar Servicios del Balneario</h3>
+                  <div className="servicios-lista">
+                    {todosLosServicios.map(serv => {
+                      const tieneServicio = balnearioInfo.servicios?.some(s => s.id_servicio === serv.id_servicio);
+                      return (
+                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
+                          <img src={serv.imagen} className="icono-imagen" />
+                          <span>{serv.nombre}</span>
+                          <button
+                            className="boton-agregar-servicio"
+                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
+                          >
+                            {tieneServicio ? "Quitar" : "Agregar"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="modal-buttons-servicios">
+                    <button className="boton-agregar-servicio" onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* MODAL AGREGAR CARPA/SOMBRILLA */}
@@ -514,8 +515,8 @@ function CarpasDelBalneario() {
                 onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
             </label>
             <div className="modal-buttons">
-              <button onClick={handleAgregarCarpa}>Agregar</button>
-              <button onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
+              <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
+              <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
             </div>
           </div>
         </div>
@@ -538,8 +539,8 @@ function CarpasDelBalneario() {
               Capacidad: <input name="capacidad" type="number" value={carpaEditando.capacidad || ''} onChange={handleInputChange} />
             </label>
             <div className="modal-buttons">
-              <button onClick={guardarCambios}>Guardar</button>
-              <button onClick={() => setCarpaEditando(null)}>Cancelar</button>
+              <button className="boton-agregar-servicio" onClick={guardarCambios}>Guardar</button>
+              <button className="boton-agregar-servicio" onClick={() => setCarpaEditando(null)}>Cancelar</button>
             </div>
           </div>
         </div>
@@ -547,32 +548,32 @@ function CarpasDelBalneario() {
 
       {/* PRECIOS DEL BALNEARIO */}
       {precios && precios.length > 0 && (
-      <div className="precios-balneario-tabla" style={{ marginTop: "2em" }}>
-        <h3>Disponibilidad</h3>
-        <table className="tabla-precios-reserva">
-          <thead>
-            <tr>
-              <th>Tipo de reserva</th>
-              <th>Precio por día</th>
-              <th>Precio por semana</th>
-              <th>Precio por quincena</th>
-              <th>Precio por mes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {precios.map(p => (
-              <tr key={p.id_tipo_ubicacion}>
-                <td>{p.nombre}</td>
-                <td>${p.dia}</td>
-                <td>${p.semana}</td>
-                <td>${p.quincena}</td>
-                <td>${p.mes}</td>
+        <div className="precios-balneario-tabla" style={{ marginTop: "2em" }}>
+          <h3>Disponibilidad</h3>
+          <table className="tabla-precios-reserva">
+            <thead>
+              <tr>
+                <th>Tipo de reserva</th>
+                <th>Precio por día</th>
+                <th>Precio por semana</th>
+                <th>Precio por quincena</th>
+                <th>Precio por mes</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )}
+            </thead>
+            <tbody>
+              {precios.map(p => (
+                <tr key={p.id_tipo_ubicacion}>
+                  <td>{p.nombre}</td>
+                  <td>${p.dia}</td>
+                  <td>${p.semana}</td>
+                  <td>${p.quincena}</td>
+                  <td>${p.mes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
