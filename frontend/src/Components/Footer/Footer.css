@@ -32,8 +32,8 @@ footer {
 }
 
 .slogan_footer {
-  font-size: 14px;
   line-height: 1.5;
+  margin: 0;
 }
 
 .slogan_footer span {
