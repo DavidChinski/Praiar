@@ -312,10 +312,11 @@ function BusquedaHome() {
                   className="search-button"
                   onClick={() => {
                     if (balnearioSeleccionado) {
+                      console.log(rangoFechas[0].startDate.toISOString(), rangoFechas[0].endDate.toISOString())
                       navigate(`/balneario/${balnearioSeleccionado}`, {
                         state: {
-                          fechaInicio: rangoFechas[0].startDate.toISOString(),
-                          fechaFin: rangoFechas[0].endDate.toISOString()
+                          fechaInicio: rangoFechas[0].startDate.toISOString().split('T')[0],
+                          fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0]
                         }
                       });
                     }

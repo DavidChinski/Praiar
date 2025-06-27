@@ -306,7 +306,8 @@ app.post('/api/crear-balneario', async (req, res) => {
     imagenUrl,
     ciudadSeleccionada,
     idUsuario,
-    tandasCarpas // <-- [{ id_tipo_ubicacion, cantidadCarpas, ... }]
+    tandasCarpas, // array de todas las tandas
+    precios       // objeto { dia, semana, quincena, mes }
   } = req.body;
 
   if (!idUsuario) {
@@ -317,6 +318,9 @@ app.post('/api/crear-balneario', async (req, res) => {
   }
   if (!Array.isArray(tandasCarpas) || tandasCarpas.length === 0) {
     return res.status(400).json({ error: 'Debe agregar al menos una tanda de carpas.' });
+  }
+  if (!precios || !precios.dia || !precios.semana || !precios.quincena || !precios.mes) {
+    return res.status(400).json({ error: 'Debe ingresar todos los precios.' });
   }
 
   try {
@@ -340,7 +344,22 @@ app.post('/api/crear-balneario', async (req, res) => {
 
     const nuevoBalnearioId = balnearioData.id_balneario;
 
-    // 2. Crear todas las carpas de todas las tandas
+    // 2. Crear los precios asociados a este balneario
+    const { error: precioError } = await supabase
+      .from("precios")
+      .insert([{
+        id_balneario: nuevoBalnearioId,
+        dia: precios.dia,
+        semana: precios.semana,
+        quincena: precios.quincena,
+        mes: precios.mes
+      }]);
+
+      if (precioError) {
+      return res.status(500).json({ error: "Balneario creado, pero ocurrió un error al guardar los precios." });
+    }
+
+    // 3. Crear todas las carpas de todas las tandas
     let ubicaciones = [];
     let pos = 1;
     tandasCarpas.forEach((tanda) => {
@@ -377,10 +396,10 @@ app.post('/api/crear-balneario', async (req, res) => {
       .insert(ubicaciones);
 
     if (carpasError) {
-      return res.status(500).json({ error: "Balneario creado, pero ocurrió un error al crear las carpas." });
+      return res.status(500).json({ error: "Balneario y precios creados, pero ocurrió un error al crear las carpas." });
     }
 
-    res.status(200).json({ mensaje: 'Balneario y carpas creados correctamente.' });
+    res.status(200).json({ mensaje: 'Balneario, precios y carpas creados correctamente.' });
   } catch (err) {
     console.error("Error en /api/crear-balneario:", err);
     res.status(500).json({ error: 'Error interno del servidor.' });
@@ -396,6 +415,18 @@ app.get('/api/tipos-ubicaciones', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Error al obtener tipos de ubicaciones" });
   }
+});
+
+// GET /api/balneario/:id/precios
+app.get('/api/balneario/:id/precios', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from("precios")
+    .select("dia, semana, quincena, mes")
+    .eq("id_balneario", id)
+    .single();
+  if (error || !data) return res.status(404).json({ error: "Precios no encontrados" });
+  res.json(data);
 });
 
 // --------- ENDPOINTS PARA CarpasDelBalneario ------------

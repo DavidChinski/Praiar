@@ -7,7 +7,15 @@ import Sombrilla from '../../assets/BalneariosBusquedaHome.png';
 function CarpasDelBalneario() {
   const { id } = useParams();
   const location = useLocation();
-  const { fechaInicio, fechaFin } = location.state || {};
+  let { fechaInicio, fechaFin } = location.state || {};
+
+  if (!fechaInicio || !fechaFin) {
+    const today = new Date();
+    fechaInicio = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    fechaFin = tomorrow.toISOString().split('T')[0];
+  }
 
   const containerRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
@@ -32,10 +40,11 @@ function CarpasDelBalneario() {
     cant_reposeras: 2,
     capacidad: 4,
   });
+  const [precios, setPrecios] = useState(null);
 
   const navigate = useNavigate();
 
-  // Obtener usuario logueado
+  // Obtener usuario logueado y balneario info
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (usuario && usuario.auth_id) {
@@ -52,7 +61,7 @@ function CarpasDelBalneario() {
     }
   }, [id]);
 
-  // Cargar carpas, elementos y servicios
+  // Cargar carpas, elementos, servicios, tipos de ubicacion
   useEffect(() => {
     setLoading(true);
 
@@ -74,7 +83,6 @@ function CarpasDelBalneario() {
       .then(res => res.json())
       .then(setTodosLosServicios);
 
-    // Traer tipos de ubicaciones
     fetch("http://localhost:3000/api/tipos-ubicaciones")
       .then(res => res.json())
       .then(setTiposUbicacion);
@@ -89,6 +97,13 @@ function CarpasDelBalneario() {
       .then(res => res.json())
       .then(setReservas);
   }, [id, fechaInicio, fechaFin]);
+
+  // Cargar precios del balneario
+  useEffect(() => {
+    fetch(`http://localhost:3000/api/balneario/${id}/precios`)
+      .then(res => res.json())
+      .then(setPrecios);
+  }, [id]);
 
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
@@ -122,7 +137,6 @@ function CarpasDelBalneario() {
       });
     }
 
-    // Refrescar info balneario
     fetch(`http://localhost:3000/api/balneario/${id}/info`)
       .then(res => res.json())
       .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
@@ -187,7 +201,6 @@ function CarpasDelBalneario() {
     setDragging(null);
   }
 
-  // Eliminar carpa
   async function eliminarCarpa(id_carpa) {
     await fetch(`http://localhost:3000/api/balneario/carpas/${id_carpa}`, { method: "DELETE" });
     setCarpas((prev) => prev.filter((carpa) => carpa.id_carpa !== id_carpa));
@@ -258,7 +271,6 @@ function CarpasDelBalneario() {
         cant_reposeras: 2,
         capacidad: 4,
       });
-      // Recargar carpas
       fetch(`http://localhost:3000/api/balneario/${id}/carpas`)
         .then(res => res.json())
         .then(data => {
@@ -288,11 +300,13 @@ function CarpasDelBalneario() {
         </div>
       )}
 
-      {fechaInicio && fechaFin && (
+      {fechaInicio && fechaFin ? (
         <p>
           Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString()} al{" "}
           {new Date(fechaFin + 'T00:00:00').toLocaleDateString()}
         </p>
+      ) : (
+        <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
       )}
 
       <div className="iconos-servicios">
@@ -528,6 +542,19 @@ function CarpasDelBalneario() {
               <button onClick={() => setCarpaEditando(null)}>Cancelar</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* PRECIOS DEL BALNEARIO */}
+      {precios && (
+        <div className="precios-balneario" style={{ marginTop: "2em" }}>
+          <h3>Precios</h3>
+          <ul>
+            <li><strong>Día:</strong> ${precios.dia}</li>
+            <li><strong>Semana:</strong> ${precios.semana}</li>
+            <li><strong>Quincena:</strong> ${precios.quincena}</li>
+            <li><strong>Mes:</strong> ${precios.mes}</li>
+          </ul>
         </div>
       )}
     </div>

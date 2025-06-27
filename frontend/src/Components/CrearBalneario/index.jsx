@@ -23,6 +23,12 @@ function CrearBalneario() {
   // Todas las tandas cargadas
   const [tandasCarpas, setTandasCarpas] = useState([]);
 
+  // PRECIOS
+  const [precioDia, setPrecioDia] = useState("");
+  const [precioSemana, setPrecioSemana] = useState("");
+  const [precioQuincena, setPrecioQuincena] = useState("");
+  const [precioMes, setPrecioMes] = useState("");
+
   useEffect(() => {
     fetch("http://localhost:3000/api/ciudades")
       .then(res => res.json())
@@ -84,6 +90,22 @@ function CrearBalneario() {
       setMensaje("Debe agregar al menos una tanda de carpas.");
       return;
     }
+    if (
+      precioDia === "" ||
+      precioSemana === "" ||
+      precioQuincena === "" ||
+      precioMes === ""
+    ) {
+      setMensaje("Debe ingresar todos los precios.");
+      return;
+    }
+
+    const precios = {
+      dia: precioDia,
+      semana: precioSemana,
+      quincena: precioQuincena,
+      mes: precioMes
+    };
 
     const body = {
       nombre,
@@ -92,7 +114,8 @@ function CrearBalneario() {
       imagenUrl,
       ciudadSeleccionada,
       idUsuario: usuario.auth_id,
-      tandasCarpas // array de todas las tandas
+      tandasCarpas, // array de todas las tandas
+      precios      // precios a guardar
     };
 
     try {
@@ -138,6 +161,20 @@ function CrearBalneario() {
                 ))}
               </select>
             </div>
+
+            {/* Formulario de precios */}
+            <div className="form-section">
+              <h3>Precios</h3>
+              <label htmlFor="precioDia">Precio por día</label>
+              <input id="precioDia" type="number" value={precioDia} onChange={(e) => setPrecioDia(e.target.value)} required />
+              <label htmlFor="precioSemana">Precio por semana</label>
+              <input id="precioSemana" type="number" value={precioSemana} onChange={(e) => setPrecioSemana(e.target.value)} required />
+              <label htmlFor="precioQuincena">Precio por quincena</label>
+              <input id="precioQuincena" type="number" value={precioQuincena} onChange={(e) => setPrecioQuincena(e.target.value)} required />
+              <label htmlFor="precioMes">Precio por mes</label>
+              <input id="precioMes" type="number" value={precioMes} onChange={(e) => setPrecioMes(e.target.value)} required />
+            </div>
+
             {/* Formulario de carpa (tanda) */}
             <div className="form-section">
               <h3>Agregar tanda de carpas</h3>

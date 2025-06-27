@@ -9,14 +9,13 @@
 
 /* Layout del formulario */
 .form-layout {
-  padding: 0.5rem 6vw;
   max-width: 960px;
   margin: 0 auto;
 }
 
 /* Contenedor interior */
 .form-container-consultas {
-  width: 100%;
+  width: 500%;
 }
 
 /* Título */
@@ -30,7 +29,7 @@
 .formulario {
   display: flex;
   flex-direction: row;
-  gap: 7.5rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
