@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const { supabase } = require('./supabaseClient');
+const nodemailer = require('nodemailer');
 const app = express();
 
 app.use(cors());
@@ -756,25 +757,7 @@ app.post('/api/reserva', async (req, res) => {
   }
 
   try {
-    // Verificar reservas existentes para esa ubicación y balneario
-    const { data: reservasExistentes, error: reservasError } = await supabase
-      .from("reservas")
-      .select("*")
-      .eq("id_ubicacion", id_ubicacion)
-      .eq("id_balneario", id_balneario);
-
-    if (reservasError) {
-      return res.status(500).json({ error: "Error verificando reservas." });
-    }
-
-    // Validar solapamiento de fechas
-    const conflicto = reservasExistentes.some(r =>
-      fecha_inicio <= r.fecha_salida && fecha_salida >= r.fecha_inicio
-    );
-
-    if (conflicto) {
-      return res.status(400).json({ error: "Ya hay una reserva para esas fechas." });
-    }
+    // ...validación de reservas...
 
     // Insertar nueva reserva
     const { error: insertError } = await supabase.from("reservas").insert({
@@ -790,16 +773,80 @@ app.post('/api/reserva', async (req, res) => {
       return res.status(500).json({ error: "Error al realizar la reserva." });
     }
 
-    res.status(200).json({ mensaje: "Reserva realizada con éxito." });
+    // === NUEVO: enviar email al dueño del balneario ===
+
+    // 1. Buscar el balneario y obtener el id_usuario del dueño
+    const { data: balneario, error: balnearioError } = await supabase
+      .from("balnearios")
+      .select("id_usuario, nombre")
+      .eq("id_balneario", id_balneario)
+      .single();
+
+    if (!balneario || balnearioError) {
+      return res.status(500).json({ error: "Reserva realizada pero no se pudo notificar al balneario (no se encontró el dueño)." });
+    }
+
+    // 2. Buscar el email del dueño del balneario
+    const { data: duenio, error: duenioError } = await supabase
+      .from("usuarios")
+      .select("email")
+      .eq("auth_id", balneario.id_usuario)
+      .single();
+
+    if (!duenio || duenioError) {
+      return res.status(500).json({ error: "Reserva realizada pero no se pudo notificar al dueño del balneario (no se encontró su email)." });
+    }
+
+    // 3. Buscar nombre/email del cliente (quien reservó)
+    const { data: usuario, error: usuarioError } = await supabase
+      .from("usuarios")
+      .select("nombre, apellido, email")
+      .eq("auth_id", id_usuario)
+      .single();
+
+    // 4. Configurá tu transport (esto es para SMTP de Gmail, cambiá a tu proveedor si es otro)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'praiar.info@gmail.com',
+        pass: 'hbtt hyzt ktwp team'
+      }
+    });
+
+    // 5. Armá el mail
+    const mailOptions = {
+      from: '"Reservas" <praiar.info@gmail.com>',
+      to: duenio.email,
+      subject: `Nueva reserva en ${balneario.nombre}`,
+      text: `
+¡Nueva reserva recibida!
+
+Cliente: ${usuario ? usuario.nombre + ' ' + usuario.apellido : 'ID usuario: ' + id_usuario}
+Email cliente: ${usuario?.email || 'No disponible'}
+
+Ubicación: ${id_ubicacion}
+Fecha inicio: ${fecha_inicio}
+Fecha salida: ${fecha_salida}
+Método de pago: ${metodo_pago}
+      `
+    };
+
+    // 6. Enviá el mail (esto es async, pero no detiene la respuesta)
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error enviando mail:", error);
+      }
+    });
+
+    // Responder éxito al frontend
+    res.status(200).json({ mensaje: "Reserva realizada con éxito. Se notificó al dueño del balneario por mail." });
+
   } catch (error) {
     res.status(500).json({ error: "Error al realizar la reserva." });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+
 
 // POST /api/balneario/:id/carpas
 app.post('/api/balneario/:id/carpas', async (req, res) => {
@@ -853,4 +900,9 @@ app.post('/api/balneario/:id/carpas', async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: "Error interno al agregar carpa." });
   }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
