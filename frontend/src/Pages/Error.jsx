@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import Layout from "../Layout";
 
 function Error() {
   const navigate = useNavigate();
 
   return (
-    <Layout>
+    <>
       <div
         style={{
           display: "flex",             // usar flexbox
@@ -31,7 +30,7 @@ function Error() {
           Volver a la página anterior
         </button>
       </div>
-    </Layout>
+    </>
   );
 }
 

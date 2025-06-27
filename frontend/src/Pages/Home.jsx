@@ -1,5 +1,5 @@
 // src/Pages/Home.jsx
-import Layout from '../Layout/';
+
 import BusquedaHome from '../Components/BusquedaHome';
 import Ciudades from '../Components/Ciudades';
 import ElegirPraiarHome from '../Components/ElegirPraiarHome/';
@@ -18,7 +18,7 @@ function Home() {
   }, []);
 
   return (
-    <Layout>
+    <>
       <BusquedaHome />
       <div id="seccion-inferior">
         <ElegirPraiarHome /> 
@@ -31,7 +31,7 @@ function Home() {
           <Ciudades />
         )}
       </div>
-    </Layout>
+    </>
   );
 }
 
