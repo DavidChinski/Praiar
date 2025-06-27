@@ -319,8 +319,11 @@ app.post('/api/crear-balneario', async (req, res) => {
   if (!Array.isArray(tandasCarpas) || tandasCarpas.length === 0) {
     return res.status(400).json({ error: 'Debe agregar al menos una tanda de carpas.' });
   }
-  if (!precios || !precios.dia || !precios.semana || !precios.quincena || !precios.mes) {
-    return res.status(400).json({ error: 'Debe ingresar todos los precios.' });
+  if (!Array.isArray(precios) || precios.length === 0) {
+    return res.status(400).json({ error: 'Debe ingresar al menos un precio.' });
+  }
+  if (precios.some(p => !p.dia || !p.semana || !p.quincena || !p.mes || !p.id_tipo_ubicacion)) {
+    return res.status(400).json({ error: 'Cada precio debe estar completo.' });
   }
 
   try {
@@ -345,19 +348,17 @@ app.post('/api/crear-balneario', async (req, res) => {
     const nuevoBalnearioId = balnearioData.id_balneario;
 
     // 2. Crear los precios asociados a este balneario
+    const preciosAInsertar = precios.map(p => ({
+      id_balneario: nuevoBalnearioId,
+      id_tipo_ubicacion: p.id_tipo_ubicacion,
+      dia: p.dia,
+      semana: p.semana,
+      quincena: p.quincena,
+      mes: p.mes
+    }));
     const { error: precioError } = await supabase
       .from("precios")
-      .insert([{
-        id_balneario: nuevoBalnearioId,
-        dia: precios.dia,
-        semana: precios.semana,
-        quincena: precios.quincena,
-        mes: precios.mes
-      }]);
-
-      if (precioError) {
-      return res.status(500).json({ error: "Balneario creado, pero ocurrió un error al guardar los precios." });
-    }
+      .insert(preciosAInsertar);
 
     // 3. Crear todas las carpas de todas las tandas
     let ubicaciones = [];
