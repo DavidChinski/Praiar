@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import './BusquedaHome.css';
 import { DateRange } from 'react-date-range';
-import { format } from 'date-fns';
+import { format, max } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import BalneariosBusquedaHome from '../../assets/BalneariosBusquedaHome.png';
@@ -37,7 +37,6 @@ function BusquedaHome() {
   const balnearioDropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Cerrar dropdowns al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event) {
       if (ciudadDropdownRef.current && !ciudadDropdownRef.current.contains(event.target)) {
@@ -79,7 +78,7 @@ function BusquedaHome() {
     const inputNorm = normalizar(ciudadInput);
     const matches = ciudades.filter(c =>
       normalizar(c.nombre).startsWith(inputNorm)
-    ).slice(0, 3); // Máximo 3 resultados
+    ).slice(0, 3);
     
     setCiudadMatches(matches);
     
@@ -124,7 +123,7 @@ function BusquedaHome() {
     const inputNorm = normalizar(balnearioInput);
     const matches = balnearios.filter(b =>
       normalizar(b.nombre).startsWith(inputNorm)
-    ).slice(0, 3); // Máximo 3 resultados
+    ).slice(0, max); // Máximo 3 resultados
     
     setBalnearioMatches(matches);
     
@@ -182,8 +181,19 @@ function BusquedaHome() {
   }
 
   function renderBalnearioMatch() {
+    // Si HAY ciudad seleccionada y el input está vacío, muestra TODOS los balnearios de esa ciudad
+    const showAll = ciudadSeleccionada && balnearioInput.length === 0 && balnearios.length > 0;
+    // Si HAY input, muestra los matches filtrados
     const showSuggestions = balnearioInput.length > 0 && balnearioMatches.length > 0;
-
+  
+    // Lo que se va a mostrar en el dropdown
+    let suggestions = [];
+    if (showAll) {
+      suggestions = balnearios;
+    } else if (showSuggestions) {
+      suggestions = balnearioMatches;
+    }
+  
     return (
       <div className="input-autocomplete-wrapper" ref={balnearioDropdownRef}>
         <input
@@ -197,9 +207,9 @@ function BusquedaHome() {
           autoComplete="off"
           disabled={!ciudadSeleccionada}
         />
-        {showSuggestions && (
+        {(showAll || showSuggestions) && (
           <div className="autocomplete-dropdown">
-            {balnearioMatches.map((balneario, index) => (
+            {suggestions.map((balneario, index) => (
               <div
                 key={balneario.id_balneario}
                 className="autocomplete-option"
