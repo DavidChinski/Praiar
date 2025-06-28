@@ -60,6 +60,12 @@ function CarpasDelBalneario() {
   const elementoInputRef = useRef(null);
   const elementoDropdownRef = useRef(null);
 
+  // ==== RESEÑAS ====
+  const [resenias, setResenias] = useState([]);
+  const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5 });
+  const [loadingResenias, setLoadingResenias] = useState(false);
+  const [errorResenias, setErrorResenias] = useState(null);
+
   // Obtener usuario logueado y balneario info
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -195,6 +201,21 @@ function CarpasDelBalneario() {
       .then(setPrecios);
   }, [id]);
 
+  // ==== Cargar reseñas ====
+  useEffect(() => {
+    setLoadingResenias(true);
+    fetch(`http://localhost:3000/api/balneario/${id}/resenias`)
+      .then(res => res.json())
+      .then(data => {
+        setResenias(data.resenias || []);
+        setLoadingResenias(false);
+      })
+      .catch(err => {
+        setErrorResenias("Error cargando reseñas");
+        setLoadingResenias(false);
+      });
+  }, [id]);
+
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
     return tiposUbicacion.find(t => t.id_tipo_ubicaciones === carpa.id_tipo_ubicacion)?.nombre || "simple";
@@ -232,6 +253,51 @@ function CarpasDelBalneario() {
       .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
   }
 
+  // ---- RESEÑAS: Agregar reseña ----
+  async function agregarResenia() {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || !usuario.auth_id) {
+      alert("Debes iniciar sesión para dejar una reseña.");
+      return;
+    }
+    if (!reseniaNueva.comentario.trim()) {
+      alert("Por favor escribe un comentario.");
+      return;
+    }
+    if (!reseniaNueva.estrellas || isNaN(reseniaNueva.estrellas) || reseniaNueva.estrellas < 1 || reseniaNueva.estrellas > 5) {
+      alert("Selecciona una cantidad de estrellas válida.");
+      return;
+    }
+    const body = {
+      comentario: reseniaNueva.comentario,
+      estrellas: Number(reseniaNueva.estrellas),
+      id_usuario: usuario.id_usuario // puede venir como id_usuario o auth_id
+    };
+    const res = await fetch(`http://localhost:3000/api/balneario/${id}/resenias`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      setReseniaNueva({ comentario: "", estrellas: 5 });
+      // Refrescar lista
+      fetch(`http://localhost:3000/api/balneario/${id}/resenias`)
+        .then(r => r.json())
+        .then(data => setResenias(data.resenias || []));
+    } else {
+      alert("Error al enviar reseña");
+    }
+  }
+
+  // ---- RESEÑAS: Like reseña ----
+  async function likeResenia(id_reseña) {
+    const res = await fetch(`http://localhost:3000/api/resenias/${id_reseña}/like`, { method: "POST" });
+    if (res.ok) {
+      setResenias(resenias => resenias.map(r =>
+        r.id_reseña === id_reseña ? { ...r, likes: (r.likes || 0) + 1 } : r
+      ));
+    }
+  }
 
   // Drag & drop
   function onMouseMove(e) {
@@ -400,6 +466,7 @@ function CarpasDelBalneario() {
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
+  // ---- RENDER ----
   return (
     <div className="carpas-del-balneario">
       <h2>{balnearioInfo?.nombre || 'Carpas del Balneario'}</h2>
@@ -580,6 +647,83 @@ function CarpasDelBalneario() {
         )}
       </div>
 
+      {/* === RESEÑAS === */}
+      <div className="resenias-section" style={{ marginTop: "3em" }}>
+        <h3>Reseñas</h3>
+        {loadingResenias ? (
+          <p>Cargando reseñas...</p>
+        ) : (
+          <>
+            <div className="resenias-lista">
+              {resenias.length === 0 && <p>No hay reseñas aún.</p>}
+              {resenias.map(resenia => (
+                <div className="resenia-card" key={resenia.id_reseña}>
+                  <div className="resenia-header">
+                    <span className="resenia-usuario">
+                      {resenia.usuario_nombre
+                        ? resenia.usuario_nombre
+                        : "Usuario"}
+                    </span>
+                    <span className="resenia-estrellas">
+                      {"★".repeat(resenia.estrellas)}{"☆".repeat(5 - resenia.estrellas)}
+                    </span>
+                  </div>
+                  <div className="resenia-comentario">{resenia.comentario}</div>
+                  <div className="resenia-footer">
+                    <span className="resenia-likes" style={{ marginRight: 8 }}>
+                      <button
+                        className="like-boton"
+                        onClick={() => likeResenia(resenia.id_reseña)}
+                      >
+                        👍
+                      </button>
+                      {resenia.likes || 0}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Form agregar reseña */}
+            {usuarioLogueado && !esDuenio && (
+              <div className="agregar-resenia-form">
+                <h4>Dejá tu reseña</h4>
+                <label>
+                  Estrellas:{" "}
+                  <select
+                    value={reseniaNueva.estrellas}
+                    onChange={e =>
+                      setReseniaNueva(r => ({
+                        ...r,
+                        estrellas: Number(e.target.value)
+                      }))
+                    }
+                  >
+                    {[1, 2, 3, 4, 5].map(v => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Comentario:{" "}
+                  <textarea
+                    value={reseniaNueva.comentario}
+                    onChange={e =>
+                      setReseniaNueva(r => ({
+                        ...r,
+                        comentario: e.target.value
+                      }))
+                    }
+                  />
+                </label>
+                <button className="boton-agregar-servicio" onClick={agregarResenia}>
+                  Publicar reseña
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       {/* MODAL AGREGAR CARPA/SOMBRILLA */}
       {mostrarAgregarCarpa && (
         <div className="modal">
@@ -752,7 +896,6 @@ function CarpasDelBalneario() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

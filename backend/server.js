@@ -968,6 +968,109 @@ app.put('/api/balneario/:id/precios/:id_tipo_ubicacion', async (req, res) => {
   }
 });
 
+// === RESEÑAS APIs ===
+
+// Helper para parsear seguro el id de balneario (solo enteros válidos)
+function toIntOrNull(val) {
+  const n = parseInt(val, 10);
+  return Number.isInteger(n) && !isNaN(n) ? n : null;
+}
+
+// GET /api/balneario/:id/resenias
+app.get('/api/balneario/:id/resenias', async (req, res) => {
+  const { id } = req.params;
+  const balnearioId = toIntOrNull(id);
+  if (balnearioId === null) return res.status(400).json({ error: 'Id de balneario inválido.' });
+  try {
+    // Buscar las reseñas asociadas a este balneario (con join de usuario)
+    const { data: joinData, error: joinError } = await supabase
+      .from('reseñas_x_balnearios')
+      .select('id_reseña, reseñas (comentario, estrellas, likes, id_usuario, id_reseña), usuarios:reseñas(id_usuario, nombre, apellido)')
+      .eq('id_balneario', balnearioId);
+
+    if (joinError) return res.status(500).json({ error: 'Error trayendo reseñas.' });
+
+    // Formatear reseñas
+    const reseñas = (joinData || []).map(r => ({
+      id_reseña: r.id_reseña,
+      comentario: r.reseñas?.comentario,
+      estrellas: r.reseñas?.estrellas,
+      likes: r.reseñas?.likes || 0,
+      id_usuario: r.reseñas?.id_usuario,
+      usuario_nombre: r.usuarios?.nombre
+        ? r.usuarios.nombre + (r.usuarios.apellido ? " " + r.usuarios.apellido : "")
+        : undefined
+    }));
+
+    res.json({ resenias: reseñas });
+  } catch (e) {
+    res.status(500).json({ error: 'Error interno trayendo reseñas.' });
+  }
+});
+
+// POST /api/balneario/:id/resenias
+app.post('/api/balneario/:id/resenias', async (req, res) => {
+  const { id } = req.params;
+  const balnearioId = toIntOrNull(id);
+  if (balnearioId === null) return res.status(400).json({ error: 'Id de balneario inválido.' });
+  const { comentario, estrellas, id_usuario } = req.body;
+  if (!comentario?.trim() || !estrellas || !id_usuario) {
+    return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
+  }
+  try {
+    // 1. Insertar reseña
+    const { data: nuevaResenia, error: reseniaError } = await supabase
+      .from('reseñas')
+      .insert([{ comentario, estrellas, id_usuario, likes: 0 }])
+      .select()
+      .single();
+
+    console.log("Nueva reseña creada:", nuevaResenia);
+    if (reseniaError || !nuevaResenia) {
+      return res.status(500).json({ error: 'Error guardando reseña.' });
+    }
+    // 2. Insertar relación reseña-balneario
+    const { error: relError } = await supabase
+      .from('reseñas_x_balnearios')
+      .insert([{ id_reseña: nuevaResenia.id_reseña, id_balneario: balnearioId }]);
+
+    console.log("Relación reseña-balneario creada:", { id_reseña: nuevaResenia.id_reseña, id_balneario: balnearioId });
+    if (relError) {
+      return res.status(500).json({ error: 'Reseña creada pero error asociando al balneario.' });
+    }
+    res.json({ ok: true, reseña: nuevaResenia });
+  } catch (e) {
+    res.status(500).json({ error: 'Error interno guardando reseña.' });
+  }
+});
+
+// POST /api/resenias/:id_reseña/like
+app.post('/api/resenias/:id_reseña/like', async (req, res) => {
+  const { id_reseña } = req.params;
+  try {
+    // Sumar un like
+    const { data: reseña, error: getError } = await supabase
+      .from('reseñas')
+      .select('likes')
+      .eq('id_reseña', id_reseña)
+      .single();
+    if (getError || !reseña) {
+      return res.status(404).json({ error: 'Reseña no encontrada.' });
+    }
+    const nuevosLikes = (reseña.likes || 0) + 1;
+    const { error: updateError } = await supabase
+      .from('reseñas')
+      .update({ likes: nuevosLikes })
+      .eq('id_reseña', id_reseña);
+    if (updateError) {
+      return res.status(500).json({ error: 'Error actualizando likes.' });
+    }
+    res.json({ ok: true, likes: nuevosLikes });
+  } catch (e) {
+    res.status(500).json({ error: 'Error interno sumando like.' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
