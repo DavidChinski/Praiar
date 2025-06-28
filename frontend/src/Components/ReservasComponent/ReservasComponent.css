@@ -33,7 +33,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  height: 56px;
   flex-grow: 2;
   min-width: 280px;
   position: relative;

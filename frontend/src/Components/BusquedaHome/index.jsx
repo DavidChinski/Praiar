@@ -287,8 +287,8 @@ function BusquedaHome() {
 
                 {/* Fecha con calendario */}
                 <div className="input-group date-group">
-                  <img
-                    src={FechaBusquedaHome}
+                  <FontAwesomeIcon 
+                    icon="fa-solid fa-calendar-days"
                     className="iconFecha"
                     alt="Fecha"
                     onClick={() => setShowCalendario(!showCalendario)}

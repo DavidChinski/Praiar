@@ -95,6 +95,7 @@
 
 /* Contenedor del formulario */
 .busqueda-form {
+  height: auto;
   display: flex;
   background-color: white;
   border-radius: 2rem;
@@ -110,8 +111,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  height: 56px; /* Altura fija para todos los grupos */
-  min-height: 56px;
   box-sizing: border-box;
 }
 
@@ -147,6 +146,7 @@
   align-items: center;
   transition: box-shadow 0.3s, border 0.3s;
   box-sizing: border-box;
+  margin: 0;
 }
 
 /* Selects usan la clase input-estandar */
@@ -188,7 +188,6 @@ select.input-estandar:hover,
 }
 
 .search-button:hover, .iconFecha:hover {
-  background-color: #00527c;
   transform: scale(1.05);
 }
 
