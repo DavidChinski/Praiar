@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient.js';
 import './BusquedaHome.css';
 import { DateRange } from 'react-date-range';
-import { format, max } from 'date-fns';
+import { format } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
@@ -44,7 +44,6 @@ function BusquedaHome() {
         setBalnearioMatches([]);
       }
     }
-    
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -77,9 +76,9 @@ function BusquedaHome() {
     const matches = ciudades.filter(c =>
       normalizar(c.nombre).startsWith(inputNorm)
     ).slice(0, 3);
-    
+
     setCiudadMatches(matches);
-    
+
     // Verificar si hay coincidencia exacta
     const exactMatch = matches.find(c => normalizar(c.nombre) === inputNorm);
     if (exactMatch) {
@@ -121,10 +120,10 @@ function BusquedaHome() {
     const inputNorm = normalizar(balnearioInput);
     const matches = balnearios.filter(b =>
       normalizar(b.nombre).startsWith(inputNorm)
-    ).slice(0, max); // Máximo 3 resultados
-    
+    ).slice(0, 3);
+
     setBalnearioMatches(matches);
-    
+
     // Verificar si hay coincidencia exacta
     const exactMatch = matches.find(b => normalizar(b.nombre) === inputNorm);
     if (exactMatch) {
@@ -183,7 +182,7 @@ function BusquedaHome() {
     const showAll = ciudadSeleccionada && balnearioInput.length === 0 && balnearios.length > 0;
     // Si HAY input, muestra los matches filtrados
     const showSuggestions = balnearioInput.length > 0 && balnearioMatches.length > 0;
-  
+
     // Lo que se va a mostrar en el dropdown
     let suggestions = [];
     if (showAll) {
@@ -191,7 +190,7 @@ function BusquedaHome() {
     } else if (showSuggestions) {
       suggestions = balnearioMatches;
     }
-  
+
     return (
       <div className="input-autocomplete-wrapper" ref={balnearioDropdownRef}>
         <input
@@ -232,6 +231,22 @@ function BusquedaHome() {
       </div>
     );
   }
+
+  // Validar si hay algún balneario que coincida con el input (parcial o exacto)
+  function getBalnearioIdFromInput() {
+    const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const inputNorm = normalizar(balnearioInput);
+    // 1. Busca coincidencia exacta
+    let seleccionado = balnearios.find(b => normalizar(b.nombre) === inputNorm);
+    // 2. Si no hay exacta, busca coincidencia parcial
+    if (!seleccionado) {
+      seleccionado = balnearios.find(b => normalizar(b.nombre).includes(inputNorm));
+    }
+    return seleccionado ? seleccionado.id_balneario : null;
+  }
+
+  // El botón se habilita si hay input y hay al menos un balneario que coincida
+  const isSearchEnabled = ciudadSeleccionada && balnearioInput.trim().length > 0 && getBalnearioIdFromInput();
 
   return (
     <div className="busqueda-home">
@@ -319,17 +334,19 @@ function BusquedaHome() {
                 <button
                   className="search-button"
                   onClick={() => {
-                    if (balnearioSeleccionado) {
-                      console.log(rangoFechas[0].startDate.toISOString(), rangoFechas[0].endDate.toISOString())
-                      navigate(`/balneario/${balnearioSeleccionado}`, {
+                    const idBalneario = getBalnearioIdFromInput();
+                    if (idBalneario) {
+                      navigate(`/balneario/${idBalneario}`, {
                         state: {
                           fechaInicio: rangoFechas[0].startDate.toISOString().split('T')[0],
                           fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0]
                         }
                       });
+                    } else {
+                      alert('Seleccioná un balneario válido.');
                     }
                   }}
-                  disabled={!balnearioSeleccionado}
+                  disabled={!isSearchEnabled}
                 >
                   <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
                 </button>
