@@ -49,6 +49,17 @@ function CarpasDelBalneario() {
   }); // NUEVO
   const navigate = useNavigate();
 
+  // AUTOCOMPLETADO DE ELEMENTOS
+  const [todosElementos] = useState([
+    { nombre: "Pasillo", tipo: "pasillo" },
+    { nombre: "Pileta", tipo: "pileta" },
+    { nombre: "Quincho", tipo: "quincho" }
+  ]);
+  const [elementoInput, setElementoInput] = useState("");
+  const [elementoMatches, setElementoMatches] = useState([]);
+  const elementoInputRef = useRef(null);
+  const elementoDropdownRef = useRef(null);
+
   // Obtener usuario logueado y balneario info
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -65,6 +76,80 @@ function CarpasDelBalneario() {
       setUsuarioLogueado(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (!elementoInput) {
+      setElementoMatches([]);
+      return;
+    }
+    const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const inputNorm = normalizar(elementoInput);
+    const matches = todosElementos.filter(e =>
+      normalizar(e.nombre).startsWith(inputNorm)
+    );
+    setElementoMatches(matches);
+  }, [elementoInput, todosElementos]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (elementoDropdownRef.current && !elementoDropdownRef.current.contains(event.target)) {
+        setElementoMatches([]);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  async function agregarElementoTipo(tipo) {
+    const res = await fetch(`http://localhost:3000/api/balneario/${id}/elemento`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tipo }),
+    });
+    const data = await res.json();
+    setElementos((prev) => [...prev, data]);
+    setElementoInput("");
+    setElementoMatches([]);
+  }
+
+  function renderElementoMatch() {
+    const showSuggestions = elementoInput.length > 0 && elementoMatches.length > 0;
+    return (
+      <div className="input-autocomplete-wrapper" ref={elementoDropdownRef}>
+        <input
+          ref={elementoInputRef}
+          className="input-estandar"
+          type="text"
+          placeholder="Agregar elemento (pasillo, pileta, quincho...)"
+          value={elementoInput}
+          onChange={e => setElementoInput(e.target.value)}
+          autoComplete="off"
+        />
+        {showSuggestions && (
+          <div className="autocomplete-dropdown">
+            {elementoMatches.map((elemento, idx) => (
+              <div
+                key={elemento.tipo}
+                className="autocomplete-option"
+                onMouseDown={e => {
+                  e.preventDefault();
+                  setElementoInput(elemento.nombre);
+                  agregarElementoTipo(elemento.tipo);
+                  setElementoMatches([]);
+                  setTimeout(() => elementoInputRef.current && elementoInputRef.current.blur(), 0);
+                }}
+              >
+                <span className="suggestion-text">
+                  <span className="typed-text">{elemento.nombre.slice(0, elementoInput.length)}</span>
+                  <span className="completion-text">{elemento.nombre.slice(elementoInput.length)}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Cargar carpas, elementos, servicios, tipos de ubicacion
   useEffect(() => {
@@ -147,16 +232,6 @@ function CarpasDelBalneario() {
       .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
   }
 
-  // Agregar elemento
-  async function agregarElemento(tipo) {
-    const res = await fetch(`http://localhost:3000/api/balneario/${id}/elemento`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tipo }),
-    });
-    const data = await res.json();
-    setElementos((prev) => [...prev, data]);
-  }
 
   // Drag & drop
   function onMouseMove(e) {
@@ -349,13 +424,11 @@ function CarpasDelBalneario() {
       {esDuenio && (
         <>
           <div className="toolbar">
-            <div className="toolbar-dropdown">
-              <button className="boton-agregar-servicio dropdown-toggle">Agregar elemento ▾</button>
-              <div className="dropdown-menu">
-                <button className="boton-agregar-servicio" onClick={() => agregarElemento("pasillo")}>Pasillo</button>
-                <button className="boton-agregar-servicio" onClick={() => agregarElemento("pileta")}>Pileta</button>
-                <button className="boton-agregar-servicio" onClick={() => agregarElemento("quincho")}>Quincho</button>
-              </div>
+            <div style={{ minWidth: 250 }}>
+              <label className="subtitulo" style={{ marginBottom: 4, display: "block" }}>
+                Agregar elemento
+              </label>
+              {renderElementoMatch()}
             </div>
             <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(true)}>
               Agregar carpa/sombrilla

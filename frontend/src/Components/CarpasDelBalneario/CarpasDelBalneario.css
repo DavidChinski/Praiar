@@ -244,11 +244,18 @@
   display: inline-block;
   text-align: center;
 }
-.toolbar a:hover,
-.toolbar .boton-agregar-servicio:hover {
+
+/* CORREGIDO: solo los links subrayados, los botones NO */
+.toolbar a:hover {
   background: #003F5E;
   color: #fff;
   text-decoration: underline;
+}
+
+.toolbar .boton-agregar-servicio:hover {
+  background: #003F5E;
+  color: #fff;
+  text-decoration: none;
 }
 
 @keyframes fadeIn {
