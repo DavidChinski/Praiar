@@ -1,8 +1,8 @@
 import './Footer.css';
 import Logo from "../../assets/LogoPraiar.png";
-import TwitterFooter from "../../assets/TwitterFooter.png";
-import InstaFooter from "../../assets/InstaFooter.png";
-import LinkedinFooter from "../../assets/LinkedinFooter.png";
+import XFooter from "../../assets/XLogo.png";
+import InstagramFooter from "../../assets/InstagramLogo.webp";
+import LinkedinFooter from "../../assets/LinkedinLogo.png";
 import { Link } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const linkedinPraiar = "https://www.linkedin.com/company/praiararg";
@@ -45,8 +45,8 @@ function Footer() {
             <li><FontAwesomeIcon icon="fa-solid fa-envelope" className="iconFooter"/> contacto@praiar.com</li>
             <li><FontAwesomeIcon icon="fa-solid fa-phone" className="iconFooter"/> +54 911 0000-0000</li>
             <li className="social_icons">
-              <img src={TwitterFooter} alt="Twitter" />
-              <img src={InstaFooter} alt="Instagram" />
+              <img src={XFooter} alt="Twitter" />
+              <img src={InstagramFooter} alt="Instagram" />
               <a href={linkedinPraiar} target="_blank" rel="noopener noreferrer"><img src={LinkedinFooter} alt="LinkedIn" /></a>
             </li>
           </ul>

@@ -6,7 +6,6 @@ import { DateRange } from 'react-date-range';
 import { format, max } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import FechaBusquedaHome from '../../assets/FechaBusquedaHome.png';
 import BusquedaHomeSearch from '../../assets/BusquedaHome.png';
 import VideoBanner from '../../assets/VideoBusqueda.mp4';
 import { FaChevronDown } from 'react-icons/fa';
@@ -166,7 +165,7 @@ function BusquedaHome() {
                 }}
               >
                 <span className="suggestion-text">
-                  <span className="typed-text">{ciudadInput}</span>
+                  <span className="typed-text">{ciudad.nombre.slice(0, ciudadInput.length)}</span>
                   <span className="completion-text">
                     {ciudad.nombre.slice(ciudadInput.length)}
                   </span>
@@ -221,7 +220,7 @@ function BusquedaHome() {
                 }}
               >
                 <span className="suggestion-text">
-                  <span className="typed-text">{balnearioInput}</span>
+                  <span className="typed-text">{balneario.nombre.slice(0, balnearioInput.length)}</span>
                   <span className="completion-text">
                     {balneario.nombre.slice(balnearioInput.length)}
                   </span>

@@ -1,5 +1,4 @@
 import './BanerContactos.css';
-import BannerImage from '../../assets/ImagenBusquedaHome.png';
 import { FaChevronDown } from 'react-icons/fa';
 import VideoBanner from '../../assets/VideoBusqueda.mp4';
 

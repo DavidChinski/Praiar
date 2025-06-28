@@ -1,8 +1,8 @@
 import './ComoContactarnos.css';
 import IlustracionContactos from "../../assets/IlustracionContactos.png"
-import InstaContactos from "../../assets/InstaContactos.png"
-import TwitterContactos from "../../assets/TwitterContactos.png"
-import LinkedinContactos from "../../assets/LinkedinContactos.png"
+import XContactos from "../../assets/XLogo.png";
+import InstagramContactos from "../../assets/InstagramLogo.webp";
+import LinkedinContactos from "../../assets/LinkedinLogo.png";
 const linkedinPraiar = "https://www.linkedin.com/company/praiararg";
 const instagramPraiar = "https://www.instagram.com/matibebe__/";
 const XPraiar = "https://x.com/momorelojero";
@@ -19,10 +19,10 @@ function ComoContactarnos() {
 
         <div className="contacto-redes">
           <a href={XPraiar} target="_blank" rel="noopener noreferrer">
-            <img src={TwitterContactos} alt="X" className="icono-red" />
+            <img src={XContactos} alt="X" className="icono-red" />
           </a>
           <a href={instagramPraiar} target="_blank" rel="noopener noreferrer">
-            <img src={InstaContactos} alt="Instagram" className="icono-red" />
+            <img src={InstagramContactos} alt="Instagram" className="icono-red" />
           </a>
           <a href={linkedinPraiar} target="_blank" rel="noopener noreferrer">
             <img src={LinkedinContactos} alt="LinkedIn" className="icono-red" />

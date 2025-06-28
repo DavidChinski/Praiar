@@ -1,5 +1,5 @@
 import './QuienesSomos.css';
-import LinkedinTrasparente from "../../assets/LinkedinTrasparente.webp";
+import LinkedinLogo from "../../assets/LinkedinLogo.png";
 const linkedinBenezra = "https://www.linkedin.com/in/lucas-benezra/";
 const linkedinBrodsky = "https://www.linkedin.com/in/elias-brodsky-ba6b26315/";
 const linkedinChinski = "https://www.linkedin.com/in/david-chinski-a16a88297/";
@@ -18,7 +18,7 @@ function QuienesSomos() {
             rel="noopener noreferrer"
           >
             <img
-              src={LinkedinTrasparente}
+              src={LinkedinLogo}
               alt="LinkedIn Lucas"
               className="linkedin"
             />
@@ -34,7 +34,7 @@ function QuienesSomos() {
             rel="noopener noreferrer"
           >
             <img
-              src={LinkedinTrasparente}
+              src={LinkedinLogo}
               alt="LinkedIn Elias"
               className="linkedin"
             />
@@ -50,7 +50,7 @@ function QuienesSomos() {
             rel="noopener noreferrer"
           >
             <img
-              src={LinkedinTrasparente}
+              src={LinkedinLogo}
               alt="LinkedIn David"
               className="linkedin"
             />

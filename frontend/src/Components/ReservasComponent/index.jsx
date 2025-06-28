@@ -4,18 +4,18 @@ import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import FechaBusquedaHome from "../../assets/FechaBusquedaHome.png";
 import BusquedaHomeSearch from "../../assets/BusquedaHome.png";
 import "./ReservasComponent.css";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // ICONOS & LOGOS FOOTER
 import Logo from "../../assets/LogoPraiarSinNombre.png";
 import LogoNombre from "../../assets/LogoCircular.png";
-import InstaFooter from "../../assets/InstaFooter.png";
-import LinkedinFooter from "../../assets/LinkedinFooter.png";
-import TwitterFooter from "../../assets/TwitterFooter.png";
+import XFooter from "../../assets/XLogo.png";
+import InstagramFooter from "../../assets/InstagramLogo.webp";
+import LinkedinFooter from "../../assets/LinkedinLogo.png";
 import MailFooter from "../../assets/MailFooter.png";
 import TelefonoFooter from "../../assets/TelefonoFooter.png";
 import GanchoFooter from "../../assets/GanchoFooter.png";
@@ -126,14 +126,14 @@ function ReservasComponent() {
     Promise.all([
       getBase64FromImageUrl(Logo),
       getBase64FromImageUrl(LogoNombre),
-      getBase64FromImageUrl(InstaFooter),
+      getBase64FromImageUrl(InstagramFooter),
       getBase64FromImageUrl(LinkedinFooter),
-      getBase64FromImageUrl(TwitterFooter),
+      getBase64FromImageUrl(XFooter),
       getBase64FromImageUrl(MailFooter),
       getBase64FromImageUrl(TelefonoFooter),
       getBase64FromImageUrl(GanchoFooter),
-    ]).then(([logo, logonombre, insta, linkedin, twitter, mail, tel, gancho]) => {
-      setIconosBase64({ logo, logonombre, insta, linkedin, twitter, mail, tel, gancho });
+    ]).then(([logo, logonombre, instagram, linkedin, X, mail, tel, gancho]) => {
+      setIconosBase64({ logo, logonombre, instagram, linkedin, X, mail, tel, gancho });
     });
   }, []);
 
@@ -239,8 +239,8 @@ function ReservasComponent() {
       <h1 className="hero-title">{idBalneario ? "Reservas de Clientes" : "Tus Reservas"}</h1>
       <div className="busqueda-form">
         <div className="input-group date-group">
-          <img
-            src={FechaBusquedaHome}
+          <FontAwesomeIcon 
+            icon="fa-solid fa-calendar-days"
             className="iconFecha"
             alt="Icono de fecha"
             onClick={() => setShowCalendario(!showCalendario)}

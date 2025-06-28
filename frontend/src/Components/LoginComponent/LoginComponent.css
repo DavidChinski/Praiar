@@ -119,7 +119,7 @@ button:focus {
 }
 
 #icon-facebook {
-  background-image: url('../../assets/facebook.png');
+  background-image: url('../../assets/LogoFacebook.webp');
 }
 
 #icon-apple {
@@ -165,3 +165,6 @@ button:focus {
   transition: transform 0.2s;
 }
 
+.password-wrapper input{
+  margin: 0;
+}
