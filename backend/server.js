@@ -946,6 +946,28 @@ app.post('/api/balneario/:id/carpas', async (req, res) => {
   }
 });
 
+// PUT /api/balneario/:id/precios/:id_tipo_ubicacion
+app.put('/api/balneario/:id/precios/:id_tipo_ubicacion', async (req, res) => {
+  const { id, id_tipo_ubicacion } = req.params;
+  const { dia, semana, quincena, mes } = req.body;
+  // Opcional: Chequear autenticación y que sea dueño del balneario
+
+  try {
+    const { error } = await supabase
+      .from("precios")
+      .update({ dia, semana, quincena, mes })
+      .eq("id_balneario", id)
+      .eq("id_tipo_ubicacion", id_tipo_ubicacion);
+
+    if (error) {
+      return res.status(500).json({ error: "Error actualizando precios." });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Error interno." });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

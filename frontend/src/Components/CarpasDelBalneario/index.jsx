@@ -40,6 +40,13 @@ function CarpasDelBalneario() {
     capacidad: 4,
   });
   const [precios, setPrecios] = useState([]);
+  const [editandoPrecio, setEditandoPrecio] = useState(null); // NUEVO
+  const [precioEdit, setPrecioEdit] = useState({
+    dia: "",
+    semana: "",
+    quincena: "",
+    mes: "",
+  }); // NUEVO
   const navigate = useNavigate();
 
   // Obtener usuario logueado y balneario info
@@ -283,6 +290,38 @@ function CarpasDelBalneario() {
     }
   }
 
+  // ---- NUEVO: edición de precios ----
+  function abrirModalPrecio(p) {
+    setEditandoPrecio(p);
+    setPrecioEdit({
+      dia: p.dia,
+      semana: p.semana,
+      quincena: p.quincena,
+      mes: p.mes,
+    });
+  }
+
+  async function guardarPrecio() {
+    const p = editandoPrecio;
+    const res = await fetch(
+      `http://localhost:3000/api/balneario/${id}/precios/${p.id_tipo_ubicacion}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(precioEdit),
+      }
+    );
+    if (res.ok) {
+      // Refrescar precios:
+      fetch(`http://localhost:3000/api/balneario/${id}/precios`)
+        .then(res => res.json())
+        .then(setPrecios);
+      setEditandoPrecio(null);
+    } else {
+      alert("Error al guardar precio.");
+    }
+  }
+
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
@@ -412,7 +451,7 @@ function CarpasDelBalneario() {
         ))}
       </div>
 
-      {/* SERVICIOS - MOVER ABAJO DE CARPAS Y ARRIBA DE PRECIOS */}
+      {/* SERVICIOS */}
       <div className="iconos-servicios" style={{ marginTop: "2em" }}>
         <h3 className="titulo-servicio">Servicios</h3>
         {balnearioInfo?.servicios?.length > 0 ? (
@@ -549,22 +588,98 @@ function CarpasDelBalneario() {
                 <th>Precio por semana</th>
                 <th>Precio por quincena</th>
                 <th>Precio por mes</th>
+                {esDuenio && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
-              {precios.map(p => (
+              {precios.map((p) => (
                 <tr key={p.id_tipo_ubicacion}>
                   <td>{p.nombre}</td>
                   <td>${p.dia}</td>
                   <td>${p.semana}</td>
                   <td>${p.quincena}</td>
                   <td>${p.mes}</td>
+                  {esDuenio && (
+                    <td>
+                      <button
+                        className="boton-agregar-servicio"
+                        onClick={() => abrirModalPrecio(p)}
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+
+      {/* MODAL editar precio */}
+      {editandoPrecio && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Editar precio: {editandoPrecio.nombre}</h3>
+            <label>
+              Día:
+              <input
+                type="number"
+                value={precioEdit.dia}
+                onChange={e =>
+                  setPrecioEdit(pe => ({ ...pe, dia: e.target.value }))
+                }
+                min={0}
+              />
+            </label>
+            <label>
+              Semana:
+              <input
+                type="number"
+                value={precioEdit.semana}
+                onChange={e =>
+                  setPrecioEdit(pe => ({ ...pe, semana: e.target.value }))
+                }
+                min={0}
+              />
+            </label>
+            <label>
+              Quincena:
+              <input
+                type="number"
+                value={precioEdit.quincena}
+                onChange={e =>
+                  setPrecioEdit(pe => ({ ...pe, quincena: e.target.value }))
+                }
+                min={0}
+              />
+            </label>
+            <label>
+              Mes:
+              <input
+                type="number"
+                value={precioEdit.mes}
+                onChange={e =>
+                  setPrecioEdit(pe => ({ ...pe, mes: e.target.value }))
+                }
+                min={0}
+              />
+            </label>
+            <div className="modal-buttons">
+              <button className="boton-agregar-servicio" onClick={guardarPrecio}>
+                Guardar
+              </button>
+              <button
+                className="boton-agregar-servicio"
+                onClick={() => setEditandoPrecio(null)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
