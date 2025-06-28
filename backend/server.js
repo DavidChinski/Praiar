@@ -983,20 +983,31 @@ app.get('/api/balneario/:id/resenias', async (req, res) => {
   if (balnearioId === null) return res.status(400).json({ error: 'Id de balneario inválido.' });
   try {
     // Buscar las reseñas asociadas a este balneario (con join de usuario)
-    const { data: joinData, error: joinError } = await supabase
-      .from('reseñas_x_balnearios')
-      .select('id_reseña, reseñas (comentario, estrellas, likes, id_usuario, id_reseña), usuarios:reseñas(id_usuario, nombre, apellido)')
+    const { data: reseñasData, error: reseñasError } = await supabase
+      .from('reseñas')
+      .select(`
+        id_reseña,
+        comentario,
+        estrellas,
+        likes,
+        id_usuario,
+        id_balneario,
+        usuarios (
+          id_usuario,
+          nombre,
+          apellido
+        )
+      `)
       .eq('id_balneario', balnearioId);
 
-    if (joinError) return res.status(500).json({ error: 'Error trayendo reseñas.' });
+    if (reseñasError) return res.status(500).json({ error: 'Error trayendo reseñas.' });
 
-    // Formatear reseñas
-    const reseñas = (joinData || []).map(r => ({
+    const reseñas = (reseñasData || []).map(r => ({
       id_reseña: r.id_reseña,
-      comentario: r.reseñas?.comentario,
-      estrellas: r.reseñas?.estrellas,
-      likes: r.reseñas?.likes || 0,
-      id_usuario: r.reseñas?.id_usuario,
+      comentario: r.comentario,
+      estrellas: r.estrellas,
+      likes: r.likes || 0,
+      id_usuario: r.id_usuario,
       usuario_nombre: r.usuarios?.nombre
         ? r.usuarios.nombre + (r.usuarios.apellido ? " " + r.usuarios.apellido : "")
         : undefined
@@ -1018,26 +1029,17 @@ app.post('/api/balneario/:id/resenias', async (req, res) => {
     return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
   }
   try {
-    // 1. Insertar reseña
+    // Insertar reseña directamente con el id_balneario
     const { data: nuevaResenia, error: reseniaError } = await supabase
       .from('reseñas')
-      .insert([{ comentario, estrellas, id_usuario, likes: 0 }])
+      .insert([{ comentario, estrellas, id_usuario, id_balneario: balnearioId, likes: 0 }])
       .select()
       .single();
 
-    console.log("Nueva reseña creada:", nuevaResenia);
     if (reseniaError || !nuevaResenia) {
       return res.status(500).json({ error: 'Error guardando reseña.' });
     }
-    // 2. Insertar relación reseña-balneario
-    const { error: relError } = await supabase
-      .from('reseñas_x_balnearios')
-      .insert([{ id_reseña: nuevaResenia.id_reseña, id_balneario: balnearioId }]);
 
-    console.log("Relación reseña-balneario creada:", { id_reseña: nuevaResenia.id_reseña, id_balneario: balnearioId });
-    if (relError) {
-      return res.status(500).json({ error: 'Reseña creada pero error asociando al balneario.' });
-    }
     res.json({ ok: true, reseña: nuevaResenia });
   } catch (e) {
     res.status(500).json({ error: 'Error interno guardando reseña.' });

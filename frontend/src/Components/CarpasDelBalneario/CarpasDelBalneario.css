@@ -523,6 +523,292 @@
   border-radius: 14px;
 }
 
+
+/* ...todo tu CSS previo... */
+
+/* === SECCIÓN COMENTARIOS (RESEÑAS) ESTILO CARRUSEL === */
+
+.resenias-section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+  margin: 0 auto 3rem auto;
+  max-width: 1200px;
+  box-shadow: 0 2px 18px 0 rgba(0,0,0,0.06);
+  font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
+}
+
+.resenias-section h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  text-align: left;
+}
+
+.resenias-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+.resenias-encabezado .badge-puntaje {
+  background: #004A68;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.30em 0.9em;
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: inline-block;
+  margin-right: 0.5em;
+}
+.resenias-encabezado .resenias-increible {
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-right: 10px;
+}
+.resenias-encabezado .resenias-total {
+  color: #555;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Subtítulo que dice "Lo que más le gustó..." */
+.resenias-section .resenias-subtitulo {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0 0 1.4rem 0;
+  font-weight: 500;
+}
+
+/* Carrusel de reseñas */
+.resenias-carrusel-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 220px;
+}
+
+.resenias-carrusel-btn {
+  background: #fff;
+  border: 1.4px solid #d2dbe8;
+  color: #444;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin: 0 7px;
+  box-shadow: 0 1px 4px 0 #0000000d;
+  transition: background 0.16s, border 0.16s;
+}
+.resenias-carrusel-btn:active,
+.resenias-carrusel-btn:focus {
+  background: #f0f7fa;
+  border-color: #339dff;
+}
+
+.resenias-lista {
+  display: flex;
+  flex-direction: row;
+  gap: 1.3rem;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.25rem;
+}
+.resenias-lista::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tarjeta de comentario */
+.resenia-card {
+  flex: 0 0 320px;
+  max-width: 320px;
+  background: #fff;
+  border: 1.5px solid #d2dbe8;
+  border-radius: 10px;
+  box-shadow: 0 1px 8px 0 rgba(0,0,0,0.04);
+  padding: 1.15rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  position: relative;
+  min-height: 160px;
+  font-size: 1rem;
+  transition: box-shadow 0.15s, border 0.15s;
+}
+.resenia-card:hover {
+  box-shadow: 0 4px 20px 0 #339dff22;
+  border-color: #339dff;
+}
+
+.resenia-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.2rem;
+}
+
+.resenia-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eaeaea;
+  display: inline-block;
+  margin-right: 5px;
+  border: 1.2px solid #d2dbe8;
+}
+
+.resenia-usuario {
+  font-weight: 600;
+  font-size: 1.07rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.resenia-usuario-nombre {
+  color: #1a1a1a;
+  font-size: 1.07rem;
+}
+
+.resenia-estrellas {
+  color: #ffb700;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-left: 0;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+}
+.resenia-estrellas .estrella-num {
+  color: #222;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-left: 5px;
+}
+
+.resenia-comentario {
+  font-size: 0.98rem;
+  color: #222;
+  line-height: 1.45;
+  margin-left: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.resenia-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: auto;
+  font-size: 0.98rem;
+  color: #444;
+}
+
+.resenia-likes {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+.like-boton {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  margin-right: 3px;
+  cursor: pointer;
+  color: #004a68;
+  transition: color 0.15s;
+}
+.like-boton:hover {
+  color: #ffb700;
+}
+
+/* Formulario para agregar reseña */
+.agregar-resenia-form {
+  margin-top: 2.2em;
+  background: #f7fbff;
+  border-radius: 10px;
+  padding: 1.2em 1.2em 1em 1.2em;
+  max-width: 420px;
+  margin-left: 0;
+  border: 1.2px solid #b4e2f5;
+  box-shadow: 0 1px 8px 0 #b4e2f533;
+}
+.agregar-resenia-form h4 {
+  font-size: 1.14em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+.agregar-resenia-form label {
+  display: block;
+  margin-bottom: 0.7em;
+}
+.agregar-resenia-form textarea {
+  width: 100%;
+  border: 1.2px solid #b4e2f5;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-top: 2px;
+  font-size: 1rem;
+  min-height: 50px;
+  resize: vertical;
+}
+.agregar-resenia-form select {
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1.2px solid #b4e2f5;
+  padding: 3px 7px;
+  margin-left: 8px;
+}
+.agregar-resenia-form button {
+  margin-top: 0.4em;
+}
+
+@media (max-width: 800px) {
+  .resenias-carrusel-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+    min-height: 0;
+  }
+  .resenias-lista {
+    gap: 0.7rem;
+  }
+  .resenia-card {
+    flex-basis: 230px;
+    min-width: 200px;
+    max-width: 220px;
+    font-size: 0.92rem;
+    padding: 0.7rem 0.7rem 1rem 0.7rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .resenias-section {
+    padding: 1.3rem 0.1rem 1.1rem 0.1rem;
+  }
+  .resenias-carrusel-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+  }
+  .resenia-card {
+    flex-basis: 170px;
+    max-width: 170px;
+    font-size: 0.87rem;
+    padding: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .carpa-container {
