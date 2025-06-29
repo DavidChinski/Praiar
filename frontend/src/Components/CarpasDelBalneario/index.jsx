@@ -3,6 +3,10 @@ import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+const CARD_WIDTH = 340; // Card width + gap, adjust as needed!
+const RESEÑAS_POR_VISTA = 2;
+const EXTEND_FACTOR = 100; // Cuantas veces se repite el array para infinito
+
 function CarpasDelBalneario() {
   const { id } = useParams();
   const location = useLocation();
@@ -40,13 +44,13 @@ function CarpasDelBalneario() {
     capacidad: 4,
   });
   const [precios, setPrecios] = useState([]);
-  const [editandoPrecio, setEditandoPrecio] = useState(null); // NUEVO
+  const [editandoPrecio, setEditandoPrecio] = useState(null);
   const [precioEdit, setPrecioEdit] = useState({
     dia: "",
     semana: "",
     quincena: "",
     mes: "",
-  }); // NUEVO
+  });
   const navigate = useNavigate();
 
   // AUTOCOMPLETADO DE ELEMENTOS
@@ -65,6 +69,25 @@ function CarpasDelBalneario() {
   const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5 });
   const [loadingResenias, setLoadingResenias] = useState(false);
   const [errorResenias, setErrorResenias] = useState(null);
+
+  // Carrusel infinito
+  const [indiceResenia, setIndiceResenia] = useState(0);
+  const [animating, setAnimating] = useState(false);
+
+  // Carrusel infinito: arreglo extendido
+  // ATENCIÓN: esto depende de resenias.length, así que debe recalcularse cuando cambie
+  const reseñasExtendidas = Array(EXTEND_FACTOR)
+    .fill(resenias)
+    .flat();
+  const baseIndex = resenias.length * Math.floor(EXTEND_FACTOR / 2);
+
+  // Centrar el carrusel cuando cambian las reseñas o al montar
+  useEffect(() => {
+    if (resenias.length > 0) {
+      setIndiceResenia(baseIndex);
+    }
+    // eslint-disable-next-line
+  }, [resenias.length]);
 
   // Obtener usuario logueado y balneario info
   useEffect(() => {
@@ -299,6 +322,27 @@ function CarpasDelBalneario() {
     }
   }
 
+  // Carrusel infinito handlers
+  function handleAvanzarResenias() {
+    if (animating) return;
+    setAnimating(true);
+    setIndiceResenia(prev => prev + 1);
+  }
+  function handleRetrocederResenias() {
+    if (animating) return;
+    setAnimating(true);
+    setIndiceResenia(prev => prev - 1);
+  }
+  function handleTransitionEnd() {
+    setAnimating(false);
+    if (resenias.length === 0) return;
+    if (indiceResenia <= resenias.length - 1) {
+      setIndiceResenia(baseIndex + (indiceResenia % resenias.length));
+    } else if (indiceResenia >= reseñasExtendidas.length - RESEÑAS_POR_VISTA) {
+      setIndiceResenia(baseIndex + ((indiceResenia - baseIndex) % resenias.length));
+    }
+  }
+
   // Drag & drop
   function onMouseMove(e) {
     if (!dragging || !containerRef.current) return;
@@ -453,7 +497,6 @@ function CarpasDelBalneario() {
       }
     );
     if (res.ok) {
-      // Refrescar precios:
       fetch(`http://localhost:3000/api/balneario/${id}/precios`)
         .then(res => res.json())
         .then(setPrecios);
@@ -532,21 +575,21 @@ function CarpasDelBalneario() {
             >
               <div className="carpa-posicion">{carpa.posicion}</div>
               {tipo === "doble" ? (
-                  <FontAwesomeIcon 
-                    icon="fa-solid fa-tents" 
-                    alt={`Carpa doble ${carpa.posicion}`}
-                    className="carpa-imagen"
-                    style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-                  />
+                <FontAwesomeIcon
+                  icon="fa-solid fa-tents"
+                  alt={`Carpa doble ${carpa.posicion}`}
+                  className="carpa-imagen"
+                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+                />
               ) : tipo === "sombrilla" ? (
-                <FontAwesomeIcon 
+                <FontAwesomeIcon
                   icon="fa-solid fa-umbrella-beach"
                   alt={`Sombrilla ${carpa.posicion}`}
                   className="carpa-imagen"
                   style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
                 />
               ) : (
-                <FontAwesomeIcon 
+                <FontAwesomeIcon
                   icon="fa-solid fa-tent"
                   alt={`Carpa ${carpa.posicion}`}
                   className="carpa-imagen"
@@ -654,34 +697,70 @@ function CarpasDelBalneario() {
           <p>Cargando reseñas...</p>
         ) : (
           <>
-            <div className="resenias-lista">
-              {resenias.length === 0 && <p>No hay reseñas aún.</p>}
-              {resenias.map(resenia => (
-                <div className="resenia-card" key={resenia.id_reseña}>
-                  <div className="resenia-header">
-                    <span className="resenia-usuario">
-                      {resenia.usuario_nombre
-                        ? resenia.usuario_nombre
-                        : "Usuario"}
-                    </span>
-                    <span className="resenia-estrellas">
-                      {"★".repeat(resenia.estrellas)}{"☆".repeat(5 - resenia.estrellas)}
-                    </span>
-                  </div>
-                  <div className="resenia-comentario">{resenia.comentario}</div>
-                  <div className="resenia-footer">
-                    <span className="resenia-likes" style={{ marginRight: 8 }}>
-                      <button
-                        className="like-boton"
-                        onClick={() => likeResenia(resenia.id_reseña)}
-                      >
-                        👍
-                      </button>
-                      {resenia.likes || 0}
-                    </span>
-                  </div>
+            <div className="resenias-carrusel-wrapper">
+              <button
+                className="resenias-carrusel-btn"
+                onClick={handleRetrocederResenias}
+                aria-label="Ver reseñas anteriores"
+              >
+                &#8592;
+              </button>
+              <div className="resenias-carrusel-lista-viewport">
+                <div
+                  className="resenias-lista"
+                  style={{
+                    transform: `translateX(${-indiceResenia * CARD_WIDTH + ((RESEÑAS_POR_VISTA * CARD_WIDTH) / 2)}px)`,
+                    transition: animating ? "transform 0.55s cubic-bezier(.5,1.6,.31,1)" : "none"
+                  }}
+                  onTransitionEnd={handleTransitionEnd}
+                >
+                  {reseñasExtendidas.map((resenia, i) => (
+                    <div className="resenia-card" key={i + "-" + (resenia?.id_reseña || i)}>
+                      <div className="resenia-header">
+                        <img
+                          className="resenia-avatar"
+                          src={
+                            resenia?.usuario_imagen
+                              ? resenia.usuario_imagen
+                              : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                          }
+                          alt={resenia?.usuario_nombre || "Usuario"}
+                        />
+                        <div className="resenia-usuario">
+                          <span className="resenia-usuario-nombre">
+                            {resenia?.usuario_nombre
+                              ? resenia.usuario_nombre
+                              : "Usuario"}
+                          </span>
+                          <span className="resenia-estrellas">
+                            <span style={{ color: "#ffb700", marginRight: 3 }}>★</span>
+                            <span className="estrella-num">{Number(resenia?.estrellas).toFixed(1)}</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="resenia-comentario">{resenia?.comentario}</div>
+                      <div className="resenia-footer">
+                        <span className="resenia-likes" style={{ marginRight: 8 }}>
+                          <button
+                            className="like-boton"
+                            onClick={() => likeResenia(resenia?.id_reseña)}
+                          >
+                            👍
+                          </button>
+                          {resenia?.likes || 0}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              <button
+                className="resenias-carrusel-btn"
+                onClick={handleAvanzarResenias}
+                aria-label="Ver más reseñas"
+              >
+                &#8594;
+              </button>
             </div>
             {/* Form agregar reseña */}
             {usuarioLogueado && !esDuenio && (

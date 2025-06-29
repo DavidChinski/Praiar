@@ -524,17 +524,17 @@
 }
 
 
-/* ...todo tu CSS previo... */
 
-/* === SECCIÓN COMENTARIOS (RESEÑAS) ESTILO CARRUSEL === */
+
+
+/* Carrusel de reseñas */
+/* ...todo tu CSS previo (queda igual hasta la sección reseñas)... */
 
 .resenias-section {
-  background: #fff;
   border-radius: 14px;
   padding: 2.2rem 1.2rem 1.5rem 1.2rem;
   margin: 0 auto 3rem auto;
   max-width: 1200px;
-  box-shadow: 0 2px 18px 0 rgba(0,0,0,0.06);
   font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
 }
 
@@ -545,42 +545,6 @@
   text-align: left;
 }
 
-.resenias-encabezado {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  margin-bottom: 0.6rem;
-}
-.resenias-encabezado .badge-puntaje {
-  background: #004A68;
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.30em 0.9em;
-  font-weight: bold;
-  font-size: 1.1rem;
-  display: inline-block;
-  margin-right: 0.5em;
-}
-.resenias-encabezado .resenias-increible {
-  font-weight: 500;
-  color: #1a1a1a;
-  margin-right: 10px;
-}
-.resenias-encabezado .resenias-total {
-  color: #555;
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-/* Subtítulo que dice "Lo que más le gustó..." */
-.resenias-section .resenias-subtitulo {
-  font-size: 1.1rem;
-  color: #222;
-  margin: 0 0 1.4rem 0;
-  font-weight: 500;
-}
-
-/* Carrusel de reseñas */
 .resenias-carrusel-wrapper {
   display: flex;
   align-items: center;
@@ -588,8 +552,29 @@
   margin-bottom: 0;
   width: 100%;
   max-width: 1200px;
-  min-height: 220px;
+  min-height: 240px;
+  justify-content: center;
+  position: relative;
 }
+.resenias-carrusel-lista-viewport {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+}
+.resenias-lista {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  will-change: transform;
+  min-width: 0;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.25rem;
+}
+.resenias-lista::-webkit-scrollbar { display: none; }
 
 .resenias-carrusel-btn {
   background: #fff;
@@ -606,6 +591,7 @@
   margin: 0 7px;
   box-shadow: 0 1px 4px 0 #0000000d;
   transition: background 0.16s, border 0.16s;
+  z-index: 1;
 }
 .resenias-carrusel-btn:active,
 .resenias-carrusel-btn:focus {
@@ -613,25 +599,12 @@
   border-color: #339dff;
 }
 
-.resenias-lista {
-  display: flex;
-  flex-direction: row;
-  gap: 1.3rem;
-  flex: 1;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 0.25rem;
-}
-.resenias-lista::-webkit-scrollbar {
-  display: none;
-}
 
-/* Tarjeta de comentario */
 .resenia-card {
   flex: 0 0 320px;
   max-width: 320px;
   background: #fff;
-  border: 1.5px solid #d2dbe8;
+  border: 1.5px solid #005278;
   border-radius: 10px;
   box-shadow: 0 1px 8px 0 rgba(0,0,0,0.04);
   padding: 1.15rem 1.2rem 1.2rem 1.2rem;
@@ -642,10 +615,11 @@
   min-height: 160px;
   font-size: 1rem;
   transition: box-shadow 0.15s, border 0.15s;
+  background: #fff;
 }
 .resenia-card:hover {
   box-shadow: 0 4px 20px 0 #339dff22;
-  border-color: #339dff;
+  border-color: #00182e;
 }
 
 .resenia-header {
@@ -732,56 +706,17 @@
   color: #ffb700;
 }
 
-/* Formulario para agregar reseña */
-.agregar-resenia-form {
-  margin-top: 2.2em;
-  background: #f7fbff;
-  border-radius: 10px;
-  padding: 1.2em 1.2em 1em 1.2em;
-  max-width: 420px;
-  margin-left: 0;
-  border: 1.2px solid #b4e2f5;
-  box-shadow: 0 1px 8px 0 #b4e2f533;
-}
-.agregar-resenia-form h4 {
-  font-size: 1.14em;
-  margin-bottom: 0.5em;
-  font-weight: 600;
-}
-.agregar-resenia-form label {
-  display: block;
-  margin-bottom: 0.7em;
-}
-.agregar-resenia-form textarea {
-  width: 100%;
-  border: 1.2px solid #b4e2f5;
-  border-radius: 6px;
-  padding: 6px 8px;
-  margin-top: 2px;
-  font-size: 1rem;
-  min-height: 50px;
-  resize: vertical;
-}
-.agregar-resenia-form select {
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1.2px solid #b4e2f5;
-  padding: 3px 7px;
-  margin-left: 8px;
-}
-.agregar-resenia-form button {
-  margin-top: 0.4em;
+/* Centrado y responsividad carrusel */
+@media (max-width: 1200px) {
+  .resenias-carrusel-lista-viewport,
+  .resenias-lista {
+    max-width: 100vw;
+  }
 }
 
 @media (max-width: 800px) {
   .resenias-carrusel-wrapper {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
     min-height: 0;
-  }
-  .resenias-lista {
-    gap: 0.7rem;
   }
   .resenia-card {
     flex-basis: 230px;
@@ -808,7 +743,6 @@
     padding: 0.5rem 0.5rem 1rem 0.5rem;
   }
 }
-
 /* Responsive */
 @media (max-width: 900px) {
   .carpa-container {
