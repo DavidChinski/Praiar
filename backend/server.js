@@ -801,7 +801,19 @@ app.post('/api/reserva', async (req, res) => {
   }
 
   try {
-    // ...validación de reservas...
+    // 1. Verificar si existe una reserva solapada
+    const { data: reservasSolapadas, error: solapadaError } = await supabase
+      .from("reservas")
+      .select("*")
+      .eq("id_ubicacion", id_ubicacion)
+      .or(`fecha_inicio.lte.${fecha_salida},fecha_salida.gte.${fecha_inicio}`);
+
+    if (solapadaError) {
+      return res.status(500).json({ error: "Error al validar disponibilidad." });
+    }
+    if (reservasSolapadas && reservasSolapadas.length > 0) {
+      return res.status(400).json({ error: "Ya existe una reserva para esa ubicación en las fechas seleccionadas." });
+    }
 
     // Insertar nueva reserva
     const { error: insertError } = await supabase.from("reservas").insert({

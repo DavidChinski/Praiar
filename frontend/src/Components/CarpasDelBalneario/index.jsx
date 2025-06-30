@@ -66,9 +66,9 @@ function CarpasDelBalneario() {
 
   // ==== RESEÑAS ====
   const [resenias, setResenias] = useState([]);
-  const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5 });
   const [loadingResenias, setLoadingResenias] = useState(false);
   const [errorResenias, setErrorResenias] = useState(null);
+  const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5, estrellasHover: undefined });
 
   // Carrusel infinito
   const [indiceResenia, setIndiceResenia] = useState(0);
@@ -302,7 +302,7 @@ function CarpasDelBalneario() {
       body: JSON.stringify(body)
     });
     if (res.ok) {
-      setReseniaNueva({ comentario: "", estrellas: 5 });
+      setReseniaNueva({ comentario: "", estrellas: 5, estrellasHover: undefined });
       // Refrescar lista
       fetch(`http://localhost:3000/api/balneario/${id}/resenias`)
         .then(r => r.json())
@@ -733,8 +733,17 @@ function CarpasDelBalneario() {
                               : "Usuario"}
                           </span>
                           <span className="resenia-estrellas">
-                            <span style={{ color: "#ffb700", marginRight: 3 }}>★</span>
-                            <span className="estrella-num">{Number(resenia?.estrellas).toFixed(1)}</span>
+                            {[1, 2, 3, 4, 5].map((v) => (
+                              <span
+                                key={v}
+                                style={{
+                                  color: v <= resenia.estrellas ? "#ffb700" : "#ccc",
+                                  fontSize: "1.1em",
+                                }}
+                              >
+                                ★
+                              </span>
+                            ))}
                           </span>
                         </div>
                       </div>
@@ -768,19 +777,28 @@ function CarpasDelBalneario() {
                 <h4>Dejá tu reseña</h4>
                 <label>
                   Estrellas:{" "}
-                  <select
-                    value={reseniaNueva.estrellas}
-                    onChange={e =>
-                      setReseniaNueva(r => ({
-                        ...r,
-                        estrellas: Number(e.target.value)
-                      }))
-                    }
-                  >
-                    {[1, 2, 3, 4, 5].map(v => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <span
+                      key={v}
+                      style={{
+                        cursor: "pointer",
+                        color: v <= (reseniaNueva.estrellasHover ?? reseniaNueva.estrellas) ? "#ffb700" : "#ccc",
+                        fontSize: "1.6em",
+                        marginRight: 2,
+                        transition: "color 0.2s"
+                      }}
+                      onClick={() =>
+                        setReseniaNueva((r) => ({
+                          ...r,
+                          estrellas: v,
+                        }))
+                      }
+                      onMouseEnter={() => setReseniaNueva((r) => ({ ...r, estrellasHover: v }))}
+                      onMouseLeave={() => setReseniaNueva((r) => ({ ...r, estrellasHover: undefined }))}
+                    >
+                      ★
+                    </span>
+                  ))}
                 </label>
                 <label>
                   Comentario:{" "}
