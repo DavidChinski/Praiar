@@ -572,24 +572,6 @@ function CarpasDelBalneario() {
         toggleServicio={toggleServicio}
       />
 
-      <ReseniasSection
-        loadingResenias={loadingResenias}
-        handleRetrocederResenias={handleRetrocederResenias}
-        handleAvanzarResenias={handleAvanzarResenias}
-        indiceResenia={indiceResenia}
-        animating={animating}
-        handleTransitionEnd={handleTransitionEnd}
-        reseñasExtendidas={reseñasExtendidas}
-        CARD_WIDTH={CARD_WIDTH}
-        RESEÑAS_POR_VISTA={RESEÑAS_POR_VISTA}
-        likeResenia={likeResenia}
-        usuarioLogueado={usuarioLogueado}
-        esDuenio={esDuenio}
-        reseniaNueva={reseniaNueva}
-        setReseniaNueva={setReseniaNueva}
-        agregarResenia={agregarResenia}
-      />
-
       <AgregarCarpaModal
         mostrarAgregarCarpa={mostrarAgregarCarpa}
         setMostrarAgregarCarpa={setMostrarAgregarCarpa}
@@ -618,6 +600,24 @@ function CarpasDelBalneario() {
         setPrecioEdit={setPrecioEdit}
         guardarPrecio={guardarPrecio}
         setEditandoPrecio={setEditandoPrecio}
+      />
+
+      <ReseniasSection
+        loadingResenias={loadingResenias}
+        handleRetrocederResenias={handleRetrocederResenias}
+        handleAvanzarResenias={handleAvanzarResenias}
+        indiceResenia={indiceResenia}
+        animating={animating}
+        handleTransitionEnd={handleTransitionEnd}
+        reseñasExtendidas={reseñasExtendidas}
+        CARD_WIDTH={CARD_WIDTH}
+        RESEÑAS_POR_VISTA={RESEÑAS_POR_VISTA}
+        likeResenia={likeResenia}
+        usuarioLogueado={usuarioLogueado}
+        esDuenio={esDuenio}
+        reseniaNueva={reseniaNueva}
+        setReseniaNueva={setReseniaNueva}
+        agregarResenia={agregarResenia}
       />
     </div>
   );

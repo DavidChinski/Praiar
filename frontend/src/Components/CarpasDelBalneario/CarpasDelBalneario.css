@@ -535,7 +535,7 @@
   padding: 2.2rem 1.2rem 1.5rem 1.2rem;
   margin: 0 auto 3rem auto;
   max-width: 1200px;
-  font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
+  font-family: 'arial', sans-serif;
 }
 
 .resenias-section h3 {
@@ -543,6 +543,7 @@
   font-weight: 600;
   margin-bottom: 0.7rem;
   text-align: left;
+  font-family: 'El Messiri', sans-serif;
 }
 
 .resenias-carrusel-wrapper {
@@ -791,3 +792,43 @@ button {
   cursor: pointer;
   text-decoration: none;
 }
+
+
+/* Estilo de flechas igual al botón "flecha-abajo" de BusquedaHome */
+.flecha-carrusel {
+  background: #006699;
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  margin: 0 0.5rem;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.08);
+  outline: none;
+}
+
+.flecha-carrusel:active, .flecha-carrusel:focus {
+  background: #005984;
+}
+
+.flecha-carrusel:hover {
+  background: #0077b6;
+  transform: scale(1.2);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1.2) translateY(0);
+  }
+  50% {
+    transform: scale(1.2) translateY(8px);
+  }
+}
+
+/* Asegura que las flechas del carrusel sean consistentes con .flecha-abajo */

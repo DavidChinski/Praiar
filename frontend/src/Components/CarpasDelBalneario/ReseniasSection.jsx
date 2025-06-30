@@ -1,4 +1,5 @@
 import React from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function ReseniasSection({
   loadingResenias,
@@ -26,11 +27,11 @@ function ReseniasSection({
         <>
           <div className="resenias-carrusel-wrapper">
             <button
-              className="resenias-carrusel-btn"
+              className="resenias-carrusel-btn flecha-carrusel"
               onClick={handleRetrocederResenias}
               aria-label="Ver reseñas anteriores"
             >
-              &#8592;
+              <FaChevronLeft />
             </button>
             <div className="resenias-carrusel-lista-viewport">
               <div
@@ -91,11 +92,11 @@ function ReseniasSection({
               </div>
             </div>
             <button
-              className="resenias-carrusel-btn"
+              className="resenias-carrusel-btn flecha-carrusel"
               onClick={handleAvanzarResenias}
               aria-label="Ver más reseñas"
             >
-              &#8594;
+              <FaChevronRight />
             </button>
           </div>
           {/* Form agregar reseña */}
