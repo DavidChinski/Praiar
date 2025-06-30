@@ -3,9 +3,20 @@ import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const CARD_WIDTH = 340; // Card width + gap, adjust as needed!
+// NUEVOS COMPONENTES
+import ElementoAutocomplete from "./ElementoAutocomplete";
+import CarpaItem from "./CarpaItem";
+import ElementoItem from "./ElementoItem";
+import ServiciosSection from "./ServiciosSection";
+import ReseniasSection from "./ReseniasSection";
+import AgregarCarpaModal from "./AgregarCarpaModal";
+import EditarCarpaModal from "./EditarCarpaModal";
+import PreciosBalnearioTabla from "./PreciosBalnearioTabla";
+import EditarPrecioModal from "./EditarPrecioModal";
+
+const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
-const EXTEND_FACTOR = 100; // Cuantas veces se repite el array para infinito
+const EXTEND_FACTOR = 100;
 
 function CarpasDelBalneario() {
   const { id } = useParams();
@@ -75,13 +86,11 @@ function CarpasDelBalneario() {
   const [animating, setAnimating] = useState(false);
 
   // Carrusel infinito: arreglo extendido
-  // ATENCIÓN: esto depende de resenias.length, así que debe recalcularse cuando cambie
   const reseñasExtendidas = Array(EXTEND_FACTOR)
     .fill(resenias)
     .flat();
   const baseIndex = resenias.length * Math.floor(EXTEND_FACTOR / 2);
 
-  // Centrar el carrusel cuando cambian las reseñas o al montar
   useEffect(() => {
     if (resenias.length > 0) {
       setIndiceResenia(baseIndex);
@@ -139,45 +148,6 @@ function CarpasDelBalneario() {
     setElementos((prev) => [...prev, data]);
     setElementoInput("");
     setElementoMatches([]);
-  }
-
-  function renderElementoMatch() {
-    const showSuggestions = elementoInput.length > 0 && elementoMatches.length > 0;
-    return (
-      <div className="input-autocomplete-wrapper" ref={elementoDropdownRef}>
-        <input
-          ref={elementoInputRef}
-          className="input-estandar"
-          type="text"
-          placeholder="Agregar elemento (pasillo, pileta, quincho...)"
-          value={elementoInput}
-          onChange={e => setElementoInput(e.target.value)}
-          autoComplete="off"
-        />
-        {showSuggestions && (
-          <div className="autocomplete-dropdown">
-            {elementoMatches.map((elemento, idx) => (
-              <div
-                key={elemento.tipo}
-                className="autocomplete-option"
-                onMouseDown={e => {
-                  e.preventDefault();
-                  setElementoInput(elemento.nombre);
-                  agregarElementoTipo(elemento.tipo);
-                  setElementoMatches([]);
-                  setTimeout(() => elementoInputRef.current && elementoInputRef.current.blur(), 0);
-                }}
-              >
-                <span className="suggestion-text">
-                  <span className="typed-text">{elemento.nombre.slice(0, elementoInput.length)}</span>
-                  <span className="completion-text">{elemento.nombre.slice(elementoInput.length)}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
   }
 
   // Cargar carpas, elementos, servicios, tipos de ubicacion
@@ -509,7 +479,6 @@ function CarpasDelBalneario() {
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
-  // ---- RENDER ----
   return (
     <div className="carpas-del-balneario">
       <h2>{balnearioInfo?.nombre || 'Carpas del Balneario'}</h2>
@@ -532,20 +501,26 @@ function CarpasDelBalneario() {
       )}
 
       {esDuenio && (
-        <>
-          <div className="toolbar">
-            <div style={{ minWidth: 250 }}>
-              <label className="subtitulo" style={{ marginBottom: 4, display: "block" }}>
-                Agregar elemento
-              </label>
-              {renderElementoMatch()}
-            </div>
-            <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(true)}>
-              Agregar carpa/sombrilla
-            </button>
-            <Link className="boton-agregar-servicio" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
+        <div className="toolbar">
+          <div style={{ minWidth: 250 }}>
+            <label className="subtitulo" style={{ marginBottom: 4, display: "block" }}>
+              Agregar elemento
+            </label>
+            <ElementoAutocomplete
+              elementoInput={elementoInput}
+              setElementoInput={setElementoInput}
+              elementoMatches={elementoMatches}
+              setElementoMatches={setElementoMatches}
+              agregarElementoTipo={agregarElementoTipo}
+              elementoInputRef={elementoInputRef}
+              elementoDropdownRef={elementoDropdownRef}
+            />
           </div>
-        </>
+          <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(true)}>
+            Agregar carpa/sombrilla
+          </button>
+          <Link className="boton-agregar-servicio" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
+        </div>
       )}
 
       <div
@@ -559,440 +534,91 @@ function CarpasDelBalneario() {
           const left = carpa.x;
           const top = carpa.y;
           return (
-            <div
+            <CarpaItem
               key={carpa.id_carpa}
-              className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
-              style={{ left: `${left}px`, top: `${top}px` }}
-              onMouseDown={() =>
-                esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
-              }
-              onClick={() => {
-                if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
-                  navigate(`/reservaubicacion/${carpa.id_carpa}`);
-                }
-              }}
-              title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
-            >
-              <div className="carpa-posicion">{carpa.posicion}</div>
-              {tipo === "doble" ? (
-                <FontAwesomeIcon
-                  icon="fa-solid fa-tents"
-                  alt={`Carpa doble ${carpa.posicion}`}
-                  className="carpa-imagen"
-                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-                />
-              ) : tipo === "sombrilla" ? (
-                <FontAwesomeIcon
-                  icon="fa-solid fa-umbrella-beach"
-                  alt={`Sombrilla ${carpa.posicion}`}
-                  className="carpa-imagen"
-                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-                />
-              ) : (
-                <FontAwesomeIcon
-                  icon="fa-solid fa-tent"
-                  alt={`Carpa ${carpa.posicion}`}
-                  className="carpa-imagen"
-                  style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
-                />
-              )}
-              <div className="acciones">
-                {esDuenio && (
-                  <>
-                    <button className="boton-agregar-servicio" onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
-                    <button className="boton-agregar-servicio" onClick={() => handleEditarCarpa(carpa)}>✏️</button>
-                  </>
-                )}
-              </div>
-            </div>
+              carpa={carpa}
+              tipo={tipo}
+              left={left}
+              top={top}
+              esDuenio={esDuenio}
+              dragging={dragging}
+              setDragging={setDragging}
+              carpaReservada={carpaReservada}
+              usuarioLogueado={usuarioLogueado}
+              navigate={navigate}
+              eliminarCarpa={eliminarCarpa}
+              handleEditarCarpa={handleEditarCarpa}
+            />
           );
         })}
 
         {elementos.map((el) => (
-          <div
+          <ElementoItem
             key={el.id_elemento}
-            className={`elemento tipo-${el.tipo}`}
-            style={{
-              left: `${el.x}px`,
-              top: `${el.y}px`,
-              transform: `rotate(${el.rotado || 0}deg)`,
-              transformOrigin: 'center center',
-              position: 'absolute'
-            }}
-            onMouseDown={() =>
-              esDuenio && setDragging({ tipo: "elemento", id: el.id_elemento })
-            }
-            title={el.tipo}
-          >
-            {el.tipo}
-            {esDuenio && (
-              <div className="acciones">
-                <button className="boton-agregar-servicio" onClick={() => rotarElemento(el.id_elemento)}>🔄</button>
-              </div>
-            )}
-          </div>
+            el={el}
+            esDuenio={esDuenio}
+            setDragging={setDragging}
+            rotarElemento={rotarElemento}
+          />
         ))}
       </div>
 
-      {/* SERVICIOS */}
-      <div className="iconos-servicios" style={{ marginTop: "2em" }}>
-        <h3 className="titulo-servicio">Servicios</h3>
-        {balnearioInfo?.servicios?.length > 0 ? (
-          <div className="servicios-lista">
-            {balnearioInfo.servicios.map((servicio) => (
-              <div key={servicio.id_servicio} className="servicio-icono">
-                <img src={servicio.imagen} className="icono-imagen" />
-                <span>{servicio.nombre}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No hay servicios cargados para este balneario.</p>
-        )}
+      <ServiciosSection
+        balnearioInfo={balnearioInfo}
+        esDuenio={esDuenio}
+        mostrarModalServicios={mostrarModalServicios}
+        setMostrarModalServicios={setMostrarModalServicios}
+        todosLosServicios={todosLosServicios}
+        toggleServicio={toggleServicio}
+      />
 
-        {esDuenio && (
-          <>
-            <button
-              className="boton-agregar-servicio"
-              onClick={() => setMostrarModalServicios(true)}
-            >
-              Agrega un Servicio
-            </button>
+      <ReseniasSection
+        loadingResenias={loadingResenias}
+        handleRetrocederResenias={handleRetrocederResenias}
+        handleAvanzarResenias={handleAvanzarResenias}
+        indiceResenia={indiceResenia}
+        animating={animating}
+        handleTransitionEnd={handleTransitionEnd}
+        reseñasExtendidas={reseñasExtendidas}
+        CARD_WIDTH={CARD_WIDTH}
+        RESEÑAS_POR_VISTA={RESEÑAS_POR_VISTA}
+        likeResenia={likeResenia}
+        usuarioLogueado={usuarioLogueado}
+        esDuenio={esDuenio}
+        reseniaNueva={reseniaNueva}
+        setReseniaNueva={setReseniaNueva}
+        agregarResenia={agregarResenia}
+      />
 
-            {mostrarModalServicios && (
-              <div className="modal-servicios">
-                <div className="modal-content-servicios">
-                  <h3>Editar Servicios del Balneario</h3>
-                  <div className="servicios-lista">
-                    {todosLosServicios.map(serv => {
-                      const tieneServicio = balnearioInfo.servicios?.some(s => s.id_servicio === serv.id_servicio);
-                      return (
-                        <div key={serv.id_servicio} className={`servicio-icono ${tieneServicio ? 'activo' : ''}`}>
-                          <img src={serv.imagen} className="icono-imagen" />
-                          <span>{serv.nombre}</span>
-                          <button
-                            className="boton-agregar-servicio"
-                            onClick={() => toggleServicio(serv.id_servicio, tieneServicio)}
-                          >
-                            {tieneServicio ? "Quitar" : "Agregar"}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="modal-buttons-servicios">
-                    <button className="boton-agregar-servicio" onClick={() => setMostrarModalServicios(false)}>Cerrar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <AgregarCarpaModal
+        mostrarAgregarCarpa={mostrarAgregarCarpa}
+        setMostrarAgregarCarpa={setMostrarAgregarCarpa}
+        nuevaCarpa={nuevaCarpa}
+        setNuevaCarpa={setNuevaCarpa}
+        tiposUbicacion={tiposUbicacion}
+        handleAgregarCarpa={handleAgregarCarpa}
+      />
 
-      {/* === RESEÑAS === */}
-      <div className="resenias-section" style={{ marginTop: "3em" }}>
-        <h3>Reseñas</h3>
-        {loadingResenias ? (
-          <p>Cargando reseñas...</p>
-        ) : (
-          <>
-            <div className="resenias-carrusel-wrapper">
-              <button
-                className="resenias-carrusel-btn"
-                onClick={handleRetrocederResenias}
-                aria-label="Ver reseñas anteriores"
-              >
-                &#8592;
-              </button>
-              <div className="resenias-carrusel-lista-viewport">
-                <div
-                  className="resenias-lista"
-                  style={{
-                    transform: `translateX(${-indiceResenia * CARD_WIDTH + ((RESEÑAS_POR_VISTA * CARD_WIDTH) / 2)}px)`,
-                    transition: animating ? "transform 0.55s cubic-bezier(.5,1.6,.31,1)" : "none"
-                  }}
-                  onTransitionEnd={handleTransitionEnd}
-                >
-                  {reseñasExtendidas.map((resenia, i) => (
-                    <div className="resenia-card" key={i + "-" + (resenia?.id_reseña || i)}>
-                      <div className="resenia-header">
-                        <img
-                          className="resenia-avatar"
-                          src={
-                            resenia?.usuario_imagen
-                              ? resenia.usuario_imagen
-                              : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-                          }
-                          alt={resenia?.usuario_nombre || "Usuario"}
-                        />
-                        <div className="resenia-usuario">
-                          <span className="resenia-usuario-nombre">
-                            {resenia?.usuario_nombre
-                              ? resenia.usuario_nombre
-                              : "Usuario"}
-                          </span>
-                          <span className="resenia-estrellas">
-                            {[1, 2, 3, 4, 5].map((v) => (
-                              <span
-                                key={v}
-                                style={{
-                                  color: v <= resenia.estrellas ? "#ffb700" : "#ccc",
-                                  fontSize: "1.1em",
-                                }}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="resenia-comentario">{resenia?.comentario}</div>
-                      <div className="resenia-footer">
-                        <span className="resenia-likes" style={{ marginRight: 8 }}>
-                          <button
-                            className="like-boton"
-                            onClick={() => likeResenia(resenia?.id_reseña)}
-                          >
-                            👍
-                          </button>
-                          {resenia?.likes || 0}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button
-                className="resenias-carrusel-btn"
-                onClick={handleAvanzarResenias}
-                aria-label="Ver más reseñas"
-              >
-                &#8594;
-              </button>
-            </div>
-            {/* Form agregar reseña */}
-            {usuarioLogueado && !esDuenio && (
-              <div className="agregar-resenia-form">
-                <h4>Dejá tu reseña</h4>
-                <label>
-                  Estrellas:{" "}
-                  {[1, 2, 3, 4, 5].map((v) => (
-                    <span
-                      key={v}
-                      style={{
-                        cursor: "pointer",
-                        color: v <= (reseniaNueva.estrellasHover ?? reseniaNueva.estrellas) ? "#ffb700" : "#ccc",
-                        fontSize: "1.6em",
-                        marginRight: 2,
-                        transition: "color 0.2s"
-                      }}
-                      onClick={() =>
-                        setReseniaNueva((r) => ({
-                          ...r,
-                          estrellas: v,
-                        }))
-                      }
-                      onMouseEnter={() => setReseniaNueva((r) => ({ ...r, estrellasHover: v }))}
-                      onMouseLeave={() => setReseniaNueva((r) => ({ ...r, estrellasHover: undefined }))}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </label>
-                <label>
-                  Comentario:{" "}
-                  <textarea
-                    value={reseniaNueva.comentario}
-                    onChange={e =>
-                      setReseniaNueva(r => ({
-                        ...r,
-                        comentario: e.target.value
-                      }))
-                    }
-                  />
-                </label>
-                <button className="boton-agregar-servicio" onClick={agregarResenia}>
-                  Publicar reseña
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <EditarCarpaModal
+        carpaEditando={carpaEditando}
+        handleInputChange={handleInputChange}
+        guardarCambios={guardarCambios}
+        setCarpaEditando={setCarpaEditando}
+      />
 
-      {/* MODAL AGREGAR CARPA/SOMBRILLA */}
-      {mostrarAgregarCarpa && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Agregar carpa o sombrilla</h3>
-            <label>
-              Tipo:
-              <select
-                value={nuevaCarpa.id_tipo_ubicacion}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, id_tipo_ubicacion: e.target.value }))}
-              >
-                <option value="">Seleccione tipo</option>
-                {tiposUbicacion.map(t =>
-                  <option key={t.id_tipo_ubicaciones} value={t.id_tipo_ubicaciones}>{t.nombre}</option>
-                )}
-              </select>
-            </label>
-            <label>
-              Sillas:
-              <input type="number" value={nuevaCarpa.cant_sillas} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_sillas: +e.target.value }))} />
-            </label>
-            <label>
-              Mesas:
-              <input type="number" value={nuevaCarpa.cant_mesas} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_mesas: +e.target.value }))} />
-            </label>
-            <label>
-              Reposeras:
-              <input type="number" value={nuevaCarpa.cant_reposeras} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_reposeras: +e.target.value }))} />
-            </label>
-            <label>
-              Capacidad:
-              <input type="number" value={nuevaCarpa.capacidad} min={1}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
-            </label>
-            <div className="modal-buttons">
-              <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
-              <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PreciosBalnearioTabla
+        precios={precios}
+        esDuenio={esDuenio}
+        abrirModalPrecio={abrirModalPrecio}
+      />
 
-      {carpaEditando && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Editando Carpa #{carpaEditando.posicion}</h3>
-            <label>
-              Sillas: <input name="cant_sillas" type="number" value={carpaEditando.cant_sillas || ''} onChange={handleInputChange} />
-            </label>
-            <label>
-              Mesas: <input name="cant_mesas" type="number" value={carpaEditando.cant_mesas || ''} onChange={handleInputChange} />
-            </label>
-            <label>
-              Reposeras: <input name="cant_reposeras" type="number" value={carpaEditando.cant_reposeras || ''} onChange={handleInputChange} />
-            </label>
-            <label>
-              Capacidad: <input name="capacidad" type="number" value={carpaEditando.capacidad || ''} onChange={handleInputChange} />
-            </label>
-            <div className="modal-buttons">
-              <button className="boton-agregar-servicio" onClick={guardarCambios}>Guardar</button>
-              <button className="boton-agregar-servicio" onClick={() => setCarpaEditando(null)}>Cancelar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* PRECIOS DEL BALNEARIO */}
-      {precios && precios.length > 0 && (
-        <div className="precios-balneario-tabla" style={{ marginTop: "2em" }}>
-          <h3>Disponibilidad</h3>
-          <table className="tabla-precios-reserva">
-            <thead>
-              <tr>
-                <th>Tipo de reserva</th>
-                <th>Precio por día</th>
-                <th>Precio por semana</th>
-                <th>Precio por quincena</th>
-                <th>Precio por mes</th>
-                {esDuenio && <th>Acciones</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {precios.map((p) => (
-                <tr key={p.id_tipo_ubicacion}>
-                  <td>{p.nombre}</td>
-                  <td>${p.dia}</td>
-                  <td>${p.semana}</td>
-                  <td>${p.quincena}</td>
-                  <td>${p.mes}</td>
-                  {esDuenio && (
-                    <td>
-                      <button
-                        className="boton-agregar-servicio"
-                        onClick={() => abrirModalPrecio(p)}
-                      >
-                        Editar
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* MODAL editar precio */}
-      {editandoPrecio && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Editar precio: {editandoPrecio.nombre}</h3>
-            <label>
-              Día:
-              <input
-                type="number"
-                value={precioEdit.dia}
-                onChange={e =>
-                  setPrecioEdit(pe => ({ ...pe, dia: e.target.value }))
-                }
-                min={0}
-              />
-            </label>
-            <label>
-              Semana:
-              <input
-                type="number"
-                value={precioEdit.semana}
-                onChange={e =>
-                  setPrecioEdit(pe => ({ ...pe, semana: e.target.value }))
-                }
-                min={0}
-              />
-            </label>
-            <label>
-              Quincena:
-              <input
-                type="number"
-                value={precioEdit.quincena}
-                onChange={e =>
-                  setPrecioEdit(pe => ({ ...pe, quincena: e.target.value }))
-                }
-                min={0}
-              />
-            </label>
-            <label>
-              Mes:
-              <input
-                type="number"
-                value={precioEdit.mes}
-                onChange={e =>
-                  setPrecioEdit(pe => ({ ...pe, mes: e.target.value }))
-                }
-                min={0}
-              />
-            </label>
-            <div className="modal-buttons">
-              <button className="boton-agregar-servicio" onClick={guardarPrecio}>
-                Guardar
-              </button>
-              <button
-                className="boton-agregar-servicio"
-                onClick={() => setEditandoPrecio(null)}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditarPrecioModal
+        editandoPrecio={editandoPrecio}
+        precioEdit={precioEdit}
+        setPrecioEdit={setPrecioEdit}
+        guardarPrecio={guardarPrecio}
+        setEditandoPrecio={setEditandoPrecio}
+      />
     </div>
   );
 }
