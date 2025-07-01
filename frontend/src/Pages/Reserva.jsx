@@ -5,7 +5,6 @@ function Reserva() {
   return (
       <>
         <div id="seccion-inferior">
-        {/* contenido que viene después */}
           <ReservaComponent />
         </div>
       </>
