@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import FasesReserva from '../FasesReserva/';
 import './ReservaComponent.css';
 
 function ReservaComponent() {
 const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   const id_ubicacion = id;
 
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaSalida, setFechaSalida] = useState("");
+  // Obtener fechas del location state (enviadas desde CarpasDelBalneario)
+  const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps } = location.state || {};
+
+  const [fechaInicio, setFechaInicio] = useState(fechaInicioProps || "");
+  const [fechaSalida, setFechaSalida] = useState(fechaFinProps || "");
   const [metodoPago, setMetodoPago] = useState("mercado pago");
   const [error, setError] = useState(null);
   const [exito, setExito] = useState(null);
@@ -120,7 +125,7 @@ const navigate = useNavigate();
 
   return (
     <>
-      <h2>Reservar Ubicación #{id_ubicacion}</h2>
+      <FasesReserva faseActual={2} />
       <div className="formulario-reserva">
         <div className="informacion-reserva">
             {ubicacionInfo && balnearioInfo && (
@@ -133,37 +138,14 @@ const navigate = useNavigate();
           <div className="info-datos-reserva">
             <h4>Los datos de tu reserva</h4>
             
-            <div className="seleccion-fechas">
-              <div className="fecha-group">
-                <label>Fecha de entrada<span className="required-asterisk">*</span></label>
-                <input 
-                  type="date" 
-                  value={fechaInicio}
-                  onChange={(e) => setFechaInicio(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  required 
-                />
-              </div>
-              <div className="fecha-group">
-                <label>Fecha de salida<span className="required-asterisk">*</span></label>
-                <input 
-                  type="date" 
-                  value={fechaSalida}
-                  onChange={(e) => setFechaSalida(e.target.value)}
-                  min={fechaInicio || new Date().toISOString().split('T')[0]}
-                  required 
-                />
-              </div>
-            </div>
-
             <div className="datos-entrada-salida">
               <div className="datos-entrada">
                 <h5>Entrada</h5>
-                <p className="fecha">{fechaInicio ? new Date(fechaInicio).toLocaleDateString('es-ES') : 'Seleccionar fecha'}</p>
+                <p className="fecha">{fechaInicio ? new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES') : 'Seleccionar fecha'}</p>
               </div>
               <div className="datos-salida">
                 <h5>Salida</h5>
-                <p className="fecha">{fechaSalida ? new Date(fechaSalida).toLocaleDateString('es-ES') : 'Seleccionar fecha'}</p>
+                <p className="fecha">{fechaSalida ? new Date(fechaSalida + 'T00:00:00').toLocaleDateString('es-ES') : 'Seleccionar fecha'}</p>
               </div>
             </div>
             <div className="duracion-estancia">

@@ -493,8 +493,8 @@ function CarpasDelBalneario() {
 
       {fechaInicio && fechaFin ? (
         <p>
-          Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString()} al{" "}
-          {new Date(fechaFin + 'T00:00:00').toLocaleDateString()}
+          Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
+          {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
         </p>
       ) : (
         <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
@@ -548,6 +548,8 @@ function CarpasDelBalneario() {
               navigate={navigate}
               eliminarCarpa={eliminarCarpa}
               handleEditarCarpa={handleEditarCarpa}
+              fechaInicio={fechaInicio}
+              fechaFin={fechaFin}
             />
           );
         })}

@@ -1,0 +1,131 @@
+.fases-reserva {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 2rem auto 1rem auto;
+  padding: 1.5rem 2rem;
+}
+
+.fase {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.fase-circulo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9ecef;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.fase-circulo.completada {
+  background-color: #005A84;
+  border-color: #005A84;
+  color: white;
+}
+
+.fase-circulo.activa {
+  background-color: #005A84;
+  border-color: #005A84;
+  color: white;
+  box-shadow: 0 0 0 4px rgba(0, 90, 132, 0.2);
+}
+
+.fase-numero {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.fase-circulo.completada .fase-numero,
+.fase-circulo.activa .fase-numero {
+  color: white;
+}
+
+.fase-texto {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #6c757d;
+}
+
+.fase-texto.completada {
+  color: #005A84;
+  font-weight: 600;
+}
+
+.fase-texto.activa {
+  color: #005A84;
+  font-weight: 600;
+}
+
+.fase-linea {
+  width: 30%;
+  height: 2px;
+  background-color: #dee2e6;
+  margin: 0 1rem;
+  transition: background-color 0.3s ease;
+  align-self: center;
+  margin-top: -20px;
+}
+
+.fase-linea.activa {
+  background-color: #005A84;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fases-reserva {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+  
+  .fase-circulo {
+    width: 35px;
+    height: 35px;
+    margin-right: 8px;
+  }
+  
+  .fase-numero {
+    font-size: 1rem;
+  }
+  
+  .fase-texto {
+    font-size: 0.9rem;
+    margin-right: 1rem;
+  }
+  
+  .fase-linea {
+    width: 40px;
+    margin: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fases-reserva {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .fase-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .fase-linea {
+    display: none;
+  }
+  
+  .fase-texto {
+    margin-right: 0;
+    margin-top: 0.5rem;
+  }
+}

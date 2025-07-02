@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: space-between;
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: 1rem auto 2rem auto;
   padding: 2rem;
   font-family: sans-serif;
 }
@@ -230,29 +230,4 @@
 .required-asterisk {
   color: red;
   margin-left: 3px;
-}
-
-.seleccion-fechas {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #005A84;
-}
-
-.fecha-group {
-  margin-bottom: 15px;
-}
-
-.fecha-group label {
-  display: block;
-  font-size: 1rem;
-  margin-bottom: 5px;
-  font-weight: normal;
-}
-
-.fecha-group input[type="date"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
 }

@@ -13,7 +13,9 @@ function CarpaItem({
   usuarioLogueado,
   navigate,
   eliminarCarpa,
-  handleEditarCarpa
+  handleEditarCarpa,
+  fechaInicio,
+  fechaFin
 }) {
   return (
     <div
@@ -25,7 +27,9 @@ function CarpaItem({
       }
       onClick={() => {
         if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
-          navigate(`/reservaubicacion/${carpa.id_carpa}`);
+          navigate(`/reservaubicacion/${carpa.id_carpa}`, {
+            state: { fechaInicio, fechaFin }
+          });
         }
       }}
       title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
