@@ -127,7 +127,6 @@ const navigate = useNavigate();
             <div className="info-balneario">
               <h4>{balnearioInfo.nombre}</h4>
               <p>{balnearioInfo.direccion}, {balnearioInfo.ciudad_nombre}</p>
-              <p><strong>Ubicación capacidad:</strong> {ubicacionInfo.capacidad}</p>
             </div>
           )}
 
