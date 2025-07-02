@@ -794,7 +794,22 @@ app.get('/api/reserva/ubicacion/:id_ubicacion', async (req, res) => {
 
 // POST /api/reserva
 app.post('/api/reserva', async (req, res) => {
-  const { id_usuario, id_ubicacion, id_balneario, fecha_inicio, fecha_salida, metodo_pago } = req.body;
+  const { 
+    id_usuario, 
+    id_ubicacion, 
+    id_balneario, 
+    fecha_inicio, 
+    fecha_salida, 
+    metodo_pago,
+    nombre,
+    apellido,
+    email,
+    telefono,
+    direccion,
+    ciudad,
+    codigo_postal,
+    pais
+  } = req.body;
 
   if (!id_usuario || !id_ubicacion || !id_balneario || !fecha_inicio || !fecha_salida) {
     return res.status(400).json({ error: "Datos incompletos para la reserva." });
@@ -822,6 +837,14 @@ app.post('/api/reserva', async (req, res) => {
       id_balneario,
       fecha_inicio,
       fecha_salida,
+      nombre,
+      apellido,
+      telefono,
+      email,
+      direccion,
+      ciudad,
+      codigo_postal,
+      pais_region: pais,
       metodo_pago
     });
 
