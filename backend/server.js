@@ -1044,48 +1044,32 @@ function toIntOrNull(val) {
   return Number.isInteger(n) && !isNaN(n) ? n : null;
 }
 
-// GET /api/balneario/:id/resenias
-app.get('/api/balneario/:id/resenias', async (req, res) => {
+// POST /api/balneario/:id/resenias
+app.post('/api/balneario/:id/resenias', async (req, res) => {
   const { id } = req.params;
   const balnearioId = toIntOrNull(id);
   if (balnearioId === null) return res.status(400).json({ error: 'Id de balneario inválido.' });
-  try {
-    // Buscar las reseñas asociadas a este balneario (con join de usuario)
-    const { data: reseñasData, error: reseñasError } = await supabase
-      .from('reseñas')
-      .select(`
-        id_reseña,
-        comentario,
-        estrellas,
-        likes,
-        id_usuario,
-        id_balneario,
-        usuarios (
-          id_usuario,
-          nombre,
-          apellido
-        )
-      `)
-      .eq('id_balneario', balnearioId);
-
-    if (reseñasError) return res.status(500).json({ error: 'Error trayendo reseñas.' });
-
-    const reseñas = (reseñasData || []).map(r => ({
-      id_reseña: r.id_reseña,
-      comentario: r.comentario,
-      estrellas: r.estrellas,
-      likes: r.likes || 0,
-      id_usuario: r.id_usuario,
-      usuario_nombre: r.usuarios?.nombre
-        ? r.usuarios.nombre + (r.usuarios.apellido ? " " + r.usuarios.apellido : "")
-        : undefined
-    }));
-
-    res.json({ resenias: reseñas });
-  } catch (e) {
-    res.status(500).json({ error: 'Error interno trayendo reseñas.' });
+  const { comentario, estrellas, id_usuario } = req.body;
+  if (!comentario?.trim() || !estrellas || !id_usuario) {
+    return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
   }
-});
+  try {
+    // Insertar reseña directamente con el id_balneario
+    const { data: nuevaResenia, error: reseniaError } = await supabase
+    .from('reseñas')
+      .insert([{ comentario, estrellas, id_usuario, id_balneario: balnearioId, likes: 0 }])
+      .select()
+      .single();
+
+      if (reseniaError || !nuevaResenia) {
+        return res.status(500).json({ error: 'Error guardando reseña.' });
+      }
+
+      res.json({ ok: true, reseña: nuevaResenia });
+    } catch (e) {
+      res.status(500).json({ error: 'Error interno guardando reseña.' });
+    }
+  });
 
 // GET /api/balneario/:id/resenias?usuario_id=XX
 app.get('/api/balneario/:id/resenias', async (req, res) => {
