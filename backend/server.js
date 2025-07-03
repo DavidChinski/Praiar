@@ -808,11 +808,43 @@ app.post('/api/reserva', async (req, res) => {
     direccion,
     ciudad,
     codigo_postal,
-    pais
+    pais,
+    precio_total
   } = req.body;
 
   if (!id_usuario || !id_ubicacion || !id_balneario || !fecha_inicio || !fecha_salida) {
     return res.status(400).json({ error: "Datos incompletos para la reserva." });
+  }
+
+  // OPCIONAL: Recalcular precio aquí (recomendado)
+  let precioCalculado = precio_total;
+  try {
+    // Obtener info de ubicación
+    const { data: ubicacion } = await supabase
+      .from("ubicaciones")
+      .select("id_tipo_ubicacion")
+      .eq("id_carpa", id_ubicacion)
+      .single();
+
+    // Obtener precios
+    const { data: precios } = await supabase
+      .from("precios")
+      .select("*")
+      .eq("id_balneario", id_balneario)
+      .eq("id_tipo_ubicacion", ubicacion.id_tipo_ubicacion);
+
+    if (precios && precios.length > 0) {
+      const precio = precios[0];
+      const dias = Math.ceil(
+        (new Date(fecha_salida) - new Date(fecha_inicio)) / (1000 * 60 * 60 * 24)
+      );
+      if (dias === 1) precioCalculado = precio.dia;
+      else if (dias <= 7) precioCalculado = Number(precio.semana) * Math.ceil(dias / 7);
+      else if (dias <= 15) precioCalculado = Number(precio.quincena) * Math.ceil(dias / 15);
+      else precioCalculado = Number(precio.mes) * Math.ceil(dias / 30);
+    }
+  } catch (e) {
+    // si algo falla, usa el enviado por frontend
   }
 
   try {
@@ -845,7 +877,8 @@ app.post('/api/reserva', async (req, res) => {
       ciudad,
       codigo_postal,
       pais_region: pais,
-      metodo_pago
+      metodo_pago,
+      precio_total: precioCalculado
     });
 
     if (insertError) {

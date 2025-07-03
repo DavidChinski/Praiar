@@ -4,7 +4,7 @@ import FasesReserva from '../FasesReserva/';
 import './ReservaComponent.css';
 
 function ReservaComponent() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
   const id_ubicacion = id;
@@ -19,7 +19,10 @@ const navigate = useNavigate();
   const [exito, setExito] = useState(null);
   const [ubicacionInfo, setUbicacionInfo] = useState(null);
   const [balnearioInfo, setBalnearioInfo] = useState(null);
-  
+
+  // Para mostrar precio total
+  const [precioTotal, setPrecioTotal] = useState(null);
+
   // Campos del formulario
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -31,8 +34,20 @@ const navigate = useNavigate();
   const [pais, setPais] = useState("");
   const [codigoPais, setCodigoPais] = useState("+54");
 
+  // Función para calcular la duración de la estancia
+  const calcularDuracion = () => {
+    if (fechaInicio && fechaSalida) {
+      const inicio = new Date(fechaInicio);
+      const salida = new Date(fechaSalida);
+      const diffTime = Math.abs(salida - inicio);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+    return 0;
+  };
+
+  // Cargar info de la ubicación y balneario desde el backend
   useEffect(() => {
-    // Cargar info de la ubicación y balneario desde el backend
     fetch(`http://localhost:3000/api/reserva/ubicacion/${id_ubicacion}`)
       .then(res => res.json())
       .then(data => {
@@ -46,17 +61,56 @@ const navigate = useNavigate();
       .catch(() => setError("Error al obtener datos de la ubicación."));
   }, [id_ubicacion]);
 
-  // Función para calcular la duración de la estancia
-  const calcularDuracion = () => {
-    if (fechaInicio && fechaSalida) {
-      const inicio = new Date(fechaInicio);
-      const salida = new Date(fechaSalida);
-      const diffTime = Math.abs(salida - inicio);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
-    }
-    return 0;
-  };
+  // Cargar y calcular precio total
+  useEffect(() => {
+    const fetchPrecios = async () => {
+      if (!balnearioInfo || !ubicacionInfo) {
+        setPrecioTotal(null);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:3000/api/balneario/${balnearioInfo.id_balneario}/precios`);
+        const preciosBD = await res.json();
+        // buscar el precio para este tipo de ubicación
+        const precioTipo = preciosBD.find(
+          (p) => String(p.id_tipo_ubicacion) === String(ubicacionInfo.id_tipo_ubicacion)
+        );
+        if (precioTipo) {
+          const dias = calcularDuracion();
+          let total = 0;
+          let resto = dias;
+
+          // Suma por meses
+          const mes = Number(precioTipo.mes);
+          const quincena = Number(precioTipo.quincena);
+          const semana = Number(precioTipo.semana);
+          const dia = Number(precioTipo.dia);
+
+          let cantidadMeses = Math.floor(resto / 30);
+          total += cantidadMeses * mes;
+          resto = resto % 30;
+
+          let cantidadQuincenas = Math.floor(resto / 15);
+          total += cantidadQuincenas * quincena;
+          resto = resto % 15;
+
+          let cantidadSemanas = Math.floor(resto / 7);
+          total += cantidadSemanas * semana;
+          resto = resto % 7;
+
+          let cantidadDias = resto;
+          total += cantidadDias * dia;
+
+          setPrecioTotal(total);
+        } else {
+          setPrecioTotal(null);
+        }
+      } catch (e) {
+        setPrecioTotal(null);
+      }
+    };
+    fetchPrecios();
+  }, [ubicacionInfo, balnearioInfo, fechaInicio, fechaSalida]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,7 +154,8 @@ const navigate = useNavigate();
       direccion: direccion.trim(),
       ciudad: ciudad.trim(),
       codigo_postal: codigoPostal.trim(),
-      pais: pais.trim()
+      pais: pais.trim(),
+      precio_total: precioTotal // enviar el precio calculado
     };
 
     try {
@@ -109,7 +164,7 @@ const navigate = useNavigate();
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
-      
+
       const result = await response.json();
 
       if (!response.ok) {
@@ -128,7 +183,7 @@ const navigate = useNavigate();
       <FasesReserva faseActual={2} />
       <div className="formulario-reserva">
         <div className="informacion-reserva">
-            {ubicacionInfo && balnearioInfo && (
+          {ubicacionInfo && balnearioInfo && (
             <div className="info-balneario">
               <h4>{balnearioInfo.nombre}</h4>
               <p>{balnearioInfo.direccion}, {balnearioInfo.ciudad_nombre}</p>
@@ -137,7 +192,7 @@ const navigate = useNavigate();
 
           <div className="info-datos-reserva">
             <h4>Los datos de tu reserva</h4>
-            
+
             <div className="datos-entrada-salida">
               <div className="datos-entrada">
                 <h5>Entrada</h5>
@@ -156,41 +211,43 @@ const navigate = useNavigate();
               <p>Has seleccionado</p>
               <p className="carpa-seleccionada">Ubicación #{id_ubicacion} - Capacidad: {ubicacionInfo?.capacidad || 'N/A'}</p>
             </div>
+            <div className="precio-reserva">
+              <p><b>Precio total:</b> {precioTotal !== null ? `$${precioTotal}` : 'Cargando...'}</p>
+            </div>
           </div>
         </div>
-        
 
         <form className="reserva-form" onSubmit={handleSubmit}>
           <h2>Introduce tus datos</h2>
           <div className="form-group">
             <label>Nombre/s<span className="required-asterisk">*</span>
-              <input 
-                type="text" 
-                name="nombre" 
+              <input
+                type="text"
+                name="nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                required 
+                required
               />
             </label>
 
             <label>Apellido/s<span className="required-asterisk">*</span>
-              <input 
-                type="text" 
-                name="apellido" 
+              <input
+                type="text"
+                name="apellido"
                 value={apellido}
                 onChange={(e) => setApellido(e.target.value)}
-                required 
+                required
               />
             </label>
           </div>
 
           <label>Email<span className="required-asterisk">*</span>
-            <input 
-              type="email" 
-              name="email" 
+            <input
+              type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
+              required
             />
           </label>
 
@@ -212,37 +269,37 @@ const navigate = useNavigate();
           </div>
 
           <label>Dirección<span className="required-asterisk">*</span>
-            <input 
-              type="text" 
-              name="direccion" 
+            <input
+              type="text"
+              name="direccion"
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
-              required 
+              required
             />
           </label>
 
           <label>Ciudad<span className="required-asterisk">*</span>
-            <input 
-              type="text" 
-              name="ciudad" 
+            <input
+              type="text"
+              name="ciudad"
               value={ciudad}
               onChange={(e) => setCiudad(e.target.value)}
-              required 
+              required
             />
           </label>
 
           <label>Código Postal
-            <input 
-              type="text" 
-              name="codigo_postal" 
+            <input
+              type="text"
+              name="codigo_postal"
               value={codigoPostal}
               onChange={(e) => setCodigoPostal(e.target.value)}
             />
           </label>
 
           <label>País/región<span className="required-asterisk">*</span>
-            <select 
-              name="pais" 
+            <select
+              name="pais"
               value={pais}
               onChange={(e) => setPais(e.target.value)}
               required
@@ -260,10 +317,10 @@ const navigate = useNavigate();
               <option value="Ecuador">Ecuador</option>
             </select>
           </label>
-          
+
           <label>Método de pago<span className="required-asterisk">*</span>
-            <select 
-              value={metodoPago} 
+            <select
+              value={metodoPago}
               onChange={(e) => setMetodoPago(e.target.value)}
               required
             >
@@ -273,7 +330,7 @@ const navigate = useNavigate();
               <option value="credito">Crédito</option>
             </select>
           </label>
-          
+
           <button type="submit">Reservar</button>
           {error && <p style={{ color: "red" }}>{error}</p>}
           {exito && <p style={{ color: "green" }}>{exito}</p>}
