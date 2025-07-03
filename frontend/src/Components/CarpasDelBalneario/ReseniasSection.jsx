@@ -79,8 +79,10 @@ function ReseniasSection({
                     <div className="resenia-footer">
                       <span className="resenia-likes" style={{ marginRight: 8 }}>
                         <button
-                          className="like-boton"
-                          onClick={() => likeResenia(resenia?.id_reseña)}
+                          className={`like-boton ${resenia.dioLike ? "ya-like" : ""}`}
+                          onClick={() => likeResenia(resenia.id_reseña)}
+                          disabled={!usuarioLogueado || resenia.dioLike}
+                          title={resenia.dioLike ? "Ya diste like" : "Dar like"}
                         >
                           👍
                         </button>

@@ -283,14 +283,31 @@ function CarpasDelBalneario() {
   }
 
   // ---- RESEÑAS: Like reseña ----
-  async function likeResenia(id_reseña) {
-    const res = await fetch(`http://localhost:3000/api/resenias/${id_reseña}/like`, { method: "POST" });
-    if (res.ok) {
-      setResenias(resenias => resenias.map(r =>
-        r.id_reseña === id_reseña ? { ...r, likes: (r.likes || 0) + 1 } : r
-      ));
-    }
+
+  async function fetchResenias() {
+  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+  const usuario_id = usuarioGuardado?.id_usuario;
+  let url = `http://localhost:3000/api/balneario/${id}/resenias`;
+  if (usuario_id) url += `?usuario_id=${usuario_id}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  setResenias(data.resenias);
+}
+
+async function likeResenia(id_reseña) {
+  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+  const id_usuario = usuarioGuardado?.id_usuario;
+  if (!id_usuario) {
+    alert("Debes estar logueado para dar like.");
+    return;
   }
+  await fetch(`http://localhost:3000/api/resenias/${id_reseña}/like`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id_usuario })
+  });
+  fetchResenias(); // <- Actualizá desde el backend!
+}
 
   // Carrusel infinito handlers
   function handleAvanzarResenias() {

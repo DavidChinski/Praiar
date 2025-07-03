@@ -1087,57 +1087,101 @@ app.get('/api/balneario/:id/resenias', async (req, res) => {
   }
 });
 
-// POST /api/balneario/:id/resenias
-app.post('/api/balneario/:id/resenias', async (req, res) => {
+// GET /api/balneario/:id/resenias?usuario_id=XX
+app.get('/api/balneario/:id/resenias', async (req, res) => {
   const { id } = req.params;
   const balnearioId = toIntOrNull(id);
+  const usuarioId = parseInt(req.query.usuario_id, 10) || null;
   if (balnearioId === null) return res.status(400).json({ error: 'Id de balneario inválido.' });
-  const { comentario, estrellas, id_usuario } = req.body;
-  if (!comentario?.trim() || !estrellas || !id_usuario) {
-    return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
-  }
   try {
-    // Insertar reseña directamente con el id_balneario
-    const { data: nuevaResenia, error: reseniaError } = await supabase
+    const { data: reseñasData, error: reseñasError } = await supabase
       .from('reseñas')
-      .insert([{ comentario, estrellas, id_usuario, id_balneario: balnearioId, likes: 0 }])
-      .select()
-      .single();
+      .select(`
+        id_reseña,
+        comentario,
+        estrellas,
+        id_usuario,
+        id_balneario,
+        usuarios (
+          id_usuario,
+          nombre,
+          apellido
+        )
+      `)
+      .eq('id_balneario', balnearioId);
 
-    if (reseniaError || !nuevaResenia) {
-      return res.status(500).json({ error: 'Error guardando reseña.' });
+    if (reseñasError) return res.status(500).json({ error: 'Error trayendo reseñas.' });
+
+    // Traer todos los likes para estas reseñas
+    const idsResenias = reseñasData.map(r => r.id_reseña);
+    let likesPorResenia = {};
+    let likesDelUsuario = {};
+    if (idsResenias.length > 0) {
+      // Contar likes por reseña
+      const { data: likesData } = await supabase
+        .from('likes')
+        .select('id_reseña, id_usuario');
+      idsResenias.forEach(idResenia => {
+        likesPorResenia[idResenia] = 0;
+      });
+      (likesData || []).forEach(l => {
+        likesPorResenia[l.id_reseña] = (likesPorResenia[l.id_reseña] || 0) + 1;
+        if (usuarioId && l.id_usuario === usuarioId) {
+          likesDelUsuario[l.id_reseña] = true;
+        }
+      });
     }
 
-    res.json({ ok: true, reseña: nuevaResenia });
+    const reseñas = (reseñasData || []).map(r => ({
+      id_reseña: r.id_reseña,
+      comentario: r.comentario,
+      estrellas: r.estrellas,
+      id_usuario: r.id_usuario,
+      usuario_nombre: r.usuarios?.nombre
+        ? r.usuarios.nombre + (r.usuarios.apellido ? " " + r.usuarios.apellido : "")
+        : undefined,
+      likes: likesPorResenia[r.id_reseña] || 0,
+      dioLike: !!likesDelUsuario[r.id_reseña]
+    }));
+
+    res.json({ resenias: reseñas });
   } catch (e) {
-    res.status(500).json({ error: 'Error interno guardando reseña.' });
+    res.status(500).json({ error: 'Error interno trayendo reseñas.' });
   }
 });
 
 // POST /api/resenias/:id_reseña/like
 app.post('/api/resenias/:id_reseña/like', async (req, res) => {
   const { id_reseña } = req.params;
+  const { id_usuario } = req.body;
+  if (!id_usuario) return res.status(400).json({ error: 'Falta el id_usuario.' });
+
   try {
-    // Sumar un like
-    const { data: reseña, error: getError } = await supabase
-      .from('reseñas')
-      .select('likes')
+    // Verificar si ya dio like
+    const { data: yaLike } = await supabase
+      .from('likes')
+      .select('*')
       .eq('id_reseña', id_reseña)
+      .eq('id_usuario', id_usuario)
       .single();
-    if (getError || !reseña) {
-      return res.status(404).json({ error: 'Reseña no encontrada.' });
+
+    if (yaLike) {
+      // Si ya dio like, eliminarlo (toggle off)
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('id_reseña', id_reseña)
+        .eq('id_usuario', id_usuario);
+      return res.json({ ok: true, liked: false });
+    } else {
+      // Si no, insertar like
+      await supabase
+        .from('likes')
+        .insert({ id_usuario, id_reseña });
+      return res.json({ ok: true, liked: true });
     }
-    const nuevosLikes = (reseña.likes || 0) + 1;
-    const { error: updateError } = await supabase
-      .from('reseñas')
-      .update({ likes: nuevosLikes })
-      .eq('id_reseña', id_reseña);
-    if (updateError) {
-      return res.status(500).json({ error: 'Error actualizando likes.' });
-    }
-    res.json({ ok: true, likes: nuevosLikes });
   } catch (e) {
-    res.status(500).json({ error: 'Error interno sumando like.' });
+    res.status(500).json({ error: 'Error procesando el like.' });
   }
 });
 
