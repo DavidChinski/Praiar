@@ -79,10 +79,12 @@ button:focus {
 .link-btn {
   background-color: transparent;
   border: none;
-  color: #0077aa;
+  color: #008ab2;
   text-decoration: underline;
   cursor: pointer;
   font-size: 14px;
+  margin-top: 10px;
+  padding: 0;
 }
 
 .linea {
@@ -126,18 +128,6 @@ button:focus {
   background-image: url('../../assets/apple.jpg');
 }
 
-.extra-buttons {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  gap: 30px;
-}
-
-.secondary {
-  background-color: #B0DBE7;
-  color: #003F5E;
-}
-
 .password-wrapper {
   display: flex;
   align-items: center;
@@ -167,4 +157,23 @@ button:focus {
 
 .password-wrapper input{
   margin: 0;
+}
+
+.login-container>p{
+  margin: 0;
+  margin-bottom: 20px;
+}
+.login-container>p>a{
+  color: #005984;
+  text-decoration: underline;
+}
+
+.login-container .password-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+button[type="submit"] {
+  margin-top: 20px;
 }
