@@ -132,8 +132,8 @@ function ReservasComponent() {
       getBase64FromImageUrl(MailFooter),
       getBase64FromImageUrl(TelefonoFooter),
       getBase64FromImageUrl(GanchoFooter),
-    ]).then(([logo, logonombre, instagram, linkedin, X, mail, tel, gancho]) => {
-      setIconosBase64({ logo, logonombre, instagram, linkedin, X, mail, tel, gancho });
+    ]).then(([logo, logonombre, insta, linkedin, twitter, mail, tel, gancho]) => {
+      setIconosBase64({ logo, logonombre, insta, linkedin, twitter, mail, tel, gancho });
     });
   }, []);
 
@@ -191,47 +191,67 @@ function ReservasComponent() {
     fetchReservas(true);
   };
 
+  // NUEVO: helper para obtener todos los atributos de la reserva
+  function getPDFReservaInfo(reserva) {
+    // Basado en la tabla reservas y usuarios de la imagen
+    return [
+      ["ID Reserva", reserva.id_reserva || ""],
+      ["Cliente", reserva.cliente_nombre || reserva.nombre || ""],
+      ["Apellido", reserva.apellido || ""],
+      ["Email", reserva.email || ""],
+      ["Teléfono", reserva.telefono || ""],
+      ["Balneario", reserva.balneario_nombre || "Sin nombre"],
+      ["Ubicación", reserva.ubicacion_posicion || reserva.ubicacion_id_carpa || ""],
+      ["Fecha Entrada", reserva.fecha_inicio ? format(new Date(reserva.fecha_inicio + "T00:00:00"), "dd/MM/yyyy") : ""],
+      ["Fecha Salida", reserva.fecha_salida ? format(new Date(reserva.fecha_salida + "T00:00:00"), "dd/MM/yyyy") : ""],
+      ["Dirección", reserva.direccion || ""],
+      ["Ciudad", reserva.ciudad || ""],
+      ["Código Postal", reserva.codigo_postal || ""],
+      ["País/Región", reserva.pais_region || reserva.pais || ""],
+      ["Método de Pago", reserva.metodo_pago || ""],
+      ["Precio Total", reserva.precio_total !== undefined ? `$${reserva.precio_total}` : ""],
+    ];
+  }
+
   const handleVerPDF = (reserva) => {
     if (!iconosBase64.logonombre) return;
     const doc = new jsPDF();
-    const cliente =
-      idBalneario
-        ? reserva.cliente_nombre || "Cliente desconocido"
-        : `${usuario?.nombre || ""} ${usuario?.apellido || ""}`;
-    const balneario = reserva.balneario_nombre || "Sin nombre";
-    const ubicacion = reserva.ubicacion_posicion || reserva.ubicacion_id_carpa || "Sin ubicación";
-    const entrada = format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy");
-    const salida = format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy");
+    const info = getPDFReservaInfo(reserva);
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Header
     doc.addImage(iconosBase64.logo, "PNG", 15, 10, 25, 25);
     doc.setFontSize(18);
     doc.setTextColor("#004b75");
     doc.text("Detalle de Reserva", pageWidth / 2, 20, { align: "center" });
+
+    // Info tabla
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     const left = 30;
     let y = 50;
-    const info = [
-      ["Cliente:", cliente],
-      ["Balneario:", balneario],
-      ["Ubicación:", ubicacion],
-      ["Entrada:", entrada],
-      ["Salida:", salida],
-    ];
+
     info.forEach(([label, value]) => {
       doc.setFont("helvetica", "bold");
-      doc.text(label, left, y);
+      doc.text(label + ":", left, y);
       doc.setFont("helvetica", "normal");
-      doc.text(String(value), left + 40, y);
+      doc.text(String(value), left + 50, y);
       y += 10;
     });
-    y += 10;
+
+    y += 5;
     doc.setDrawColor("#008ab2");
     doc.setLineWidth(0.5);
     doc.line(left, y, pageWidth - left, y);
+
     agregarFooterEstiloPraiar(doc, pageWidth, pageHeight, iconosBase64);
-    doc.save(`Reserva_${balneario}_${entrada}.pdf`);
+
+    // El nombre del archivo incluye balneario y fecha de entrada/salida
+    const balneario = info.find(([l]) => l === "Balneario")?.[1] || "Reserva";
+    const entrada = info.find(([l]) => l === "Fecha Entrada")?.[1] || "";
+    const salida = info.find(([l]) => l === "Fecha Salida")?.[1] || "";
+    doc.save(`Reserva_${balneario}_${entrada}_${salida}.pdf`);
   };
 
   return (

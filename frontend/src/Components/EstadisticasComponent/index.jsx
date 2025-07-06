@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
   Chart,
@@ -337,7 +337,7 @@ export default function EstadisticasComponent() {
           <tbody>
             {balnearios.map((b) => (
               <tr key={b.id_balneario}>
-                <td>{b.nombre}</td>
+                <td><Link to={`/balneario/${b.id_balneario}`}>{b.nombre}</Link></td>
                 <td>
                   {ciudades.find((c) => c.id_ciudad === b.id_ciudad)?.nombre ||
                     b.ciudad ||
