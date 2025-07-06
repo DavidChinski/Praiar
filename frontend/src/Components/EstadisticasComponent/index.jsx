@@ -39,6 +39,20 @@ function getUserFromStorage() {
   }
 }
 
+// Paleta de azules para los gráficos
+const bluePalette = [
+  "#003f5e",
+  "#005984",
+  "#0077b6",
+  "#0099cc",
+  "#41b6e6",
+  "#73c2fb",
+  "#bde0fe",
+  "#8ecae6",
+  "#1976d2",
+  "#90caf9",
+];
+
 export default function EstadisticasComponent() {
   const [ciudades, setCiudades] = useState([]);
   const [balnearios, setBalnearios] = useState([]);
@@ -126,10 +140,10 @@ export default function EstadisticasComponent() {
     return (
       <div
         style={{
-          display: "flex",             // usar flexbox
-          flexDirection: "column",     // apilar elementos verticalmente
-          justifyContent: "center",    // centrar verticalmente
-          alignItems: "center",        // centrar horizontalmente
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           textAlign: "center",
           padding: "1rem",
         }}
@@ -186,7 +200,9 @@ export default function EstadisticasComponent() {
         data: ciudades
           .filter((c) => balneariosPorCiudad[c.id_ciudad])
           .map((c) => balneariosPorCiudad[c.id_ciudad]),
-        backgroundColor: ["#4dc9f6", "#f67019", "#f53794", "#537bc4"],
+        backgroundColor: ciudades
+          .filter((c) => balneariosPorCiudad[c.id_ciudad])
+          .map((_, i) => bluePalette[i % bluePalette.length]),
       },
     ],
   };
@@ -199,7 +215,7 @@ export default function EstadisticasComponent() {
         data: balnearios.map(
           (b) => reservasPorBalneario[b.id_balneario]?.length || 0
         ),
-        backgroundColor: "#36A2EB",
+        backgroundColor: balnearios.map((_, i) => bluePalette[i % bluePalette.length]),
       },
     ],
   };
@@ -215,7 +231,7 @@ export default function EstadisticasComponent() {
             0
           )
         ),
-        backgroundColor: "#FFCE56",
+        backgroundColor: balnearios.map((_, i) => bluePalette[(i + 2) % bluePalette.length]),
       },
     ],
   };
@@ -232,7 +248,7 @@ export default function EstadisticasComponent() {
       {
         label: "Cantidad",
         data: Object.values(estrellasCount),
-        backgroundColor: "#FF6384",
+        backgroundColor: Object.keys(estrellasCount).map((_, i) => bluePalette[i % bluePalette.length]),
       },
     ],
   };
@@ -263,7 +279,11 @@ export default function EstadisticasComponent() {
       {
         label: "Reservas por mes",
         data: reservasPorMesArr.map((r) => r.total),
-        backgroundColor: "#8dd17e",
+        backgroundColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
+        borderColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
+        pointBackgroundColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
+        tension: 0.3,
+        fill: true,
       },
     ],
   };
@@ -361,6 +381,20 @@ export default function EstadisticasComponent() {
 }
 
 function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) {
+  // Paleta de azules para los gráficos
+  const bluePalette = [
+    "#003f5e",
+    "#005984",
+    "#0077b6",
+    "#0099cc",
+    "#41b6e6",
+    "#73c2fb",
+    "#bde0fe",
+    "#8ecae6",
+    "#1976d2",
+    "#90caf9",
+  ];
+
   // Estadísticas por balneario
   const estrellasCount = {};
   reseñas.forEach((r) => {
@@ -372,14 +406,14 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
       {
         label: "Cantidad",
         data: Object.values(estrellasCount),
-        backgroundColor: "#FF6384",
+        backgroundColor: Object.keys(estrellasCount).map((_, i) => bluePalette[i % bluePalette.length]),
       },
     ],
   };
   return (
     <div className="balneario-detalle-card">
       <button className="cerrar-button" onClick={onClose}>
-        ×
+        ✕
       </button>
       <h3>Detalle de {balneario.nombre}</h3>
       <ul>

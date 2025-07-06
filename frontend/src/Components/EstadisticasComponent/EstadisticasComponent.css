@@ -99,18 +99,13 @@
 
 .cerrar-button {
   position: absolute;
-  right: 14px;
-  top: 14px;
-  font-weight: bold;
-  background: #e74c3c;
-  color: #fff;
+  top: env(safe-area-inset-top, 10px);
+  right: env(safe-area-inset-right, 14px);
+  font-size: 22px;
+  background: none;
   border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
   cursor: pointer;
-  font-size: 1.22rem;
-  line-height: 1;
+  color: #002537;
 }
 
 .balneario-detalle-card h3 {
