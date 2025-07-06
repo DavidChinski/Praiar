@@ -17,7 +17,8 @@ function NavLinks({ usuario }) {
   if (usuario.esPropietario) {
     return (
       <>
-        <Link to="/tusbalnearios">Tus Balnearios</Link>
+        <Link to="/tusbalnearios">Mis Balnearios</Link>
+        <Link to="/estadisticas">Estadísticas</Link>
         <Link to="/nosotros">Contactos</Link>
       </>
     );

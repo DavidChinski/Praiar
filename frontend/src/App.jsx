@@ -17,6 +17,8 @@ import InformacionExtra from './Pages/informacion-extra'
 import AuthCallback from './Pages/AuthCallback';
 import Error from "./Pages/Error";
 import Layout from './Layout';
+import EstadisticasComponent from "./Components/EstadisticasComponent"; 
+
 function App() {
   return (
     <Router>
@@ -48,6 +50,9 @@ function App() {
             } />
             <Route path="/reservaubicacion/:id" element={
               <ProtectedRoute><Reserva /></ProtectedRoute>
+            } />
+            <Route path="/estadisticas" element={
+              <ProtectedRoute><EstadisticasComponent /></ProtectedRoute>
             } />
           </Route>
         </Routes>
