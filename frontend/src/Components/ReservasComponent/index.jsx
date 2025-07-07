@@ -259,7 +259,7 @@ function ReservasComponent() {
       <h1 className="hero-title">{idBalneario ? "Reservas de Clientes" : "Tus Reservas"}</h1>
       <div className="busqueda-form">
         <div className="input-group date-group">
-          <FontAwesomeIcon 
+          <FontAwesomeIcon
             icon="fa-solid fa-calendar-days"
             className="iconFecha"
             alt="Icono de fecha"
@@ -313,28 +313,34 @@ function ReservasComponent() {
             {reservas
               .sort((a, b) => new Date(b.fecha_inicio + 'T00:00:00') - new Date(a.fecha_inicio + 'T00:00:00'))
               .map((reserva) => (
-              <tr key={reserva.id_reserva}>
-                <td>
-                  {idBalneario
-                    ? reserva.cliente_nombre
-                    : reserva.balneario_nombre}
-                </td>
-                <td>
-                  {reserva.ubicacion_posicion || reserva.ubicacion_id_carpa}
-                </td>
-                <td>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                <td>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                <td>
-                  <button
-                    className="ver-button"
-                    disabled={!iconosBase64.logonombre}
-                    onClick={() => handleVerPDF(reserva)}
-                  >
-                    Ver
-                  </button>
-                </td>
-              </tr>
-            ))}
+                <tr key={reserva.id_reserva}>
+                  <td>
+                    {idBalneario
+                      ? reserva.cliente_nombre
+                      : reserva.balneario_nombre}
+                  </td>
+                  <td>
+                    {/* Mostrar todas las ubicaciones asociadas separadas por coma */}
+                    {(reserva.ubicaciones && reserva.ubicaciones.length > 0)
+                      ? reserva.ubicaciones
+                        .map(u => u.posicion || u.id_carpa)
+                        .filter(Boolean)
+                        .join(", ")
+                      : "-"}
+                  </td>
+                  <td>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td>
+                    <button
+                      className="ver-button"
+                      disabled={!iconosBase64.logonombre}
+                      onClick={() => handleVerPDF(reserva)}
+                    >
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       )}

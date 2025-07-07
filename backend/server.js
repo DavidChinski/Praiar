@@ -679,11 +679,12 @@ app.get('/api/balneario/:id/reservas', async (req, res) => {
 // POST /api/reservas-balneario  (Propietario: ver reservas de su balneario)
 app.post('/api/reservas-balneario', async (req, res) => {
   const { idBalneario, fechaInicio, fechaFin } = req.body;
+
   if (!idBalneario) {
     return res.status(400).json({ error: "Falta id del balneario." });
   }
 
-  // Traer reservas de ese balneario con todas sus ubicaciones asociadas
+  // 1. Consulta base: reservas + ubicaciones + balneario
   let query = supabase
     .from("reservas")
     .select(`
@@ -697,53 +698,73 @@ app.post('/api/reservas-balneario', async (req, res) => {
       ),
       balnearios (
         nombre
-      ),
-      usuarios (
-        nombre,
-        apellido,
-        email,
-        telefono
       )
     `)
     .eq("id_balneario", idBalneario);
 
+  // 2. Agregar filtro de fechas si están presentes
   if (fechaInicio && fechaFin) {
     query = query
       .lte("fecha_inicio", fechaFin)
       .gte("fecha_salida", fechaInicio);
   }
 
+  // 3. Ejecutar la consulta de reservas
   const { data, error } = await query;
 
   if (error) {
+    console.error("Error en reservas:", error);
     return res.status(500).json({ error: "Error cargando reservas." });
   }
 
-  // Para cada reserva, devolver todas las ubicaciones asociadas
-  const reservas = (data || []).map(r => ({
-    id_reserva: r.id_reserva,
-    id_usuario: r.id_usuario,
-    cliente_nombre: r.usuarios ? `${r.usuarios.nombre} ${r.usuarios.apellido}` : "Cliente desconocido",
-    email: r.usuarios?.email,
-    telefono: r.usuarios?.telefono,
-    ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
-      id_ubicacion: v.id_ubicacion,
-      posicion: v.ubicaciones?.posicion,
-      id_carpa: v.ubicaciones?.id_carpa
-    })),
-    balneario_nombre: r.balnearios?.nombre,
-    fecha_inicio: r.fecha_inicio,
-    fecha_salida: r.fecha_salida,
-    metodo_pago: r.metodo_pago,
-    direccion: r.direccion,
-    ciudad: r.ciudad,
-    codigo_postal: r.codigo_postal,
-    pais_region: r.pais_region,
-    precio_total: r.precio_total
-  }));
+  if (!data || data.length === 0) {
+    return res.json({ reservas: [] });
+  }
 
+  // 4. Extraer todos los id_usuario únicos
+  const usuarioAuthIds = [...new Set(data.map(r => r.id_usuario).filter(Boolean))];
+
+  // 5. Traer usuarios con auth_id en esos ids
+  const { data: usuarios, error: errorUsuarios } = await supabase
+    .from("usuarios")
+    .select("auth_id, nombre, apellido, email, telefono")
+    .in("auth_id", usuarioAuthIds);
+
+  if (errorUsuarios) {
+    console.error("Error trayendo usuarios:", errorUsuarios);
+    return res.status(500).json({ error: "Error cargando datos de usuarios." });
+  }
+
+  // 6. Armar respuesta enriquecida
+  const reservas = data.map(r => {
+    const usuario = usuarios.find(u => u.auth_id === r.id_usuario);
+    return {
+      id_reserva: r.id_reserva,
+      id_usuario: r.id_usuario,
+      cliente_nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : "Cliente desconocido",
+      email: usuario?.email || "",
+      telefono: usuario?.telefono || "",
+      ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
+        id_ubicacion: v.id_ubicacion,
+        posicion: v.ubicaciones?.posicion,
+        id_carpa: v.ubicaciones?.id_carpa
+      })),
+      balneario_nombre: r.balnearios?.nombre || "",
+      fecha_inicio: r.fecha_inicio,
+      fecha_salida: r.fecha_salida,
+      metodo_pago: r.metodo_pago,
+      direccion: r.direccion,
+      ciudad: r.ciudad,
+      codigo_postal: r.codigo_postal,
+      pais_region: r.pais_region,
+      precio_total: r.precio_total
+    };
+  });
+
+  // 7. Devolver respuesta
   res.json({ reservas });
 });
+
 
 // POST /api/reservas-usuario  (Cliente: ver sus reservas)
 app.post('/api/reservas-usuario', async (req, res) => {
