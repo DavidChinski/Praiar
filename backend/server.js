@@ -820,11 +820,10 @@ app.get('/api/reserva/ubicacion/:id_ubicacion', async (req, res) => {
   }
 });
 
-// POST /api/reserva
 app.post('/api/reserva', async (req, res) => {
   const { 
     id_usuario, 
-    id_ubicaciones:  [idUbicacion] , // debe ser ARRAY de ids
+    id_ubicaciones, // debe ser ARRAY de ids (ej: [2, 4, 7])
     id_balneario, 
     fecha_inicio, 
     fecha_salida, 
@@ -840,46 +839,15 @@ app.post('/api/reserva', async (req, res) => {
     precio_total
   } = req.body;
 
+  // Validación estricta de datos
   if (!id_usuario || !id_ubicaciones || !Array.isArray(id_ubicaciones) || id_ubicaciones.length === 0 || !id_balneario || !fecha_inicio || !fecha_salida) {
     return res.status(400).json({ error: "Datos incompletos para la reserva." });
   }
 
-
-  // OPCIONAL: Recalcular precio aquí (recomendado)
-  let precioCalculado = precio_total;
+  // 1. Chequeo de disponibilidad para CADA ubicación
   try {
-    // Obtener info de ubicación
-    const { data: ubicacion } = await supabase
-      .from("ubicaciones")
-      .select("id_tipo_ubicacion")
-      .eq("id_carpa", id_ubicacion)
-      .single();
-
-    // Obtener precios
-    const { data: precios } = await supabase
-      .from("precios")
-      .select("*")
-      .eq("id_balneario", id_balneario)
-      .eq("id_tipo_ubicacion", ubicacion.id_tipo_ubicacion);
-
-    if (precios && precios.length > 0) {
-      const precio = precios[0];
-      const dias = Math.ceil(
-        (new Date(fecha_salida) - new Date(fecha_inicio)) / (1000 * 60 * 60 * 24)
-      );
-      if (dias === 1) precioCalculado = precio.dia;
-      else if (dias <= 7) precioCalculado = Number(precio.semana) * Math.ceil(dias / 7);
-      else if (dias <= 15) precioCalculado = Number(precio.quincena) * Math.ceil(dias / 15);
-      else precioCalculado = Number(precio.mes) * Math.ceil(dias / 30);
-    }
-  } catch (e) {
-    // si algo falla, usa el enviado por frontend
-  }
-
-  try {
-    // 1. Verificar si alguna ubicación ya tiene reserva solapada
     for (const id_ubicacion of id_ubicaciones) {
-      // Buscar reservas que tengan vínculo a esta ubicación y se solapen en fechas
+      // Buscar reservas activas para la ubicación y solapamiento de fechas
       const { data: reservasSolapadas, error: solapadaError } = await supabase
         .from("Reservas_Ubicaciones")
         .select(`
@@ -893,7 +861,7 @@ app.post('/api/reserva', async (req, res) => {
         `)
         .eq("id_ubicacion", id_ubicacion)
         .eq("reserva_activa", true);
-    
+  
       if (solapadaError) {
         return res.status(500).json({ error: "Error al validar disponibilidad." });
       }
@@ -901,7 +869,6 @@ app.post('/api/reserva', async (req, res) => {
       const solapada = (reservasSolapadas || []).some(r => {
         const res = r.reservas;
         if (!res) return false;
-        // Si las fechas se solapan
         return new Date(res.fecha_inicio) <= new Date(fecha_salida) &&
                new Date(res.fecha_salida) >= new Date(fecha_inicio);
       });
@@ -910,7 +877,44 @@ app.post('/api/reserva', async (req, res) => {
       }
     }
 
-    // 2. Insertar en "reservas" (una por reserva, no por ubicación)
+    // 2. Recalcular precio total para TODAS las ubicaciones (si no se encuentra, se ignora y no suma)
+    let precioCalculado = 0;
+    for (const id_ubicacion of id_ubicaciones) {
+      // Obtener tipo de ubicación
+      const { data: ubicacion, error: ubicacionError } = await supabase
+        .from("ubicaciones")
+        .select("id_tipo_ubicacion")
+        .eq("id_carpa", id_ubicacion)
+        .single();
+      if (ubicacionError || !ubicacion) {
+        // Si no se encuentra la ubicación, aborta (esto sí es crítico)
+        return res.status(400).json({ error: `No se encontró la ubicación ${id_ubicacion}` });
+      }
+      // Obtener precios
+      const { data: precios } = await supabase
+        .from("precios")
+        .select("*")
+        .eq("id_balneario", id_balneario)
+        .eq("id_tipo_ubicacion", ubicacion.id_tipo_ubicacion);
+
+      if (precios && precios.length > 0) {
+        const precio = precios[0];
+        const dias = Math.max(1, Math.ceil(
+          (new Date(fecha_salida) - new Date(fecha_inicio)) / (1000 * 60 * 60 * 24)
+        ));
+        if (dias === 1) precioCalculado += Number(precio.dia);
+        else if (dias <= 7) precioCalculado += Number(precio.semana) * Math.ceil(dias / 7);
+        else if (dias <= 15) precioCalculado += Number(precio.quincena) * Math.ceil(dias / 15);
+        else precioCalculado += Number(precio.mes) * Math.ceil(dias / 30);
+        // Si hay precio, se suma; si no, simplemente no suma nada
+      }
+      // Si no hay precios para esa ubicación, no suma nada pero NO da error
+    }
+
+    // Si el frontend mandó uno, priorizo el recalculado; si da cero, uso el enviado por frontend (o cero si tampoco hay)
+    const precioTotalFinal = precioCalculado > 0 ? precioCalculado : (precio_total || 0);
+
+    // 3. Insertar en "reservas"
     const { data: reservaInsertada, error: insertError } = await supabase
       .from("reservas")
       .insert({
@@ -927,7 +931,7 @@ app.post('/api/reserva', async (req, res) => {
         ciudad,
         codigo_postal,
         pais_region: pais,
-        precio_total
+        precio_total: precioTotalFinal
       })
       .select()
       .single();
@@ -936,7 +940,7 @@ app.post('/api/reserva', async (req, res) => {
       return res.status(500).json({ error: "Error al realizar la reserva." });
     }
 
-    // 3. Insertar los vínculos en "Reservas_Ubicaciones"
+    // 4. Insertar los vínculos en "Reservas_Ubicaciones"
     const reservasUbicaciones = id_ubicaciones.map(id_ubicacion => ({
       id_reserva: reservaInsertada.id_reserva,
       id_ubicacion: id_ubicacion,
@@ -951,10 +955,15 @@ app.post('/api/reserva', async (req, res) => {
       return res.status(500).json({ error: "Reserva creada pero error vinculando ubicaciones." });
     }
 
+    // 5. Marcar ubicaciones como reservadas (opcional pero RECOMENDADO)
+    for (const id_ubicacion of id_ubicaciones) {
+      await supabase
+        .from("ubicaciones")
+        .update({ reservado: true })
+        .eq("id_carpa", id_ubicacion);
+    }
 
-    // === NUEVO: enviar email al dueño del balneario ===
-
-    // 1. Buscar el balneario y obtener el id_usuario del dueño
+    // 6. Notificar al dueño del balneario por mail
     const { data: balneario, error: balnearioError } = await supabase
       .from("balnearios")
       .select("id_usuario, nombre")
@@ -965,7 +974,6 @@ app.post('/api/reserva', async (req, res) => {
       return res.status(500).json({ error: "Reserva realizada pero no se pudo notificar al balneario (no se encontró el dueño)." });
     }
 
-    // 2. Buscar el email del dueño del balneario
     const { data: duenio, error: duenioError } = await supabase
       .from("usuarios")
       .select("email")
@@ -976,14 +984,12 @@ app.post('/api/reserva', async (req, res) => {
       return res.status(500).json({ error: "Reserva realizada pero no se pudo notificar al dueño del balneario (no se encontró su email)." });
     }
 
-    // 3. Buscar nombre/email del cliente (quien reservó)
     const { data: usuario, error: usuarioError } = await supabase
       .from("usuarios")
       .select("nombre, apellido, email")
       .eq("auth_id", id_usuario)
       .single();
 
-    // 4. Configurá tu transport (esto es para SMTP de Gmail, cambiá a tu proveedor si es otro)
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -992,7 +998,6 @@ app.post('/api/reserva', async (req, res) => {
       }
     });
 
-    // 5. Armá el mail
     const mailOptions = {
       from: '"Reservas" <praiar.info@gmail.com>',
       to: duenio.email,
@@ -1007,23 +1012,25 @@ Ubicaciones: ${id_ubicaciones.join(", ")}
 Fecha inicio: ${fecha_inicio}
 Fecha salida: ${fecha_salida}
 Método de pago: ${metodo_pago}
+Precio total: ${precioTotalFinal}
       `
     };
 
-    // 6. Enviá el mail (esto es async, pero no detiene la respuesta)
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error enviando mail:", error);
       }
     });
 
-    // Responder éxito al frontend
     res.status(200).json({ mensaje: "Reserva realizada con éxito. Se notificó al dueño del balneario por mail." });
 
   } catch (error) {
+    console.error("Error en /api/reserva:", error);
     res.status(500).json({ error: "Error al realizar la reserva." });
   }
 });
+
+
 
 
 
