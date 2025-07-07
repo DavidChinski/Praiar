@@ -880,15 +880,33 @@ app.post('/api/reserva', async (req, res) => {
   try {
     // 1. Verificar si alguna ubicación ya tiene reserva solapada
     for (const id_ubicacion of id_ubicaciones) {
+      // Buscar reservas que tengan vínculo a esta ubicación y se solapen en fechas
       const { data: reservasSolapadas, error: solapadaError } = await supabase
-        .from("reservas")
-        .select("id_reserva")
+        .from("Reservas_Ubicaciones")
+        .select(`
+          id_reservas_ubicaciones,
+          id_reserva,
+          reserva_activa,
+          reservas: id_reserva (
+            fecha_inicio,
+            fecha_salida
+          )
+        `)
         .eq("id_ubicacion", id_ubicacion)
-        .or(`fecha_inicio.lte.${fecha_salida},fecha_salida.gte.${fecha_inicio}`);
+        .eq("reserva_activa", true);
+    
       if (solapadaError) {
         return res.status(500).json({ error: "Error al validar disponibilidad." });
       }
-      if (reservasSolapadas && reservasSolapadas.length > 0) {
+      // Verifica solapamiento de fechas
+      const solapada = (reservasSolapadas || []).some(r => {
+        const res = r.reservas;
+        if (!res) return false;
+        // Si las fechas se solapan
+        return new Date(res.fecha_inicio) <= new Date(fecha_salida) &&
+               new Date(res.fecha_salida) >= new Date(fecha_inicio);
+      });
+      if (solapada) {
         return res.status(400).json({ error: `Ya existe una reserva para la ubicación ${id_ubicacion} en las fechas seleccionadas.` });
       }
     }

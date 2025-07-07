@@ -5,16 +5,18 @@ import './ReservaComponent.css';
 
 function ReservaComponent() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const location = useLocation();
 
-  // Ahora se pueden seleccionar varias ubicaciones
-  // id_ubicaciones será un array de IDs, pasado por location.state
-  // Si viene solo uno, lo convierte a array igualmente
-  const id_ubicaciones = location.state?.id_ubicaciones
-    ? Array.isArray(location.state.id_ubicaciones)
+  // CORREGIDO: Maneja ambos casos, por state o por URL
+  let id_ubicaciones = [];
+  if (location.state?.id_ubicaciones) {
+    id_ubicaciones = Array.isArray(location.state.id_ubicaciones)
       ? location.state.id_ubicaciones
-      : [location.state.id_ubicaciones]
-    : [];
+      : [location.state.id_ubicaciones];
+  } else if (id) {
+    id_ubicaciones = [id];
+  }
 
   const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps } = location.state || {};
 
