@@ -683,16 +683,26 @@ app.post('/api/reservas-balneario', async (req, res) => {
     return res.status(400).json({ error: "Falta id del balneario." });
   }
 
+  // Traer reservas de ese balneario con todas sus ubicaciones asociadas
   let query = supabase
     .from("reservas")
     .select(`
       *,
-      ubicaciones (
-        id_carpa,
-        posicion
+      Reservas_Ubicaciones (
+        id_ubicacion,
+        ubicaciones (
+          id_carpa,
+          posicion
+        )
       ),
       balnearios (
         nombre
+      ),
+      usuarios (
+        nombre,
+        apellido,
+        email,
+        telefono
       )
     `)
     .eq("id_balneario", idBalneario);
@@ -709,31 +719,27 @@ app.post('/api/reservas-balneario', async (req, res) => {
     return res.status(500).json({ error: "Error cargando reservas." });
   }
 
-  // Obtener los ids de usuario de todas las reservas
-  const usuarioIds = [...new Set(data.map(r => r.id_usuario).filter(Boolean))];
-  let usuarios = {};
-  if (usuarioIds.length > 0) {
-    const { data: usuariosData } = await supabase
-      .from("usuarios")
-      .select("id_usuario, nombre, apellido")
-      .in("id_usuario", usuarioIds);
-    if (usuariosData) {
-      usuariosData.forEach(u => { usuarios[u.id_usuario] = u; });
-    }
-  }
-
-  // Siempre devolver cliente_nombre en cada reserva
-  const reservas = data.map(r => ({
+  // Para cada reserva, devolver todas las ubicaciones asociadas
+  const reservas = (data || []).map(r => ({
     id_reserva: r.id_reserva,
     id_usuario: r.id_usuario,
-    cliente_nombre: usuarios[r.id_usuario]
-      ? `${usuarios[r.id_usuario].nombre} ${usuarios[r.id_usuario].apellido}`
-      : "Cliente desconocido",
-    ubicacion_posicion: r.ubicaciones?.posicion,
-    ubicacion_id_carpa: r.ubicaciones?.id_carpa,
+    cliente_nombre: r.usuarios ? `${r.usuarios.nombre} ${r.usuarios.apellido}` : "Cliente desconocido",
+    email: r.usuarios?.email,
+    telefono: r.usuarios?.telefono,
+    ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
+      id_ubicacion: v.id_ubicacion,
+      posicion: v.ubicaciones?.posicion,
+      id_carpa: v.ubicaciones?.id_carpa
+    })),
     balneario_nombre: r.balnearios?.nombre,
     fecha_inicio: r.fecha_inicio,
     fecha_salida: r.fecha_salida,
+    metodo_pago: r.metodo_pago,
+    direccion: r.direccion,
+    ciudad: r.ciudad,
+    codigo_postal: r.codigo_postal,
+    pais_region: r.pais_region,
+    precio_total: r.precio_total
   }));
 
   res.json({ reservas });
@@ -746,13 +752,17 @@ app.post('/api/reservas-usuario', async (req, res) => {
     return res.status(400).json({ error: "Falta id del usuario." });
   }
 
+  // Traer reservas del usuario con todas sus ubicaciones asociadas
   let query = supabase
     .from("reservas")
     .select(`
       *,
-      ubicaciones (
-        id_carpa,
-        posicion
+      Reservas_Ubicaciones (
+        id_ubicacion,
+        ubicaciones (
+          id_carpa,
+          posicion
+        )
       ),
       balnearios (
         nombre
@@ -772,17 +782,28 @@ app.post('/api/reservas-usuario', async (req, res) => {
     return res.status(500).json({ error: "Error cargando reservas." });
   }
 
-  const reservas = data.map(r => ({
+  // Para cada reserva, devolver todas las ubicaciones asociadas
+  const reservas = (data || []).map(r => ({
     id_reserva: r.id_reserva,
-    ubicacion_posicion: r.ubicaciones?.posicion,
-    ubicacion_id_carpa: r.ubicaciones?.id_carpa,
+    ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
+      id_ubicacion: v.id_ubicacion,
+      posicion: v.ubicaciones?.posicion,
+      id_carpa: v.ubicaciones?.id_carpa
+    })),
     balneario_nombre: r.balnearios?.nombre,
     fecha_inicio: r.fecha_inicio,
     fecha_salida: r.fecha_salida,
+    metodo_pago: r.metodo_pago,
+    direccion: r.direccion,
+    ciudad: r.ciudad,
+    codigo_postal: r.codigo_postal,
+    pais_region: r.pais_region,
+    precio_total: r.precio_total
   }));
 
   res.json({ reservas });
 });
+
 
 // GET /api/reserva/ubicacion/:id_ubicacion
 app.get('/api/reserva/ubicacion/:id_ubicacion', async (req, res) => {
