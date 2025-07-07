@@ -5,11 +5,17 @@ import './ReservaComponent.css';
 
 function ReservaComponent() {
   const navigate = useNavigate();
-  const { id } = useParams();
   const location = useLocation();
-  const id_ubicacion = id;
 
-  // Obtener fechas del location state (enviadas desde CarpasDelBalneario)
+  // Ahora se pueden seleccionar varias ubicaciones
+  // id_ubicaciones será un array de IDs, pasado por location.state
+  // Si viene solo uno, lo convierte a array igualmente
+  const id_ubicaciones = location.state?.id_ubicaciones
+    ? Array.isArray(location.state.id_ubicaciones)
+      ? location.state.id_ubicaciones
+      : [location.state.id_ubicaciones]
+    : [];
+
   const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps } = location.state || {};
 
   const [fechaInicio, setFechaInicio] = useState(fechaInicioProps || "");
@@ -17,10 +23,10 @@ function ReservaComponent() {
   const [metodoPago, setMetodoPago] = useState("mercado pago");
   const [error, setError] = useState(null);
   const [exito, setExito] = useState(null);
-  const [ubicacionInfo, setUbicacionInfo] = useState(null);
+  const [ubicacionesInfo, setUbicacionesInfo] = useState([]);
   const [balnearioInfo, setBalnearioInfo] = useState(null);
 
-  // Para mostrar precio total
+  // Precio total para varias ubicaciones
   const [precioTotal, setPrecioTotal] = useState(null);
 
   // Campos del formulario
@@ -34,7 +40,7 @@ function ReservaComponent() {
   const [pais, setPais] = useState("");
   const [codigoPais, setCodigoPais] = useState("+54");
 
-  // Función para calcular la duración de la estancia
+  // Duración
   const calcularDuracion = () => {
     if (fechaInicio && fechaSalida) {
       const inicio = new Date(fechaInicio);
@@ -46,78 +52,81 @@ function ReservaComponent() {
     return 0;
   };
 
-  // Cargar info de la ubicación y balneario desde el backend
+  // Traer info de ubicaciones y balneario (todas las ubicaciones deben ser del mismo balneario)
   useEffect(() => {
-    fetch(`http://localhost:3000/api/reserva/ubicacion/${id_ubicacion}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setUbicacionInfo(data.ubicacion);
-          setBalnearioInfo(data.balneario);
+    async function fetchUbicacionesYBalneario() {
+      try {
+        const ubicaciones = [];
+        let balneario = null;
+        for (const id of id_ubicaciones) {
+          const res = await fetch(`http://localhost:3000/api/reserva/ubicacion/${id}`);
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+          ubicaciones.push(data.ubicacion);
+          if (!balneario) balneario = data.balneario;
         }
-      })
-      .catch(() => setError("Error al obtener datos de la ubicación."));
-  }, [id_ubicacion]);
+        setUbicacionesInfo(ubicaciones);
+        setBalnearioInfo(balneario);
+      } catch (e) {
+        setError("Error al cargar datos de las ubicaciones.");
+      }
+    }
+    if (id_ubicaciones.length > 0) fetchUbicacionesYBalneario();
+  }, [id_ubicaciones]);
 
-  // Cargar y calcular precio total
+  // Calcular precio total sumando cada ubicación
   useEffect(() => {
-    const fetchPrecios = async () => {
-      if (!balnearioInfo || !ubicacionInfo) {
+    async function fetchPrecios() {
+      if (!balnearioInfo || ubicacionesInfo.length === 0) {
         setPrecioTotal(null);
         return;
       }
       try {
         const res = await fetch(`http://localhost:3000/api/balneario/${balnearioInfo.id_balneario}/precios`);
         const preciosBD = await res.json();
-        // buscar el precio para este tipo de ubicación
-        const precioTipo = preciosBD.find(
-          (p) => String(p.id_tipo_ubicacion) === String(ubicacionInfo.id_tipo_ubicacion)
-        );
-        if (precioTipo) {
-          const dias = calcularDuracion();
-          let total = 0;
-          let resto = dias;
+        const dias = calcularDuracion();
+        let total = 0;
 
-          // Suma por meses
-          const mes = Number(precioTipo.mes);
-          const quincena = Number(precioTipo.quincena);
-          const semana = Number(precioTipo.semana);
-          const dia = Number(precioTipo.dia);
+        for (const ubic of ubicacionesInfo) {
+          const precioTipo = preciosBD.find(
+            (p) => String(p.id_tipo_ubicacion) === String(ubic.id_tipo_ubicacion)
+          );
+          if (precioTipo) {
+            let resto = dias;
+            const mes = Number(precioTipo.mes);
+            const quincena = Number(precioTipo.quincena);
+            const semana = Number(precioTipo.semana);
+            const dia = Number(precioTipo.dia);
 
-          let cantidadMeses = Math.floor(resto / 30);
-          total += cantidadMeses * mes;
-          resto = resto % 30;
+            let cantidadMeses = Math.floor(resto / 30);
+            total += cantidadMeses * mes;
+            resto = resto % 30;
 
-          let cantidadQuincenas = Math.floor(resto / 15);
-          total += cantidadQuincenas * quincena;
-          resto = resto % 15;
+            let cantidadQuincenas = Math.floor(resto / 15);
+            total += cantidadQuincenas * quincena;
+            resto = resto % 15;
 
-          let cantidadSemanas = Math.floor(resto / 7);
-          total += cantidadSemanas * semana;
-          resto = resto % 7;
+            let cantidadSemanas = Math.floor(resto / 7);
+            total += cantidadSemanas * semana;
+            resto = resto % 7;
 
-          let cantidadDias = resto;
-          total += cantidadDias * dia;
-
-          setPrecioTotal(total);
-        } else {
-          setPrecioTotal(null);
+            let cantidadDias = resto;
+            total += cantidadDias * dia;
+          }
         }
+        setPrecioTotal(total);
       } catch (e) {
         setPrecioTotal(null);
       }
-    };
+    }
     fetchPrecios();
-  }, [ubicacionInfo, balnearioInfo, fechaInicio, fechaSalida]);
+  }, [ubicacionesInfo, balnearioInfo, fechaInicio, fechaSalida]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setExito(null);
 
-    // Validaciones
     if (!fechaInicio || !fechaSalida) {
       setError("Debes seleccionar una fecha de inicio y una de salida.");
       return;
@@ -130,23 +139,25 @@ function ReservaComponent() {
       setError("Todos los campos marcados con * son obligatorios.");
       return;
     }
+    if (id_ubicaciones.length === 0) {
+      setError("Debes seleccionar al menos una ubicación.");
+      return;
+    }
 
-    // Usuario del localStorage
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || !usuario.auth_id) {
       setError("Debes iniciar sesión para reservar.");
       return;
     }
 
-    const id_balneario = ubicacionInfo?.id_balneario;
+    const id_balneario = balnearioInfo?.id_balneario;
     const body = {
       id_usuario: usuario.auth_id,
-      id_ubicacion,
+      id_ubicaciones: id_ubicaciones, // array!
       id_balneario,
       fecha_inicio: fechaInicio,
       fecha_salida: fechaSalida,
       metodo_pago: metodoPago,
-      // Datos adicionales del formulario
       nombre: nombre.trim(),
       apellido: apellido.trim(),
       email: email.trim(),
@@ -155,7 +166,7 @@ function ReservaComponent() {
       ciudad: ciudad.trim(),
       codigo_postal: codigoPostal.trim(),
       pais: pais.trim(),
-      precio_total: precioTotal // enviar el precio calculado
+      precio_total: precioTotal
     };
 
     try {
@@ -183,7 +194,7 @@ function ReservaComponent() {
       <FasesReserva faseActual={2} />
       <div className="formulario-reserva">
         <div className="informacion-reserva">
-          {ubicacionInfo && balnearioInfo && (
+          {balnearioInfo && (
             <div className="info-balneario">
               <h4>{balnearioInfo.nombre}</h4>
               <p>{balnearioInfo.direccion}, {balnearioInfo.ciudad_nombre}</p>
@@ -192,7 +203,6 @@ function ReservaComponent() {
 
           <div className="info-datos-reserva">
             <h4>Los datos de tu reserva</h4>
-
             <div className="datos-entrada-salida">
               <div className="datos-entrada">
                 <h5>Entrada</h5>
@@ -208,8 +218,14 @@ function ReservaComponent() {
               <p className="dias">{calcularDuracion()} día{calcularDuracion() !== 1 ? 's' : ''}</p>
             </div>
             <div className="seleccion-carpa">
-              <p>Has seleccionado</p>
-              <p className="carpa-seleccionada">Ubicación #{id_ubicacion} - Capacidad: {ubicacionInfo?.capacidad || 'N/A'}</p>
+              <p>Has seleccionado:</p>
+              <ul>
+                {ubicacionesInfo.map((ubic) =>
+                  <li key={ubic.id_carpa}>
+                    Ubicación #{ubic.id_carpa} - Capacidad: {ubic.capacidad || 'N/A'}
+                  </li>
+                )}
+              </ul>
             </div>
             <div className="precio-reserva">
               <p><b>Precio total:</b> {precioTotal !== null ? `$${precioTotal}` : 'Cargando...'}</p>

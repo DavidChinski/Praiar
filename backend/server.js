@@ -11,6 +11,11 @@ app.use(express.json());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+/*const mercadopago = require('mercadopago');
+mercadopago.configure({
+  access_token: 'TU_ACCESS_TOKEN_AQUI' // Reemplazalo por tu token de producción o prueba
+});*/
+
 // post /api/login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -633,15 +638,38 @@ app.put('/api/balneario/elementos/:id_elemento', async (req, res) => {
 // GET /api/balneario/:id/reservas?fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD
 app.get('/api/balneario/:id/reservas', async (req, res) => {
   const { id } = req.params;
-  // Si se quisiera filtrar por fechas, se podrían usar los query params
+  const { fechaInicio, fechaFin } = req.query;
+
   try {
-    const { data, error } = await supabase
+    // 1. Traer todas las reservas de ese balneario en el rango de fechas
+    let reservasQuery = supabase
       .from("reservas")
-      .select("id_ubicacion, fecha_inicio, fecha_salida")
+      .select("id_reserva, fecha_inicio, fecha_salida, Reservas_Ubicaciones(id_ubicacion)")
       .eq("id_balneario", id);
 
+    if (fechaInicio && fechaFin) {
+      reservasQuery = reservasQuery
+        .lte("fecha_inicio", fechaFin)
+        .gte("fecha_salida", fechaInicio);
+    }
+
+    const { data, error } = await reservasQuery;
+
     if (error) return res.status(500).json({ error: 'Error obteniendo reservas.' });
-    res.json(data || []);
+
+    // 2. Devolver como array de { id_ubicacion, fecha_inicio, fecha_salida }
+    let reservas = [];
+    (data || []).forEach(r => {
+      (r.Reservas_Ubicaciones || []).forEach(vinculo => {
+        reservas.push({
+          id_ubicacion: vinculo.id_ubicacion,
+          fecha_inicio: r.fecha_inicio,
+          fecha_salida: r.fecha_salida
+        });
+      });
+    });
+
+    res.json(reservas);
   } catch (e) {
     res.status(500).json({ error: 'Error interno.' });
   }
@@ -796,7 +824,7 @@ app.get('/api/reserva/ubicacion/:id_ubicacion', async (req, res) => {
 app.post('/api/reserva', async (req, res) => {
   const { 
     id_usuario, 
-    id_ubicacion, 
+    id_ubicaciones, // ahora es un array!
     id_balneario, 
     fecha_inicio, 
     fecha_salida, 
@@ -812,9 +840,11 @@ app.post('/api/reserva', async (req, res) => {
     precio_total
   } = req.body;
 
-  if (!id_usuario || !id_ubicacion || !id_balneario || !fecha_inicio || !fecha_salida) {
+  // Validar campos principales
+  if (!id_usuario || !id_ubicaciones || !Array.isArray(id_ubicaciones) || id_ubicaciones.length === 0 || !id_balneario || !fecha_inicio || !fecha_salida) {
     return res.status(400).json({ error: "Datos incompletos para la reserva." });
   }
+
 
   // OPCIONAL: Recalcular precio aquí (recomendado)
   let precioCalculado = precio_total;
@@ -848,42 +878,62 @@ app.post('/api/reserva', async (req, res) => {
   }
 
   try {
-    // 1. Verificar si existe una reserva solapada
-    const { data: reservasSolapadas, error: solapadaError } = await supabase
+    // 1. Verificar si alguna ubicación ya tiene reserva solapada
+    for (const id_ubicacion of id_ubicaciones) {
+      const { data: reservasSolapadas, error: solapadaError } = await supabase
+        .from("reservas")
+        .select("id_reserva")
+        .eq("id_ubicacion", id_ubicacion)
+        .or(`fecha_inicio.lte.${fecha_salida},fecha_salida.gte.${fecha_inicio}`);
+      if (solapadaError) {
+        return res.status(500).json({ error: "Error al validar disponibilidad." });
+      }
+      if (reservasSolapadas && reservasSolapadas.length > 0) {
+        return res.status(400).json({ error: `Ya existe una reserva para la ubicación ${id_ubicacion} en las fechas seleccionadas.` });
+      }
+    }
+
+    // 2. Insertar en "reservas" (una por reserva, no por ubicación)
+    const { data: reservaInsertada, error: insertError } = await supabase
       .from("reservas")
-      .select("*")
-      .eq("id_ubicacion", id_ubicacion)
-      .or(`fecha_inicio.lte.${fecha_salida},fecha_salida.gte.${fecha_inicio}`);
+      .insert({
+        id_usuario,
+        id_balneario,
+        fecha_inicio,
+        fecha_salida,
+        metodo_pago,
+        nombre,
+        apellido,
+        telefono,
+        email,
+        direccion,
+        ciudad,
+        codigo_postal,
+        pais_region: pais,
+        precio_total
+      })
+      .select()
+      .single();
 
-    if (solapadaError) {
-      return res.status(500).json({ error: "Error al validar disponibilidad." });
-    }
-    if (reservasSolapadas && reservasSolapadas.length > 0) {
-      return res.status(400).json({ error: "Ya existe una reserva para esa ubicación en las fechas seleccionadas." });
-    }
-
-    // Insertar nueva reserva
-    const { error: insertError } = await supabase.from("reservas").insert({
-      id_usuario,
-      id_ubicacion,
-      id_balneario,
-      fecha_inicio,
-      fecha_salida,
-      nombre,
-      apellido,
-      telefono,
-      email,
-      direccion,
-      ciudad,
-      codigo_postal,
-      pais_region: pais,
-      metodo_pago,
-      precio_total: precioCalculado
-    });
-
-    if (insertError) {
+    if (insertError || !reservaInsertada) {
       return res.status(500).json({ error: "Error al realizar la reserva." });
     }
+
+    // 3. Insertar los vínculos en "Reservas_Ubicaciones"
+    const reservasUbicaciones = id_ubicaciones.map(id_ubicacion => ({
+      id_reserva: reservaInsertada.id_reserva,
+      id_ubicacion: id_ubicacion,
+      reserva_activa: true
+    }));
+
+    const { error: vinculoError } = await supabase
+      .from("Reservas_Ubicaciones")
+      .insert(reservasUbicaciones);
+
+    if (vinculoError) {
+      return res.status(500).json({ error: "Reserva creada pero error vinculando ubicaciones." });
+    }
+
 
     // === NUEVO: enviar email al dueño del balneario ===
 
@@ -1168,6 +1218,35 @@ app.post('/api/resenias/:id_reseña/like', async (req, res) => {
     res.status(500).json({ error: 'Error procesando el like.' });
   }
 });
+
+/* POST /api/pago/mercadopago
+app.post('/api/pago/mercadopago', async (req, res) => {
+  const { descripcion, precio, email } = req.body;
+
+  try {
+    const preference = {
+      items: [
+        {
+          title: descripcion,
+          unit_price: Number(precio),
+          quantity: 1,
+        }
+      ],
+      payer: {
+        email
+      },
+      back_urls: {
+        success: "http://localhost:3000/pago-exitoso", 
+      },
+      auto_return: "approved"
+    };
+
+    const response = await mercadopago.preferences.create(preference);
+    res.json({ init_point: response.body.init_point });
+  } catch (error) {
+    res.status(500).json({ error: "Error creando preferencia de pago." });
+  }
+});*/
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

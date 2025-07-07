@@ -21,8 +21,9 @@ const EXTEND_FACTOR = 100;
 function CarpasDelBalneario() {
   const { id } = useParams();
   const location = useLocation();
-  let { fechaInicio, fechaFin } = location.state || {};
+  const navigate = useNavigate();
 
+  let { fechaInicio, fechaFin } = location.state || {};
   if (!fechaInicio || !fechaFin) {
     const today = new Date();
     fechaInicio = today.toISOString().split('T')[0];
@@ -30,6 +31,9 @@ function CarpasDelBalneario() {
     tomorrow.setDate(today.getDate() + 1);
     fechaFin = tomorrow.toISOString().split('T')[0];
   }
+
+  // NUEVO: estado para selección múltiple de ubicaciones
+  const [seleccionadas, setSeleccionadas] = useState([]);
 
   const containerRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
@@ -62,7 +66,6 @@ function CarpasDelBalneario() {
     quincena: "",
     mes: "",
   });
-  const navigate = useNavigate();
 
   // AUTOCOMPLETADO DE ELEMENTOS
   const [todosElementos] = useState([
@@ -184,7 +187,7 @@ function CarpasDelBalneario() {
     if (!fechaInicio || !fechaFin) return;
     fetch(`http://localhost:3000/api/balneario/${id}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
       .then(res => res.json())
-      .then(setReservas);
+      .then(data => setReservas(Array.isArray(data) ? data : [])); // <= AQUI!
   }, [id, fechaInicio, fechaFin]);
 
   // Cargar precios del balneario
@@ -285,29 +288,29 @@ function CarpasDelBalneario() {
   // ---- RESEÑAS: Like reseña ----
 
   async function fetchResenias() {
-  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
-  const usuario_id = usuarioGuardado?.id_usuario;
-  let url = `http://localhost:3000/api/balneario/${id}/resenias`;
-  if (usuario_id) url += `?usuario_id=${usuario_id}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  setResenias(data.resenias);
-}
-
-async function likeResenia(id_reseña) {
-  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
-  const id_usuario = usuarioGuardado?.id_usuario;
-  if (!id_usuario) {
-    alert("Debes estar logueado para dar like.");
-    return;
+    const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+    const usuario_id = usuarioGuardado?.id_usuario;
+    let url = `http://localhost:3000/api/balneario/${id}/resenias`;
+    if (usuario_id) url += `?usuario_id=${usuario_id}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    setResenias(data.resenias);
   }
-  await fetch(`http://localhost:3000/api/resenias/${id_reseña}/like`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id_usuario })
-  });
-  fetchResenias(); // <- Actualizá desde el backend!
-}
+
+  async function likeResenia(id_reseña) {
+    const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+    const id_usuario = usuarioGuardado?.id_usuario;
+    if (!id_usuario) {
+      alert("Debes estar logueado para dar like.");
+      return;
+    }
+    await fetch(`http://localhost:3000/api/resenias/${id_reseña}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_usuario })
+    });
+    fetchResenias();
+  }
 
   // Carrusel infinito handlers
   function handleAvanzarResenias() {
@@ -493,6 +496,37 @@ async function likeResenia(id_reseña) {
     }
   }
 
+  // NUEVO: función para saber si está seleccionada
+  const isSeleccionada = (id_carpa) => seleccionadas.includes(id_carpa);
+
+  // NUEVO: seleccionar/deseleccionar ubicaciones
+  const handleSeleccionar = (id_carpa) => {
+    setSeleccionadas(prev =>
+      prev.includes(id_carpa)
+        ? prev.filter(id => id !== id_carpa)
+        : [...prev, id_carpa]
+    );
+  };
+
+  // NUEVO: reservar varias seleccionadas
+  const handleReservarSeleccionadas = () => {
+    if (!usuarioLogueado) {
+      alert("Debes iniciar sesión para reservar.");
+      return;
+    }
+    if (seleccionadas.length === 0) {
+      alert("Selecciona al menos una ubicación.");
+      return;
+    }
+    navigate(`/reservar/${seleccionadas[0]}`, {
+      state: {
+        id_ubicaciones: seleccionadas,
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
+      }
+    });
+  };
+
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
@@ -515,6 +549,19 @@ async function likeResenia(id_reseña) {
         </p>
       ) : (
         <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
+      )}
+
+      {/* NUEVO: Botón para reservar varias, sólo si el usuario no es dueño */}
+      {!esDuenio && (
+        <div style={{ margin: "16px 0" }}>
+          <button
+            className="btn-reservar-multiple"
+            disabled={seleccionadas.length === 0}
+            onClick={handleReservarSeleccionadas}
+          >
+            Reservar seleccionadas ({seleccionadas.length})
+          </button>
+        </div>
       )}
 
       {esDuenio && (
@@ -551,23 +598,38 @@ async function likeResenia(id_reseña) {
           const left = carpa.x;
           const top = carpa.y;
           return (
-            <CarpaItem
+            <div
               key={carpa.id_carpa}
-              carpa={carpa}
-              tipo={tipo}
-              left={left}
-              top={top}
-              esDuenio={esDuenio}
-              dragging={dragging}
-              setDragging={setDragging}
-              carpaReservada={carpaReservada}
-              usuarioLogueado={usuarioLogueado}
-              navigate={navigate}
-              eliminarCarpa={eliminarCarpa}
-              handleEditarCarpa={handleEditarCarpa}
-              fechaInicio={fechaInicio}
-              fechaFin={fechaFin}
-            />
+              className={`carpa-wrapper ${isSeleccionada(carpa.id_carpa) ? "seleccionada" : ""}`}
+              style={{ position: "absolute", left, top, zIndex: 1 }}
+            >
+              {/* Checkbox para seleccionar, sólo para clientes */}
+              {!esDuenio && !carpaReservada(carpa.id_carpa) && (
+                <input
+                  type="checkbox"
+                  checked={isSeleccionada(carpa.id_carpa)}
+                  onChange={() => handleSeleccionar(carpa.id_carpa)}
+                  style={{ position: "absolute", left: -20, top: -20, zIndex: 2 }}
+                  title="Seleccionar para reservar"
+                />
+              )}
+              <CarpaItem
+                carpa={carpa}
+                tipo={tipo}
+                left={0} // el wrapper ya posiciona
+                top={0}
+                esDuenio={esDuenio}
+                dragging={dragging}
+                setDragging={setDragging}
+                carpaReservada={carpaReservada}
+                usuarioLogueado={usuarioLogueado}
+                navigate={navigate}
+                eliminarCarpa={eliminarCarpa}
+                handleEditarCarpa={handleEditarCarpa}
+                fechaInicio={fechaInicio}
+                fechaFin={fechaFin}
+              />
+            </div>
           );
         })}
 
