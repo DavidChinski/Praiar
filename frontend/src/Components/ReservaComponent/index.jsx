@@ -61,15 +61,15 @@ function ReservaComponent() {
 
   // Duración (días completos de estadía)
   const calcularDuracion = () => {
-    if (fechaInicio && fechaSalida) {
-      const inicio = new Date(fechaInicio);
-      const salida = new Date(fechaSalida);
-      const diffTime = Math.abs(salida - inicio);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
-    }
-    return 0;
-  };
+  if (fechaInicio && fechaSalida) {
+    const inicio = new Date(fechaInicio);
+    const salida = new Date(fechaSalida);
+    const diffTime = salida - inicio;
+    if (diffTime < 0) return 0;
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  }
+  return 0;
+};
 
   // Traer info de ubicaciones y balneario
   useEffect(() => {
@@ -104,6 +104,38 @@ function ReservaComponent() {
     // eslint-disable-next-line
   }, [seleccionadas]);
 
+  // Cálculo tradicional de precio con switch (tipo "billetes")
+  function calcularPrecioPorDias(dias, precios) {
+    let resto = dias;
+    let total = 0;
+    const mes = Number(precios.mes);
+    const quincena = Number(precios.quincena);
+    const semana = Number(precios.semana);
+    const dia = Number(precios.dia);
+
+    while (resto > 0) {
+      switch (true) {
+        case resto >= 30:
+          total += mes;
+          resto -= 30;
+          break;
+        case resto >= 15:
+          total += quincena;
+          resto -= 15;
+          break;
+        case resto >= 7:
+          total += semana;
+          resto -= 7;
+          break;
+        default:
+          total += dia;
+          resto -= 1;
+          break;
+      }
+    }
+    return total;
+  }
+
   // Calcular precio total sumando cada ubicación
   useEffect(() => {
     async function fetchPrecios() {
@@ -118,33 +150,11 @@ function ReservaComponent() {
         const dias = calcularDuracion();
         let total = 0;
         for (const ubic of ubicacionesInfo) {
-          // Matcheo robusto
           const precioTipo = preciosBD.find(
             (p) => String(p.id_tipo_ubicacion) === String(ubic.id_tipo_ubicacion)
           );
           if (precioTipo) {
-            let resto = dias;
-            const mes = Number(precioTipo.mes);
-            const quincena = Number(precioTipo.quincena);
-            const semana = Number(precioTipo.semana);
-            const dia = Number(precioTipo.dia);
-
-            // Calcula usando la mayor cantidad de periodos grandes posibles, luego los chicos
-            let cantidadMeses = Math.floor(resto / 30);
-            resto = resto % 30;
-
-            let cantidadQuincenas = Math.floor(resto / 15);
-            resto = resto % 15;
-
-            let cantidadSemanas = Math.floor(resto / 7);
-            resto = resto % 7;
-
-            let cantidadDias = resto;
-
-            total += cantidadMeses * mes;
-            total += cantidadQuincenas * quincena;
-            total += cantidadSemanas * semana;
-            total += cantidadDias * dia;
+            total += calcularPrecioPorDias(dias, precioTipo);
           }
         }
         setPrecioTotal(total);
@@ -559,23 +569,11 @@ function ReservaComponent() {
           >
             {/* Botón para cerrar */}
             <button
-              style={{
-                position: "absolute",
-                top: 8,
-                right: 8,
-                fontSize: 28,
-                background: "rgba(0,0,0,0.04)",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-                width: 38,
-                height: 38,
-                lineHeight: "38px"
-              }}
+              className="cerrar-mapa-btn"
               onClick={() => setMostrarMapa(false)}
               aria-label="Cerrar"
             >
-              ×
+            ✕
             </button>
             <h3 style={{ textAlign: "center", fontWeight: 600, marginBottom: 25 }}>Selecciona una o más ubicaciones en el mapa</h3>
             {/* --- Mapa embebido aquí --- */}

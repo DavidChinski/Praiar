@@ -231,3 +231,14 @@
   color: red;
   margin-left: 3px;
 }
+
+.cerrar-mapa-btn {
+  position: absolute;
+  top: env(safe-area-inset-top, 10px);
+  right: env(safe-area-inset-right, 14px);
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #002537;
+}
