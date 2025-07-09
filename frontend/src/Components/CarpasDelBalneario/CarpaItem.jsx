@@ -15,7 +15,8 @@ function CarpaItem({
   eliminarCarpa,
   handleEditarCarpa,
   fechaInicio,
-  fechaFin
+  fechaFin,
+  idBalneario 
 }) {
   return (
     <div
@@ -28,7 +29,7 @@ function CarpaItem({
       onClick={() => {
         if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
           navigate(`/reservaubicacion/${carpa.id_carpa}`, {
-            state: { fechaInicio, fechaFin }
+            state: { fechaInicio, fechaFin, id_balneario: idBalneario }
           });
         }
       }}

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -18,12 +18,14 @@ const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
 const EXTEND_FACTOR = 100;
 
-function CarpasDelBalneario() {
-  const { id } = useParams();
-  const location = useLocation();
+function CarpasDelBalneario(props) {
+  // Si props.id está definido, lo usamos como id del balneario, si no, tomamos de params (caso para rutas legacy)
   const navigate = useNavigate();
 
-  let { fechaInicio, fechaFin } = location.state || {};
+  // Permitir recibir el id del balneario por props
+  const location = useLocation();
+  const balnearioId = props.id || location.state?.id;
+  let { fechaInicio, fechaFin } = props;
   if (!fechaInicio || !fechaFin) {
     const today = new Date();
     fechaInicio = today.toISOString().split('T')[0];
@@ -32,8 +34,11 @@ function CarpasDelBalneario() {
     fechaFin = tomorrow.toISOString().split('T')[0];
   }
 
-  // NUEVO: estado para selección múltiple de ubicaciones
-  const [seleccionadas, setSeleccionadas] = useState([]);
+  // Selección múltiple: si vienen props de selección, usarlas, sino estado interno
+  const [seleccionadas, setSeleccionadas] = [
+    props.seleccionadas,
+    props.setSeleccionadas
+  ];
 
   const containerRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
@@ -103,10 +108,11 @@ function CarpasDelBalneario() {
 
   // Obtener usuario logueado y balneario info
   useEffect(() => {
+    if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (usuario && usuario.auth_id) {
       setUsuarioLogueado(true);
-      fetch(`http://localhost:3000/api/balneario/${id}/info`)
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/info`)
         .then(res => res.json())
         .then(info => {
           setBalnearioInfo(info);
@@ -116,7 +122,7 @@ function CarpasDelBalneario() {
     } else {
       setUsuarioLogueado(false);
     }
-  }, [id]);
+  }, [balnearioId]);
 
   useEffect(() => {
     if (!elementoInput) {
@@ -142,7 +148,8 @@ function CarpasDelBalneario() {
   }, []);
 
   async function agregarElementoTipo(tipo) {
-    const res = await fetch(`http://localhost:3000/api/balneario/${id}/elemento`, {
+    if (!balnearioId) return;
+    const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/elemento`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tipo }),
@@ -155,9 +162,10 @@ function CarpasDelBalneario() {
 
   // Cargar carpas, elementos, servicios, tipos de ubicacion
   useEffect(() => {
+    if (!balnearioId) return;
     setLoading(true);
 
-    fetch(`http://localhost:3000/api/balneario/${id}/carpas`)
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
       .then(res => res.json())
       .then(data => {
         setCarpas(data.map((c, i) => ({
@@ -167,11 +175,11 @@ function CarpasDelBalneario() {
         })));
       });
 
-    fetch(`http://localhost:3000/api/balneario/${id}/elementos`)
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
       .then(res => res.json())
       .then(setElementos);
 
-    fetch(`http://localhost:3000/api/balneario/${id}/servicios-todos`)
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/servicios-todos`)
       .then(res => res.json())
       .then(setTodosLosServicios);
 
@@ -180,27 +188,29 @@ function CarpasDelBalneario() {
       .then(setTiposUbicacion);
 
     setLoading(false);
-  }, [id]);
+  }, [balnearioId]);
 
   // Cargar reservas
   useEffect(() => {
-    if (!fechaInicio || !fechaFin) return;
-    fetch(`http://localhost:3000/api/balneario/${id}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
+    if (!fechaInicio || !fechaFin || !balnearioId) return;
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
       .then(res => res.json())
-      .then(data => setReservas(Array.isArray(data) ? data : [])); // <= AQUI!
-  }, [id, fechaInicio, fechaFin]);
+      .then(data => setReservas(Array.isArray(data) ? data : []));
+  }, [balnearioId, fechaInicio, fechaFin]);
 
   // Cargar precios del balneario
   useEffect(() => {
-    fetch(`http://localhost:3000/api/balneario/${id}/precios`)
+    if (!balnearioId) return;
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`)
       .then(res => res.json())
       .then(setPrecios);
-  }, [id]);
+  }, [balnearioId]);
 
   // ==== Cargar reseñas ====
   useEffect(() => {
+    if (!balnearioId) return;
     setLoadingResenias(true);
-    fetch(`http://localhost:3000/api/balneario/${id}/resenias`)
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`)
       .then(res => res.json())
       .then(data => {
         setResenias(data.resenias || []);
@@ -210,7 +220,7 @@ function CarpasDelBalneario() {
         setErrorResenias("Error cargando reseñas");
         setLoadingResenias(false);
       });
-  }, [id]);
+  }, [balnearioId]);
 
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
@@ -232,25 +242,27 @@ function CarpasDelBalneario() {
 
   // Servicios toggle
   async function toggleServicio(servicioId, tiene) {
+    if (!balnearioId) return;
     if (tiene) {
-      await fetch(`http://localhost:3000/api/balneario/${id}/servicio/${servicioId}`, {
+      await fetch(`http://localhost:3000/api/balneario/${balnearioId}/servicio/${servicioId}`, {
         method: "DELETE"
       });
     } else {
-      await fetch(`http://localhost:3000/api/balneario/${id}/servicio`, {
+      await fetch(`http://localhost:3000/api/balneario/${balnearioId}/servicio`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_servicio: servicioId }),
       });
     }
 
-    fetch(`http://localhost:3000/api/balneario/${id}/info`)
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/info`)
       .then(res => res.json())
       .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
   }
 
   // ---- RESEÑAS: Agregar reseña ----
   async function agregarResenia() {
+    if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || !usuario.auth_id) {
       alert("Debes iniciar sesión para dejar una reseña.");
@@ -269,7 +281,7 @@ function CarpasDelBalneario() {
       estrellas: Number(reseniaNueva.estrellas),
       id_usuario: usuario.id_usuario // puede venir como id_usuario o auth_id
     };
-    const res = await fetch(`http://localhost:3000/api/balneario/${id}/resenias`, {
+    const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -277,7 +289,7 @@ function CarpasDelBalneario() {
     if (res.ok) {
       setReseniaNueva({ comentario: "", estrellas: 5, estrellasHover: undefined });
       // Refrescar lista
-      fetch(`http://localhost:3000/api/balneario/${id}/resenias`)
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`)
         .then(r => r.json())
         .then(data => setResenias(data.resenias || []));
     } else {
@@ -288,9 +300,10 @@ function CarpasDelBalneario() {
   // ---- RESEÑAS: Like reseña ----
 
   async function fetchResenias() {
+    if (!balnearioId) return;
     const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
     const usuario_id = usuarioGuardado?.id_usuario;
-    let url = `http://localhost:3000/api/balneario/${id}/resenias`;
+    let url = `http://localhost:3000/api/balneario/${balnearioId}/resenias`;
     if (usuario_id) url += `?usuario_id=${usuario_id}`;
     const res = await fetch(url);
     const data = await res.json();
@@ -298,6 +311,7 @@ function CarpasDelBalneario() {
   }
 
   async function likeResenia(id_reseña) {
+    if (!balnearioId) return;
     const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
     const id_usuario = usuarioGuardado?.id_usuario;
     if (!id_usuario) {
@@ -382,6 +396,7 @@ function CarpasDelBalneario() {
   }
 
   async function eliminarCarpa(id_carpa) {
+    if (!balnearioId) return;
     await fetch(`http://localhost:3000/api/balneario/carpas/${id_carpa}`, { method: "DELETE" });
     setCarpas((prev) => prev.filter((carpa) => carpa.id_carpa !== id_carpa));
   }
@@ -399,6 +414,7 @@ function CarpasDelBalneario() {
   }
 
   async function guardarCambios() {
+    if (!balnearioId) return;
     const { id_carpa, ...datos } = carpaEditando;
     await fetch(`http://localhost:3000/api/balneario/carpas/${id_carpa}`, {
       method: "PUT",
@@ -432,9 +448,10 @@ function CarpasDelBalneario() {
 
   // AGREGAR CARPA/SOMBRILLA
   async function handleAgregarCarpa() {
+    if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!nuevaCarpa.id_tipo_ubicacion) return alert("Seleccione el tipo");
-    const res = await fetch(`http://localhost:3000/api/balneario/${id}/carpas`, {
+    const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -451,7 +468,7 @@ function CarpasDelBalneario() {
         cant_reposeras: 2,
         capacidad: 4,
       });
-      fetch(`http://localhost:3000/api/balneario/${id}/carpas`)
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
         .then(res => res.json())
         .then(data => {
           setCarpas(data.map((c, i) => ({
@@ -477,9 +494,10 @@ function CarpasDelBalneario() {
   }
 
   async function guardarPrecio() {
+    if (!balnearioId) return;
     const p = editandoPrecio;
     const res = await fetch(
-      `http://localhost:3000/api/balneario/${id}/precios/${p.id_tipo_ubicacion}`,
+      `http://localhost:3000/api/balneario/${balnearioId}/precios/${p.id_tipo_ubicacion}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -487,7 +505,7 @@ function CarpasDelBalneario() {
       }
     );
     if (res.ok) {
-      fetch(`http://localhost:3000/api/balneario/${id}/precios`)
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`)
         .then(res => res.json())
         .then(setPrecios);
       setEditandoPrecio(null);
@@ -495,37 +513,6 @@ function CarpasDelBalneario() {
       alert("Error al guardar precio.");
     }
   }
-
-  // NUEVO: función para saber si está seleccionada
-  const isSeleccionada = (id_carpa) => seleccionadas.includes(id_carpa);
-
-  // NUEVO: seleccionar/deseleccionar ubicaciones
-  const handleSeleccionar = (id_carpa) => {
-    setSeleccionadas(prev =>
-      prev.includes(id_carpa)
-        ? prev.filter(id => id !== id_carpa)
-        : [...prev, id_carpa]
-    );
-  };
-
-  // NUEVO: reservar varias seleccionadas
-  const handleReservarSeleccionadas = () => {
-    if (!usuarioLogueado) {
-      alert("Debes iniciar sesión para reservar.");
-      return;
-    }
-    if (seleccionadas.length === 0) {
-      alert("Selecciona al menos una ubicación.");
-      return;
-    }
-    navigate(`/reservar/${seleccionadas[0]}`, {
-      state: {
-        id_ubicaciones: seleccionadas,
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin,
-      }
-    });
-  };
 
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
@@ -549,19 +536,6 @@ function CarpasDelBalneario() {
         </p>
       ) : (
         <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
-      )}
-
-      {/* NUEVO: Botón para reservar varias, sólo si el usuario no es dueño */}
-      {!esDuenio && (
-        <div style={{ margin: "16px 0" }}>
-          <button
-            className="btn-reservar-multiple"
-            disabled={seleccionadas.length === 0}
-            onClick={handleReservarSeleccionadas}
-          >
-            Reservar seleccionadas ({seleccionadas.length})
-          </button>
-        </div>
       )}
 
       {esDuenio && (
@@ -600,23 +574,13 @@ function CarpasDelBalneario() {
           return (
             <div
               key={carpa.id_carpa}
-              className={`carpa-wrapper ${isSeleccionada(carpa.id_carpa) ? "seleccionada" : ""}`}
+              className="carpa-wrapper"
               style={{ position: "absolute", left, top, zIndex: 1 }}
             >
-              {/* Checkbox para seleccionar, sólo para clientes */}
-              {!esDuenio && !carpaReservada(carpa.id_carpa) && (
-                <input
-                  type="checkbox"
-                  checked={isSeleccionada(carpa.id_carpa)}
-                  onChange={() => handleSeleccionar(carpa.id_carpa)}
-                  style={{ position: "absolute", left: -20, top: -20, zIndex: 2 }}
-                  title="Seleccionar para reservar"
-                />
-              )}
               <CarpaItem
                 carpa={carpa}
                 tipo={tipo}
-                left={0} // el wrapper ya posiciona
+                left={0}
                 top={0}
                 esDuenio={esDuenio}
                 dragging={dragging}
@@ -628,6 +592,11 @@ function CarpasDelBalneario() {
                 handleEditarCarpa={handleEditarCarpa}
                 fechaInicio={fechaInicio}
                 fechaFin={fechaFin}
+                idBalneario={balnearioId}
+                seleccionadas={seleccionadas}
+                setSeleccionadas={setSeleccionadas}
+                soloSeleccion={props.soloSeleccion}
+                reservaSeleccionMultiple={props.reservaSeleccionMultiple}
               />
             </div>
           );

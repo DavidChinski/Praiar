@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import './BalneariosPorCiudad.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosPorCiudad() {
   const { idCiudad } = useParams();
+  const navigate = useNavigate();
   const [balnearios, setBalnearios] = useState([]);
   const [nombreCiudad, setNombreCiudad] = useState("");
   const [loading, setLoading] = useState(true);
-  const [mapaDireccion, setMapaDireccion] = useState(null); // Dirección actual para mostrar en el iframe
+  const [mapaDireccion, setMapaDireccion] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -53,6 +54,11 @@ function BalneariosPorCiudad() {
     setMapaDireccion(null);
   };
 
+  // AHORA solo enviamos el id en el state!
+  const handleEntrar = (balneario) => {
+    navigate(`/balneario/${balneario.id_balneario}`, { state: { id: balneario.id_balneario } });
+  };
+
   if (loading) {
     return <p>Cargando balnearios...</p>;
   }
@@ -88,7 +94,7 @@ function BalneariosPorCiudad() {
                     </div>
                     <button
                       className="mirar-btn"
-                      onClick={() => window.location.href = `/balneario/${balneario.id_balneario}`}
+                      onClick={() => handleEntrar(balneario)}
                     >
                       Entrar
                     </button>

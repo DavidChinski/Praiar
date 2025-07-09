@@ -1,37 +1,45 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import FasesReserva from '../FasesReserva/';
 import './ReservaComponent.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+// --- Constantes reutilizadas ---
+const CARD_WIDTH = 340;
+const RESEÑAS_POR_VISTA = 2;
+const EXTEND_FACTOR = 100;
 
 function ReservaComponent() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
 
-  // CORREGIDO: Maneja ambos casos, por state o por URL
+  // --- Inicialización de ubicaciones seleccionadas SIN duplicados ---
+  // id_ubicaciones por location.state o por url param, siempre array y sin duplicados
   let id_ubicaciones = [];
   if (location.state?.id_ubicaciones) {
     id_ubicaciones = Array.isArray(location.state.id_ubicaciones)
       ? location.state.id_ubicaciones
       : [location.state.id_ubicaciones];
-  } else if (id) {
-    id_ubicaciones = [id];
   }
+  if (id) {
+    id_ubicaciones = [...id_ubicaciones, id];
+  }
+  // Quitar duplicados y falsy, pasar todo a string (por consistencia con id_carpa que puede ser string o number)
+  id_ubicaciones = Array.from(new Set(id_ubicaciones.filter(Boolean).map(String)));
 
-  const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps } = location.state || {};
-
+  const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps, id_balneario: id_balnearioProps } = location.state || {};
   const [fechaInicio, setFechaInicio] = useState(fechaInicioProps || "");
   const [fechaSalida, setFechaSalida] = useState(fechaFinProps || "");
+  const [id_balneario, setId_balneario] = useState(id_balnearioProps || "");
   const [metodoPago, setMetodoPago] = useState("mercado pago");
   const [error, setError] = useState(null);
   const [exito, setExito] = useState(null);
   const [ubicacionesInfo, setUbicacionesInfo] = useState([]);
   const [balnearioInfo, setBalnearioInfo] = useState(null);
-
-  // Precio total para varias ubicaciones
   const [precioTotal, setPrecioTotal] = useState(null);
 
-  // Campos del formulario
+  // Formulario
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -41,6 +49,19 @@ function ReservaComponent() {
   const [codigoPostal, setCodigoPostal] = useState("");
   const [pais, setPais] = useState("");
   const [codigoPais, setCodigoPais] = useState("+54");
+
+  // Mapa/modal
+  const [mostrarMapa, setMostrarMapa] = useState(false);
+
+  // Selección definitiva y temporal SIN duplicados
+  const [seleccionadas, setSeleccionadas] = useState(id_ubicaciones);
+  const [seleccionadasMapa, setSeleccionadasMapa] = useState(seleccionadas);
+
+  // Cuando abro el mapa, sync seleccionadasMapa = seleccionadas (sin duplicados)
+  const abrirMapa = () => {
+    setSeleccionadasMapa(Array.from(new Set(seleccionadas)));
+    setMostrarMapa(true);
+  };
 
   // Duración
   const calcularDuracion = () => {
@@ -54,18 +75,25 @@ function ReservaComponent() {
     return 0;
   };
 
-  // Traer info de ubicaciones y balneario (todas las ubicaciones deben ser del mismo balneario)
+  // Traer info de ubicaciones y balneario
   useEffect(() => {
     async function fetchUbicacionesYBalneario() {
       try {
         const ubicaciones = [];
         let balneario = null;
-        for (const id of id_ubicaciones) {
-          const res = await fetch(`http://localhost:3000/api/reserva/ubicacion/${id}`);
+        let balnearioId = id_balneario || balnearioInfo?.id_balneario || null;
+        for (const idCarpa of seleccionadas) {
+          const res = await fetch(`http://localhost:3000/api/reserva/ubicacion/${idCarpa}`);
           const data = await res.json();
           if (data.error) throw new Error(data.error);
-          ubicaciones.push(data.ubicacion);
-          if (!balneario) balneario = data.balneario;
+          // Evito duplicados por id_carpa
+          if (!ubicaciones.find(u => String(u.id_carpa) === String(data.ubicacion.id_carpa))) {
+            ubicaciones.push(data.ubicacion);
+          }
+          if (!balneario) {
+            balneario = data.balneario;
+            if (!balnearioId) balnearioId = data.balneario.id_balneario;
+          }
         }
         setUbicacionesInfo(ubicaciones);
         setBalnearioInfo(balneario);
@@ -73,8 +101,13 @@ function ReservaComponent() {
         setError("Error al cargar datos de las ubicaciones.");
       }
     }
-    if (id_ubicaciones.length > 0) fetchUbicacionesYBalneario();
-  }, [id_ubicaciones]);
+    if (seleccionadas.length > 0) fetchUbicacionesYBalneario();
+    else {
+      setUbicacionesInfo([]);
+      setBalnearioInfo(null);
+    }
+    // eslint-disable-next-line
+  }, [seleccionadas]);
 
   // Calcular precio total sumando cada ubicación
   useEffect(() => {
@@ -88,7 +121,6 @@ function ReservaComponent() {
         const preciosBD = await res.json();
         const dias = calcularDuracion();
         let total = 0;
-
         for (const ubic of ubicacionesInfo) {
           const precioTipo = preciosBD.find(
             (p) => String(p.id_tipo_ubicacion) === String(ubic.id_tipo_ubicacion)
@@ -124,6 +156,13 @@ function ReservaComponent() {
     fetchPrecios();
   }, [ubicacionesInfo, balnearioInfo, fechaInicio, fechaSalida]);
 
+  // Handler para tomar todas las seleccionadas del mapa y cerrar el mapa
+  const handleSeleccionarDesdeMapa = (seleccionadasDelMapa) => {
+    // Sin duplicados
+    setSeleccionadas(Array.from(new Set(seleccionadasDelMapa)));
+    setMostrarMapa(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -141,7 +180,7 @@ function ReservaComponent() {
       setError("Todos los campos marcados con * son obligatorios.");
       return;
     }
-    if (id_ubicaciones.length === 0) {
+    if (seleccionadas.length === 0) {
       setError("Debes seleccionar al menos una ubicación.");
       return;
     }
@@ -152,11 +191,11 @@ function ReservaComponent() {
       return;
     }
 
-    const id_balneario = balnearioInfo?.id_balneario;
+    const id_balneario_to_send = id_balneario || balnearioInfo?.id_balneario;
     const body = {
       id_usuario: usuario.auth_id,
-      id_ubicaciones: id_ubicaciones, // array!
-      id_balneario,
+      id_ubicaciones: seleccionadas,
+      id_balneario: id_balneario_to_send,
       fecha_inicio: fechaInicio,
       fecha_salida: fechaSalida,
       metodo_pago: metodoPago,
@@ -190,6 +229,134 @@ function ReservaComponent() {
       setError("Error de conexión al realizar la reserva.");
     }
   };
+
+  // --- MAPA embebido aquí ---
+  const containerRef = useRef(null);
+  const [carpas, setCarpas] = useState([]);
+  const [elementos, setElementos] = useState([]);
+  const [loadingMapa, setLoadingMapa] = useState(true);
+  const [reservas, setReservas] = useState([]);
+  const [tiposUbicacion, setTiposUbicacion] = useState([]);
+  const [balnearioInfoMapa, setBalnearioInfoMapa] = useState(null);
+
+  useEffect(() => {
+    let balnearioId = id_balneario || balnearioInfo?.id_balneario;
+    if (!balnearioId) return;
+    setLoadingMapa(true);
+
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
+      .then(res => res.json())
+      .then(data => {
+        setCarpas(data.map((c, i) => ({
+          ...c,
+          x: c.x ?? i * 100,
+          y: c.y ?? 0,
+        })));
+      });
+
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
+      .then(res => res.json())
+      .then(setElementos);
+
+    fetch("http://localhost:3000/api/tipos-ubicaciones")
+      .then(res => res.json())
+      .then(setTiposUbicacion);
+
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/info`)
+      .then(res => res.json())
+      .then(setBalnearioInfoMapa);
+
+    setLoadingMapa(false);
+  }, [mostrarMapa, id_balneario, balnearioInfo]);
+
+  useEffect(() => {
+    let balnearioId = id_balneario || balnearioInfo?.id_balneario;
+    if (!fechaInicio || !fechaSalida || !balnearioId) return;
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaSalida}`)
+      .then(res => res.json())
+      .then(data => setReservas(Array.isArray(data) ? data : []));
+  }, [mostrarMapa, id_balneario, balnearioInfo, fechaInicio, fechaSalida]);
+
+  // Obtener el tipo de carpa por id_tipo_ubicacion
+  const getTipoCarpa = (carpa) => {
+    return tiposUbicacion.find(t => t.id_tipo_ubicaciones === carpa.id_tipo_ubicacion)?.nombre || "simple";
+  };
+  // ¿Está reservada?
+  const carpaReservada = (idUbicacion) => {
+    if (!fechaInicio || !fechaSalida) return false;
+    const inicio = new Date(fechaInicio + 'T00:00:00');
+    const fin = new Date(fechaSalida + 'T00:00:00');
+    return reservas.some(res => {
+      if (res.id_ubicacion !== idUbicacion) return false;
+      const resInicio = new Date(res.fecha_inicio + 'T00:00:00');
+      const resFin = new Date(res.fecha_salida + 'T00:00:00');
+      return resInicio <= fin && resFin >= inicio;
+    });
+  };
+
+  // Selección múltiple en el mapa (no dueño)
+  function handleSeleccionCarpaMapa(id_carpa) {
+    setSeleccionadasMapa(prev => {
+      const sinDuplicados = prev.filter((x) => x !== undefined && x !== null).map(String);
+      if (sinDuplicados.includes(String(id_carpa))) {
+        return sinDuplicados.filter(id => id !== String(id_carpa));
+      } else {
+        return [...sinDuplicados, String(id_carpa)];
+      }
+    });
+  }
+
+  // Carpa visual (adaptado de CarpaItem)
+  function CarpaVisual({ carpa, tipo, left, top, seleccionadas, setSeleccionadas, soloSeleccion, reservaSeleccionMultiple }) {
+    const seleccionada = seleccionadas?.map(String).includes(String(carpa.id_carpa));
+    function handleSeleccionClick(e) {
+      e.stopPropagation();
+      if (!carpaReservada(carpa.id_carpa)) {
+        if (seleccionada) {
+          setSeleccionadas(seleccionadas.filter(id => String(id) !== String(carpa.id_carpa)));
+        } else {
+          setSeleccionadas([...seleccionadas, String(carpa.id_carpa)]);
+        }
+      }
+    }
+    return (
+      <div
+        key={carpa.id_carpa}
+        className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo} ${seleccionada ? "seleccionada" : ""}`}
+        style={{ left: `${left}px`, top: `${top}px` }}
+        onClick={soloSeleccion && reservaSeleccionMultiple ? handleSeleccionClick : undefined}
+        title={`Sillas: ${carpa.cant_sillas ?? "-"}, Mesas: ${carpa.cant_mesas ?? "-"}, Reposeras: ${carpa.cant_reposeras ?? "-"}, Capacidad: ${carpa.capacidad ?? "-"}`}
+      >
+        <div className="carpa-posicion">{carpa.posicion}</div>
+        {tipo === "doble" ? (
+          <FontAwesomeIcon
+            icon="fa-solid fa-tents"
+            alt={`Carpa doble ${carpa.posicion}`}
+            className="carpa-imagen"
+            style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          />
+        ) : tipo === "sombrilla" ? (
+          <FontAwesomeIcon
+            icon="fa-solid fa-umbrella-beach"
+            alt={`Sombrilla ${carpa.posicion}`}
+            className="carpa-imagen"
+            style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          />
+        ) : (
+          <FontAwesomeIcon
+            icon="fa-solid fa-tent"
+            alt={`Carpa ${carpa.posicion}`}
+            className="carpa-imagen"
+            style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          />
+        )}
+        {/* Check visual si selección múltiple */}
+        {soloSeleccion && reservaSeleccionMultiple && (
+          <div className="check-seleccion">{seleccionada ? "✅" : "⬜"}</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -228,6 +395,16 @@ function ReservaComponent() {
                   </li>
                 )}
               </ul>
+              {balnearioInfo && (
+                <button
+                  type="button"
+                  className="btn-desplegar-mapa"
+                  onClick={abrirMapa}
+                  style={{ marginTop: 10, marginBottom: 10 }}
+                >
+                  Elegir/editar ubicaciones en el mapa
+                </button>
+              )}
             </div>
             <div className="precio-reserva">
               <p><b>Precio total:</b> {precioTotal !== null ? `$${precioTotal}` : 'Cargando...'}</p>
@@ -247,7 +424,6 @@ function ReservaComponent() {
                 required
               />
             </label>
-
             <label>Apellido/s<span className="required-asterisk">*</span>
               <input
                 type="text"
@@ -354,6 +530,131 @@ function ReservaComponent() {
           {exito && <p style={{ color: "green" }}>{exito}</p>}
         </form>
       </div>
+      {/* MODAL MAPA: pantalla completa en desktop/mobile */}
+      {mostrarMapa && (
+        <div
+          style={{
+            position: "fixed",
+            left: 0,
+            top: 0,
+            zIndex: 1000,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.85)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "24px",
+              width: "96vw",
+              height: "93vh",
+              overflow: "auto",
+              position: "relative",
+              boxShadow: "0 8px 40px #0006"
+            }}
+          >
+            {/* Botón para cerrar */}
+            <button
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                fontSize: 28,
+                background: "rgba(0,0,0,0.04)",
+                border: "none",
+                borderRadius: "50%",
+                cursor: "pointer",
+                width: 38,
+                height: 38,
+                lineHeight: "38px"
+              }}
+              onClick={() => setMostrarMapa(false)}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <h3 style={{ textAlign: "center", fontWeight: 600, marginBottom: 25 }}>Selecciona una o más ubicaciones en el mapa</h3>
+            {/* --- Mapa embebido aquí --- */}
+            <div
+              className="carpa-container"
+              ref={containerRef}
+              style={{
+                minHeight: "70vh",
+                minWidth: "80vw",
+                position: "relative",
+                background: "#e3e3e3",
+                borderRadius: "16px",
+                margin: "0 auto 20px auto",
+                boxShadow: "0 2px 8px #8883"
+              }}
+            >
+              {loadingMapa ? (
+                <p>Cargando carpas...</p>
+              ) : (
+                carpas.map((carpa) => {
+                  const tipo = getTipoCarpa(carpa);
+                  const left = carpa.x;
+                  const top = carpa.y;
+                  return (
+                    <CarpaVisual
+                      key={carpa.id_carpa}
+                      carpa={carpa}
+                      tipo={tipo}
+                      left={left}
+                      top={top}
+                      seleccionadas={seleccionadasMapa}
+                      setSeleccionadas={setSeleccionadasMapa}
+                      soloSeleccion={true}
+                      reservaSeleccionMultiple={true}
+                    />
+                  );
+                })
+              )}
+              {/* Elementos visuales como pileta, quincho, etc. */}
+              {elementos.map((el) => (
+                <div key={el.id_elemento}
+                  style={{
+                    position: "absolute",
+                    left: el.x ?? 0,
+                    top: el.y ?? 0,
+                    background: "#fff4",
+                    padding: 5,
+                    borderRadius: 6
+                  }}>
+                  {el.tipo}
+                </div>
+              ))}
+            </div>
+            <button
+              style={{
+                marginTop: 25,
+                fontWeight: 600,
+                fontSize: 18,
+                padding: "10px 24px",
+                borderRadius: 7,
+                background: "#2b87f5",
+                color: "#fff",
+                border: "none",
+                cursor: seleccionadasMapa.length === 0 ? "not-allowed" : "pointer",
+                opacity: seleccionadasMapa.length === 0 ? 0.6 : 1,
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto"
+              }}
+              className="btn-aplicar-seleccion"
+              onClick={() => handleSeleccionarDesdeMapa(seleccionadasMapa)}
+              disabled={seleccionadasMapa.length === 0}
+            >
+              Elegir {seleccionadasMapa.length} ubicación{seleccionadasMapa.length !== 1 ? "es" : ""}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
