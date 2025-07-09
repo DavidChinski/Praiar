@@ -25,7 +25,8 @@ function CarpasDelBalneario(props) {
   // Permitir recibir el id del balneario por props
   const location = useLocation();
   const balnearioId = props.id || location.state?.id;
-  let { fechaInicio, fechaFin } = props;
+  let fechaInicio = props.fechaInicio || location.state?.fechaInicio;
+  let fechaFin = props.fechaFin || location.state?.fechaFin;
   if (!fechaInicio || !fechaFin) {
     const today = new Date();
     fechaInicio = today.toISOString().split('T')[0];

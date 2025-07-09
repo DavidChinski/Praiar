@@ -4,7 +4,6 @@ import FasesReserva from '../FasesReserva/';
 import './ReservaComponent.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-// --- Constantes reutilizadas ---
 const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
 const EXTEND_FACTOR = 100;
@@ -15,7 +14,6 @@ function ReservaComponent() {
   const location = useLocation();
 
   // --- Inicialización de ubicaciones seleccionadas SIN duplicados ---
-  // id_ubicaciones por location.state o por url param, siempre array y sin duplicados
   let id_ubicaciones = [];
   if (location.state?.id_ubicaciones) {
     id_ubicaciones = Array.isArray(location.state.id_ubicaciones)
@@ -25,7 +23,6 @@ function ReservaComponent() {
   if (id) {
     id_ubicaciones = [...id_ubicaciones, id];
   }
-  // Quitar duplicados y falsy, pasar todo a string (por consistencia con id_carpa que puede ser string o number)
   id_ubicaciones = Array.from(new Set(id_ubicaciones.filter(Boolean).map(String)));
 
   const { fechaInicio: fechaInicioProps, fechaFin: fechaFinProps, id_balneario: id_balnearioProps } = location.state || {};
@@ -57,13 +54,12 @@ function ReservaComponent() {
   const [seleccionadas, setSeleccionadas] = useState(id_ubicaciones);
   const [seleccionadasMapa, setSeleccionadasMapa] = useState(seleccionadas);
 
-  // Cuando abro el mapa, sync seleccionadasMapa = seleccionadas (sin duplicados)
   const abrirMapa = () => {
     setSeleccionadasMapa(Array.from(new Set(seleccionadas)));
     setMostrarMapa(true);
   };
 
-  // Duración
+  // Duración (días completos de estadía)
   const calcularDuracion = () => {
     if (fechaInicio && fechaSalida) {
       const inicio = new Date(fechaInicio);
@@ -86,7 +82,6 @@ function ReservaComponent() {
           const res = await fetch(`http://localhost:3000/api/reserva/ubicacion/${idCarpa}`);
           const data = await res.json();
           if (data.error) throw new Error(data.error);
-          // Evito duplicados por id_carpa
           if (!ubicaciones.find(u => String(u.id_carpa) === String(data.ubicacion.id_carpa))) {
             ubicaciones.push(data.ubicacion);
           }
@@ -112,16 +107,18 @@ function ReservaComponent() {
   // Calcular precio total sumando cada ubicación
   useEffect(() => {
     async function fetchPrecios() {
-      if (!balnearioInfo || ubicacionesInfo.length === 0) {
-        setPrecioTotal(null);
-        return;
-      }
       try {
-        const res = await fetch(`http://localhost:3000/api/balneario/${balnearioInfo.id_balneario}/precios`);
-        const preciosBD = await res.json();
+        const res = await fetch(`http://localhost:3000/api/balneario/${id_balneario}/precios`);
+        let preciosBD = await res.json();
+        preciosBD = preciosBD.map(p => ({
+          ...p,
+          id_tipo_ubicacion: p.id_tipo_ubicacion ?? p.id_tipo_ubicaciones
+        }));
+
         const dias = calcularDuracion();
         let total = 0;
         for (const ubic of ubicacionesInfo) {
+          // Matcheo robusto
           const precioTipo = preciosBD.find(
             (p) => String(p.id_tipo_ubicacion) === String(ubic.id_tipo_ubicacion)
           );
@@ -132,19 +129,21 @@ function ReservaComponent() {
             const semana = Number(precioTipo.semana);
             const dia = Number(precioTipo.dia);
 
+            // Calcula usando la mayor cantidad de periodos grandes posibles, luego los chicos
             let cantidadMeses = Math.floor(resto / 30);
-            total += cantidadMeses * mes;
             resto = resto % 30;
 
             let cantidadQuincenas = Math.floor(resto / 15);
-            total += cantidadQuincenas * quincena;
             resto = resto % 15;
 
             let cantidadSemanas = Math.floor(resto / 7);
-            total += cantidadSemanas * semana;
             resto = resto % 7;
 
             let cantidadDias = resto;
+
+            total += cantidadMeses * mes;
+            total += cantidadQuincenas * quincena;
+            total += cantidadSemanas * semana;
             total += cantidadDias * dia;
           }
         }
@@ -154,11 +153,10 @@ function ReservaComponent() {
       }
     }
     fetchPrecios();
+    // eslint-disable-next-line
   }, [ubicacionesInfo, balnearioInfo, fechaInicio, fechaSalida]);
 
-  // Handler para tomar todas las seleccionadas del mapa y cerrar el mapa
   const handleSeleccionarDesdeMapa = (seleccionadasDelMapa) => {
-    // Sin duplicados
     setSeleccionadas(Array.from(new Set(seleccionadasDelMapa)));
     setMostrarMapa(false);
   };
@@ -279,22 +277,25 @@ function ReservaComponent() {
 
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
-    return tiposUbicacion.find(t => t.id_tipo_ubicaciones === carpa.id_tipo_ubicacion)?.nombre || "simple";
+    // Normaliza id_tipo_ubicacion vs id_tipo_ubicaciones
+    const tipoId = carpa.id_tipo_ubicacion ?? carpa.id_tipo_ubicaciones;
+    return tiposUbicacion.find(t => 
+      String(t.id_tipo_ubicacion ?? t.id_tipo_ubicaciones) === String(tipoId)
+    )?.nombre || "simple";
   };
-  // ¿Está reservada?
+
   const carpaReservada = (idUbicacion) => {
     if (!fechaInicio || !fechaSalida) return false;
     const inicio = new Date(fechaInicio + 'T00:00:00');
     const fin = new Date(fechaSalida + 'T00:00:00');
     return reservas.some(res => {
-      if (res.id_ubicacion !== idUbicacion) return false;
+      if (String(res.id_ubicacion) !== String(idUbicacion)) return false;
       const resInicio = new Date(res.fecha_inicio + 'T00:00:00');
       const resFin = new Date(res.fecha_salida + 'T00:00:00');
       return resInicio <= fin && resFin >= inicio;
     });
   };
 
-  // Selección múltiple en el mapa (no dueño)
   function handleSeleccionCarpaMapa(id_carpa) {
     setSeleccionadasMapa(prev => {
       const sinDuplicados = prev.filter((x) => x !== undefined && x !== null).map(String);
@@ -306,7 +307,6 @@ function ReservaComponent() {
     });
   }
 
-  // Carpa visual (adaptado de CarpaItem)
   function CarpaVisual({ carpa, tipo, left, top, seleccionadas, setSeleccionadas, soloSeleccion, reservaSeleccionMultiple }) {
     const seleccionada = seleccionadas?.map(String).includes(String(carpa.id_carpa));
     function handleSeleccionClick(e) {
@@ -350,7 +350,6 @@ function ReservaComponent() {
             style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
           />
         )}
-        {/* Check visual si selección múltiple */}
         {soloSeleccion && reservaSeleccionMultiple && (
           <div className="check-seleccion">{seleccionada ? "✅" : "⬜"}</div>
         )}
@@ -615,7 +614,6 @@ function ReservaComponent() {
                   );
                 })
               )}
-              {/* Elementos visuales como pileta, quincho, etc. */}
               {elementos.map((el) => (
                 <div key={el.id_elemento}
                   style={{

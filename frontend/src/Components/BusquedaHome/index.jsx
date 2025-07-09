@@ -339,7 +339,8 @@ function BusquedaHome() {
                       navigate(`/balneario/${idBalneario}`, {
                         state: {
                           fechaInicio: rangoFechas[0].startDate.toISOString().split('T')[0],
-                          fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0]
+                          fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0],
+                          id: idBalneario
                         }
                       });
                     } else {

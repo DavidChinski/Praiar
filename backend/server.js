@@ -431,7 +431,6 @@ app.get('/api/balneario/:id/precios', async (req, res) => {
     .from("precios")
     .select("id_tipo_ubicacion, dia, semana, quincena, mes, tipos_ubicaciones(nombre)")
     .eq("id_balneario", id);
-
   if (error) return res.status(500).json({ error: "Error trayendo precios." });
 
   // Mapear para que sea { id_tipo_ubicacion, nombre, dia, semana, ... }
@@ -929,7 +928,6 @@ app.post('/api/reserva', async (req, res) => {
         .eq("id_carpa", id_ubicacion)
         .single();
       if (ubicacionError || !ubicacion) {
-        // Si no se encuentra la ubicación, aborta (esto sí es crítico)
         return res.status(400).json({ error: `No se encontró la ubicación ${id_ubicacion}` });
       }
       // Obtener precios
@@ -944,13 +942,28 @@ app.post('/api/reserva', async (req, res) => {
         const dias = Math.max(1, Math.ceil(
           (new Date(fecha_salida) - new Date(fecha_inicio)) / (1000 * 60 * 60 * 24)
         ));
-        if (dias === 1) precioCalculado += Number(precio.dia);
-        else if (dias <= 7) precioCalculado += Number(precio.semana) * Math.ceil(dias / 7);
-        else if (dias <= 15) precioCalculado += Number(precio.quincena) * Math.ceil(dias / 15);
-        else precioCalculado += Number(precio.mes) * Math.ceil(dias / 30);
-        // Si hay precio, se suma; si no, simplemente no suma nada
+        let resto = dias;
+        const mes = Number(precio.mes);
+        const quincena = Number(precio.quincena);
+        const semana = Number(precio.semana);
+        const dia = Number(precio.dia);
+
+        let cantidadMeses = Math.floor(resto / 30);
+        resto = resto % 30;
+
+        let cantidadQuincenas = Math.floor(resto / 15);
+        resto = resto % 15;
+
+        let cantidadSemanas = Math.floor(resto / 7);
+        resto = resto % 7;
+
+        let cantidadDias = resto;
+
+        precioCalculado += cantidadMeses * mes;
+        precioCalculado += cantidadQuincenas * quincena;
+        precioCalculado += cantidadSemanas * semana;
+        precioCalculado += cantidadDias * dia;
       }
-      // Si no hay precios para esa ubicación, no suma nada pero NO da error
     }
 
     // Si el frontend mandó uno, priorizo el recalculado; si da cero, uso el enviado por frontend (o cero si tampoco hay)
