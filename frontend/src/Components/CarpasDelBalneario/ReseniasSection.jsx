@@ -1,5 +1,9 @@
 import React from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaThumbsUp } from "react-icons/fa";
+// Alternativas: 
+// import { MdThumbUp } from "react-icons/md";
+// import { BsHandThumbsUpFill } from "react-icons/bs";
+// import { RiThumbUpFill } from "react-icons/ri";
 
 function ReseniasSection({
   loadingResenias,
@@ -81,10 +85,10 @@ function ReseniasSection({
                         <button
                           className={`like-boton ${resenia.dioLike ? "ya-like" : ""}`}
                           onClick={() => likeResenia(resenia.id_reseña)}
-                          disabled={!usuarioLogueado || resenia.dioLike}
-                          title={resenia.dioLike ? "Ya diste like" : "Dar like"}
+                          disabled={!usuarioLogueado}
+                          title={resenia.dioLike ? "Quitar like" : "Dar like"}
                         >
-                          👍
+                          <FaThumbsUp />
                         </button>
                         {resenia?.likes || 0}
                       </span>

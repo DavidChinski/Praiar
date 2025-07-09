@@ -89,7 +89,10 @@ function CarpasDelBalneario(props) {
   const [loadingResenias, setLoadingResenias] = useState(false);
   const [errorResenias, setErrorResenias] = useState(null);
   const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5, estrellasHover: undefined });
-
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    setUsuarioLogueado(usuario || null);
+  }, []);
   // Carrusel infinito
   const [indiceResenia, setIndiceResenia] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -209,19 +212,22 @@ function CarpasDelBalneario(props) {
 
   // ==== Cargar reseñas ====
   useEffect(() => {
-    if (!balnearioId) return;
-    setLoadingResenias(true);
-    fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`)
-      .then(res => res.json())
-      .then(data => {
-        setResenias(data.resenias || []);
-        setLoadingResenias(false);
-      })
-      .catch(err => {
-        setErrorResenias("Error cargando reseñas");
-        setLoadingResenias(false);
-      });
-  }, [balnearioId]);
+  if (!balnearioId) return;
+  setLoadingResenias(true);
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  let url = `http://localhost:3000/api/balneario/${balnearioId}/resenias`;
+  if (usuario?.id_usuario) url += `?usuario_id=${usuario.id_usuario}`;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      setResenias(data.resenias || []);
+      setLoadingResenias(false);
+    })
+    .catch(err => {
+      setErrorResenias("Error cargando reseñas");
+      setLoadingResenias(false);
+    });
+}, [balnearioId, usuarioLogueado]);
 
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {

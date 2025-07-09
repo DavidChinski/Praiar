@@ -8,6 +8,10 @@ function BalneariosComponent() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const handleEntrar = (balneario) => {
+    navigate(`/balneario/${balneario.id_balneario}`, { state: { id: balneario.id_balneario } });
+  };
+
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || !usuario.auth_id) {
@@ -67,9 +71,7 @@ function BalneariosComponent() {
                       Cantidad de carpas
                     </p>
                   </div>
-                  <Link to={`/balneario/${balneario.id_balneario}`}>
-                    <button className="mirar-btn">Entrar</button>
-                  </Link>
+                    <button onClick={() => handleEntrar(balneario)} className="mirar-btn">Entrar</button>
                 </div>
               </div>
             </div>

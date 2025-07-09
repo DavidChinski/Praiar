@@ -707,6 +707,20 @@
   color: #ffb700;
 }
 
+.like-boton.ya-like {
+  color: #004a68;
+}
+
+@keyframes likedpulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+  60% { transform: scale(0.97);}
+  100% { transform: scale(1);}
+}
+.like-boton.ya-like {
+  animation: likedpulse 0.45s;
+}
+
 /* Centrado y responsividad carrusel */
 @media (max-width: 1200px) {
   .resenias-carrusel-lista-viewport,
