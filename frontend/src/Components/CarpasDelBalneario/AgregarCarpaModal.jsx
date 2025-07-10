@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 function AgregarCarpaModal({
   mostrarAgregarCarpa,
@@ -6,9 +6,32 @@ function AgregarCarpaModal({
   nuevaCarpa,
   setNuevaCarpa,
   tiposUbicacion,
-  handleAgregarCarpa
+  handleAgregarCarpa,
+  precios, // array de precios existentes [{id_tipo_ubicacion, dia, semana, ...}]
+  onAgregarPrecio // función para agregar un precio nuevo
 }) {
+  const [nuevoPrecio, setNuevoPrecio] = useState({ dia: "", semana: "", quincena: "", mes: "" });
+
   if (!mostrarAgregarCarpa) return null;
+
+  // ¿El tipo seleccionado ya tiene precio?
+  const tipoTienePrecio = nuevaCarpa.id_tipo_ubicacion &&
+    precios.some(p => String(p.id_tipo_ubicacion) === String(nuevaCarpa.id_tipo_ubicacion));
+
+  // Handler para agregar precio y luego la carpa
+  const agregarConPrecio = () => {
+    if (!nuevoPrecio.dia || !nuevoPrecio.semana || !nuevoPrecio.quincena || !nuevoPrecio.mes) {
+      alert("Debe completar todos los precios.");
+      return;
+    }
+    onAgregarPrecio({
+      id_tipo_ubicacion: nuevaCarpa.id_tipo_ubicacion,
+      ...nuevoPrecio
+    });
+    setNuevoPrecio({ dia: "", semana: "", quincena: "", mes: "" });
+    handleAgregarCarpa();
+  };
+
   return (
     <div className="modal">
       <div className="modal-content">
@@ -45,8 +68,45 @@ function AgregarCarpaModal({
           <input type="number" value={nuevaCarpa.capacidad} min={1}
             onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
         </label>
+
+        {/* SOLO SI NO TIENE PRECIO ESE TIPO, MOSTRAR CAMPOS DE PRECIO */}
+        {!tipoTienePrecio && nuevaCarpa.id_tipo_ubicacion &&
+          <>
+            <h4>Debe ingresar los precios para este tipo de ubicación</h4>
+            <label>
+              Precio por día:
+              <input type="number" value={nuevoPrecio.dia}
+                onChange={e => setNuevoPrecio(p => ({ ...p, dia: e.target.value }))}
+                min={1} required />
+            </label>
+            <label>
+              Precio por semana:
+              <input type="number" value={nuevoPrecio.semana}
+                onChange={e => setNuevoPrecio(p => ({ ...p, semana: e.target.value }))}
+                min={1} required />
+            </label>
+            <label>
+              Precio por quincena:
+              <input type="number" value={nuevoPrecio.quincena}
+                onChange={e => setNuevoPrecio(p => ({ ...p, quincena: e.target.value }))}
+                min={1} required />
+            </label>
+            <label>
+              Precio por mes:
+              <input type="number" value={nuevoPrecio.mes}
+                onChange={e => setNuevoPrecio(p => ({ ...p, mes: e.target.value }))}
+                min={1} required />
+            </label>
+          </>
+        }
+
         <div className="modal-buttons">
-          <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
+          {tipoTienePrecio
+            ? <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
+            : (nuevaCarpa.id_tipo_ubicacion &&
+              <button className="boton-agregar-servicio" onClick={agregarConPrecio}>Agregar y guardar precio</button>
+            )
+          }
           <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
         </div>
       </div>

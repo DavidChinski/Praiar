@@ -19,10 +19,7 @@ const RESEÑAS_POR_VISTA = 2;
 const EXTEND_FACTOR = 100;
 
 function CarpasDelBalneario(props) {
-  // Si props.id está definido, lo usamos como id del balneario, si no, tomamos de params (caso para rutas legacy)
   const navigate = useNavigate();
-
-  // Permitir recibir el id del balneario por props
   const location = useLocation();
   const balnearioId = props.id || location.state?.id;
   let fechaInicio = props.fechaInicio || location.state?.fechaInicio;
@@ -212,22 +209,22 @@ function CarpasDelBalneario(props) {
 
   // ==== Cargar reseñas ====
   useEffect(() => {
-  if (!balnearioId) return;
-  setLoadingResenias(true);
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  let url = `http://localhost:3000/api/balneario/${balnearioId}/resenias`;
-  if (usuario?.id_usuario) url += `?usuario_id=${usuario.id_usuario}`;
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      setResenias(data.resenias || []);
-      setLoadingResenias(false);
-    })
-    .catch(err => {
-      setErrorResenias("Error cargando reseñas");
-      setLoadingResenias(false);
-    });
-}, [balnearioId, usuarioLogueado]);
+    if (!balnearioId) return;
+    setLoadingResenias(true);
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    let url = `http://localhost:3000/api/balneario/${balnearioId}/resenias`;
+    if (usuario?.id_usuario) url += `?usuario_id=${usuario.id_usuario}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setResenias(data.resenias || []);
+        setLoadingResenias(false);
+      })
+      .catch(err => {
+        setErrorResenias("Error cargando reseñas");
+        setLoadingResenias(false);
+      });
+  }, [balnearioId, usuarioLogueado]);
 
   // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
@@ -489,6 +486,27 @@ function CarpasDelBalneario(props) {
     }
   }
 
+  // --- NUEVO: alta de precio desde modal ---
+  async function onAgregarPrecio(precioNuevo) {
+    if (!balnearioId) return alert("Falta id de balneario");
+    // Si tu backend tiene endpoint POST /api/balneario/:id/precios, usalo:
+    const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...precioNuevo,
+        id_balneario: balnearioId
+      })
+    });
+    if (res.ok) {
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`)
+        .then(res => res.json())
+        .then(setPrecios);
+    } else {
+      alert("Error al agregar precio.");
+    }
+  }
+
   // ---- NUEVO: edición de precios ----
   function abrirModalPrecio(p) {
     setEditandoPrecio(p);
@@ -636,6 +654,8 @@ function CarpasDelBalneario(props) {
         setNuevaCarpa={setNuevaCarpa}
         tiposUbicacion={tiposUbicacion}
         handleAgregarCarpa={handleAgregarCarpa}
+        precios={precios}
+        onAgregarPrecio={onAgregarPrecio}
       />
 
       <EditarCarpaModal

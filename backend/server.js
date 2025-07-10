@@ -446,6 +446,51 @@ app.get('/api/balneario/:id/precios', async (req, res) => {
   res.json(precios);
 });
 
+// POST /api/balneario/:id/precios
+app.post('/api/balneario/:id/precios', async (req, res) => {
+  const { id } = req.params;
+  const { id_tipo_ubicacion, dia, semana, quincena, mes } = req.body;
+
+  if (!id || !id_tipo_ubicacion || !dia || !semana || !quincena || !mes) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios para el precio.' });
+  }
+
+  // Verificar que no exista ya precio para ese tipo
+  const { data: precioExistente, error: precioError } = await supabase
+    .from("precios")
+    .select("*")
+    .eq("id_balneario", id)
+    .eq("id_tipo_ubicacion", id_tipo_ubicacion)
+    .maybeSingle();
+
+  if (precioError) {
+    return res.status(500).json({ error: "Error buscando precio existente." });
+  }
+  if (precioExistente) {
+    return res.status(400).json({ error: "Ya existe un precio para este tipo de ubicación en este balneario." });
+  }
+
+  // Insertar el precio
+  const { data, error } = await supabase
+    .from('precios')
+    .insert([{
+      id_balneario: id,
+      id_tipo_ubicacion,
+      dia,
+      semana,
+      quincena,
+      mes
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(500).json({ error: 'Error agregando precio.' });
+  }
+
+  res.json(data);
+});
+
 // --------- ENDPOINTS PARA CarpasDelBalneario ------------
 
 // GET /api/balneario/:id/info
@@ -1107,6 +1152,21 @@ app.post('/api/balneario/:id/carpas', async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos obligatorios.' });
   }
 
+  // Validación nueva: ¿existe precio para este tipo en este balneario?
+  const { data: precioExistente, error: precioError } = await supabase
+    .from("precios")
+    .select("*")
+    .eq("id_balneario", id)
+    .eq("id_tipo_ubicacion", id_tipo_ubicacion)
+    .maybeSingle();
+
+  if (precioError) {
+    return res.status(500).json({ error: "Error validando precio." });
+  }
+  if (!precioExistente) {
+    return res.status(400).json({ error: "Debe cargar los precios para este tipo de ubicación antes de agregar carpas de este tipo." });
+  }
+
   try {
     // Calcular posicion (mayor existente + 1)
     const { data: ubicaciones } = await supabase
@@ -1130,8 +1190,8 @@ app.post('/api/balneario/:id/carpas', async (req, res) => {
         id_usuario,
         reservado: false,
         posicion: nuevaPosicion,
-        x,
-        y,
+        x: 0,
+        y: 0,
       }])
       .select()
       .single();
