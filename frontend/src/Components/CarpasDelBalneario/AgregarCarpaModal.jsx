@@ -29,9 +29,7 @@ function AgregarCarpaModal({
       ...nuevoPrecio
     });
     setNuevoPrecio({ dia: "", semana: "", quincena: "", mes: "" });
-    // Después de agregar el precio, no agregues la carpa aún
-    // Debes dejar que el usuario vuelva a elegir el tipo (ahora sí tiene precio)
-    setNuevaCarpa(nc => ({ ...nc, id_tipo_ubicacion: "" }));
+    handleAgregarCarpa();
   };
 
   return (
@@ -50,8 +48,28 @@ function AgregarCarpaModal({
             )}
           </select>
         </label>
-        
-        {/* Si NO tiene precio, SOLO mostrar la sección de precios */}
+        <label>
+          Sillas:
+          <input type="number" value={nuevaCarpa.cant_sillas} min={0}
+            onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_sillas: +e.target.value }))} />
+        </label>
+        <label>
+          Mesas:
+          <input type="number" value={nuevaCarpa.cant_mesas} min={0}
+            onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_mesas: +e.target.value }))} />
+        </label>
+        <label>
+          Reposeras:
+          <input type="number" value={nuevaCarpa.cant_reposeras} min={0}
+            onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_reposeras: +e.target.value }))} />
+        </label>
+        <label>
+          Capacidad:
+          <input type="number" value={nuevaCarpa.capacidad} min={1}
+            onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
+        </label>
+
+        {/* SOLO SI NO TIENE PRECIO ESE TIPO, MOSTRAR CAMPOS DE PRECIO */}
         {!tipoTienePrecio && nuevaCarpa.id_tipo_ubicacion &&
           <>
             <h4>Debe ingresar los precios para este tipo de ubicación</h4>
@@ -79,42 +97,18 @@ function AgregarCarpaModal({
                 onChange={e => setNuevoPrecio(p => ({ ...p, mes: e.target.value }))}
                 min={1} required />
             </label>
-            <div className="modal-buttons">
-              <button className="boton-agregar-servicio" onClick={agregarConPrecio}>Guardar precio</button>
-              <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
-            </div>
           </>
         }
 
-        {/* Si SÍ tiene precio, mostrar los campos de la carpa */}
-        {tipoTienePrecio && nuevaCarpa.id_tipo_ubicacion &&
-          <>
-            <label>
-              Sillas:
-              <input type="number" value={nuevaCarpa.cant_sillas} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_sillas: +e.target.value }))} />
-            </label>
-            <label>
-              Mesas:
-              <input type="number" value={nuevaCarpa.cant_mesas} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_mesas: +e.target.value }))} />
-            </label>
-            <label>
-              Reposeras:
-              <input type="number" value={nuevaCarpa.cant_reposeras} min={0}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, cant_reposeras: +e.target.value }))} />
-            </label>
-            <label>
-              Capacidad:
-              <input type="number" value={nuevaCarpa.capacidad} min={1}
-                onChange={e => setNuevaCarpa(nc => ({ ...nc, capacidad: +e.target.value }))} />
-            </label>
-            <div className="modal-buttons">
-              <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
-              <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
-            </div>
-          </>
-        }
+        <div className="modal-buttons">
+          {tipoTienePrecio
+            ? <button className="boton-agregar-servicio" onClick={handleAgregarCarpa}>Agregar</button>
+            : (nuevaCarpa.id_tipo_ubicacion &&
+              <button className="boton-agregar-servicio" onClick={agregarConPrecio}>Agregar y guardar precio</button>
+            )
+          }
+          <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(false)}>Cancelar</button>
+        </div>
       </div>
     </div>
   );

@@ -18,20 +18,16 @@ function CarpaItem({
   fechaFin,
   idBalneario 
 }) {
-  // Para el dueño, no mostrar estado de reserva - todas las carpas se ven como "libre"
-  const mostrarEstadoReserva = !esDuenio;
-  const estadoCarpa = mostrarEstadoReserva ? (carpaReservada(carpa.id_carpa) ? "reservada" : "libre") : "libre";
-  
   return (
     <div
       key={carpa.id_carpa}
-      className={`carpa ${estadoCarpa} tipo-${tipo}`}
+      className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
       style={{ left: `${left}px`, top: `${top}px` }}
       onMouseDown={() =>
         esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
       }
       onClick={() => {
-        if (!esDuenio && usuarioLogueado && (!mostrarEstadoReserva || !carpaReservada(carpa.id_carpa))) {
+        if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
           navigate(`/reservaubicacion/${carpa.id_carpa}`, {
             state: { fechaInicio, fechaFin, id_balneario: idBalneario }
           });
@@ -45,21 +41,21 @@ function CarpaItem({
           icon="fa-solid fa-tents"
           alt={`Carpa doble ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: (mostrarEstadoReserva && carpaReservada(carpa.id_ubicacion)) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
         />
       ) : tipo === "sombrilla" ? (
         <FontAwesomeIcon
           icon="fa-solid fa-umbrella-beach"
           alt={`Sombrilla ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: (mostrarEstadoReserva && carpaReservada(carpa.id_ubicacion)) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
         />
       ) : (
         <FontAwesomeIcon
           icon="fa-solid fa-tent"
           alt={`Carpa ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: (mostrarEstadoReserva && carpaReservada(carpa.id_ubicacion)) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
         />
       )}
       <div className="acciones">

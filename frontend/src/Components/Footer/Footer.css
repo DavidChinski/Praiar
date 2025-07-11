@@ -1,22 +1,10 @@
 footer {
-  background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
+  background-color: #00405E;
   color: white;
-  font-family: var(--font-family-secondary);
-  padding: 3rem 2rem 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: auto;
-  position: relative;
-  overflow: hidden;
-}
-
-footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  font-family: sans-serif;
+  padding: 30px 20px 10px; /* más corto */
+  border-top: 1px solid #ccc;
+  margin-top: auto; /* Esto empuja el footer hacia abajo */
 }
 
 .footer_main {
@@ -24,55 +12,39 @@ footer::before {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  gap: 2.5rem;
-  position: relative;
-  z-index: 1;
+  gap: 20px; /* separa columnas si hay espacio */
 }
 
 .logo_section {
   flex: 1;
-  min-width: 250px;
+  min-width: 200px;
   text-align: center;
-  margin-right: 2rem;
+  margin-right: 40px; /* separa del bloque Enlaces */
 }
 
 .logo_footer {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: auto;
   border-radius: 50%;
-  margin-bottom: 1.5rem;
-  transition: all var(--transition-normal);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  border: 3px solid rgba(255, 255, 255, 0.2);
-}
-
-.logo_footer:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 10px;
 }
 
 .slogan_footer {
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
 }
 
 .slogan_footer span {
-  font-weight: 700;
-  color: white;
-  font-family: var(--font-family-primary);
+  font-weight: bold;
 }
 
 .enlaces_section,
 .balnearios_section,
 .contacto_section {
   flex: 1;
-  min-width: 200px;
+  min-width: 150px;
 }
 
 .contacto_section {
@@ -80,226 +52,73 @@ footer::before {
 }
 
 h4 {
-  margin-bottom: 1.5rem;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: white;
-  font-family: var(--font-family-primary);
-  position: relative;
-  padding-bottom: 0.5rem;
-}
-
-h4::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-light));
-  border-radius: 1px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 ul {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 ul li {
-  font-size: 0.95rem;
+  font-size: 14px;
   display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  transition: all var(--transition-fast);
-  padding: 0.25rem 0;
-}
-
-ul li:hover {
-  transform: translateX(4px);
+  justify-content: flex-start;
+  margin-bottom: 8px;
 }
 
 ul li a {
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.85);
-  transition: all var(--transition-fast);
-  font-weight: 500;
-  position: relative;
-}
-
-ul li a::before {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--accent-light);
-  transition: width var(--transition-normal);
+  color: white;
+  transition: color 0.2s ease;
 }
 
 ul li a:hover,
 ul li a:focus,
 ul li a:active {
   text-decoration: none;
-  color: white;
-  transform: translateY(-1px);
+  color: #8AC9DC;
 }
 
-ul li a:hover::before {
-  width: 100%;
-}
 
 .iconFooter {
-  width: 20px;
+  width: auto;
   height: 20px;
-  margin-right: 1rem;
-  color: var(--accent-light);
-  font-size: 1rem;
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-}
-
-ul li:hover .iconFooter {
+  margin-right: 8px;
   color: white;
-  transform: scale(1.1);
+  font-size: 16px;
+  vertical-align: middle;
 }
 
 .social_icons {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .social_icons img {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  transition: all var(--transition-normal);
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.social_icons img:hover {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 24px;
+  height: 24px;
 }
 
 .footer_bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
+  border-top: 1px solid #aaa;
+  margin-top: 25px;
+  padding-top: 10px;
   text-align: center;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  position: relative;
-}
-
-.footer_bottom::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-}
-
-.footer_bottom p {
-  margin: 0.5rem 0;
-  font-weight: 400;
+  font-size: 13px;
 }
 
 .footer_bottom a {
-  color: var(--accent-light);
-  margin: 0 0.5rem;
+  color: #8AC9DC;
+  margin: 0 5px;
   text-decoration: none;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-  position: relative;
-}
-
-.footer_bottom a::before {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: white;
-  transition: width var(--transition-normal);
 }
 
 .footer_bottom a:hover {
   text-decoration: none;
-  color: white;
-  transform: translateY(-1px);
+  color: #002537;
 }
 
-.footer_bottom a:hover::before {
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  footer {
-    padding: 2rem 1rem 1rem;
-  }
-  
-  .footer_main {
-    flex-direction: column;
-    text-align: center;
-    gap: 2rem;
-  }
-  
-  .logo_section {
-    margin-right: 0;
-    min-width: 0;
-  }
-  
-  .enlaces_section,
-  .balnearios_section,
-  .contacto_section {
-    min-width: 0;
-    text-align: center;
-  }
-  
-  h4::after {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  ul li {
-    justify-content: center;
-  }
-  
-  .social_icons {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer_main {
-    gap: 1.5rem;
-  }
-  
-  .logo_footer {
-    width: 80px;
-    height: 80px;
-  }
-  
-  h4 {
-    font-size: 1.1rem;
-  }
-  
-  ul li {
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .social_icons img {
-    width: 28px;
-    height: 28px;
-  }
-}
