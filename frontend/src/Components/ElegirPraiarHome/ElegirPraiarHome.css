@@ -1,15 +1,37 @@
 .why-praiar {
-  padding: 0.5rem 6vw;
-  max-width: 960px;
+  padding: 4rem 6vw;
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+  border-radius: var(--border-radius-xl);
+  margin-bottom: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.why-praiar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(0, 90, 132, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(0, 180, 216, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.why-praiar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .features {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem; /* Reducido de 2rem a 1rem */
+  gap: 3rem;
+  margin-top: 3rem;
   flex-wrap: wrap;
 }
 
@@ -17,36 +39,141 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 105px;
-  
+  max-width: 280px;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
 }
+
+.feature:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 90, 132, 0.2);
+}
+
 .feature .ElegirPraiarIcon {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   font-size: 3rem;
-  margin-bottom: 0.5rem;
-  background-color: #008AB2;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
   border-radius: 50%;
   color: white;
+  transition: all var(--transition-normal);
+  box-shadow: 0 8px 25px rgba(0, 90, 132, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature .ElegirPraiarIcon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left var(--transition-slow);
+}
+
+.feature:hover .ElegirPraiarIcon {
+  transform: scale(1.1);
+  box-shadow: 0 12px 35px rgba(0, 90, 132, 0.4);
+}
+
+.feature:hover .ElegirPraiarIcon::before {
+  left: 100%;
 }
 
 .feature .ElegirPraiarIcon svg {
   max-width: 50px;
   height: auto;
+  z-index: 1;
+  position: relative;
 }
 
 .feature p {
   font-size: 1.1rem;
-  line-height: 1.2;
+  line-height: 1.5;
   margin: 0;
   word-wrap: break-word;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: center;
+}
+
+.feature strong {
+  color: var(--primary-blue-dark);
+  font-weight: 700;
+}
+
+.feature em {
+  font-style: italic;
+  color: var(--primary-blue);
+  font-weight: 600;
 }
 
 h2 {
-  font-family: "El Messiri", sans-serif;
-  margin-bottom: 0.5rem; /* Reduce espacio entre título y contenido */
-  font-size: 40px;
+  font-family: var(--font-family-primary);
+  margin-bottom: 1rem;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--primary-blue-dark);
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 768px) {
+  .why-praiar {
+    padding: 3rem 4vw;
+    margin-bottom: 3rem;
+  }
+  
+  .features {
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .feature {
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+  }
+  
+  .feature .ElegirPraiarIcon {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .feature .ElegirPraiarIcon svg {
+    max-width: 40px;
+  }
+  
+  .feature p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .features {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature {
+    width: 100%;
+    max-width: 300px;
+  }
 }
