@@ -555,11 +555,11 @@ function CarpasDelBalneario(props) {
       )}
 
       {fechaInicio && fechaFin ? (
-        <p>
+        !esDuenio && <p>
           Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
           {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
         </p>
-      ) : (
+      ) : !esDuenio && (
         <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
       )}
 
