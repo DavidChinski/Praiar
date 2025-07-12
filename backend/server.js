@@ -1,12 +1,16 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const { supabase } = require('./supabaseClient');
-const nodemailer = require('nodemailer');
-const app = express();
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import { supabase } from './supabaseClient.js';
+import nodemailer from 'nodemailer';
+import morgan from 'morgan';
+import { elAgente } from './Agente/src/agent.js';
 
+
+const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(morgan('dev'));
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -15,6 +19,21 @@ const upload = multer({ storage: storage });
 mercadopago.configure({
   access_token: 'TU_ACCESS_TOKEN_AQUI' // Reemplazalo por tu token de producción o prueba
 });*/
+
+app.post('/api/chat', async (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'No message provided' });
+  }
+
+  try {
+    const respuesta = await elAgente.run(message);
+    res.json({ response: respuesta });
+  } catch (error) {
+    console.error('Error en el agente:', error);
+    res.status(500).json({ error: 'Error procesando la respuesta del agente' });
+  }
+});
 
 // post /api/login
 app.post('/api/login', async (req, res) => {

@@ -1,11 +1,46 @@
-/* Layout principal con sticky footer */
 .layout-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: 'El Messiri', sans-serif;
+  background-color: #fffdf7;
 }
 
 .main-content {
   flex: 1;
-  /* Esto hace que el contenido principal tome todo el espacio disponible */
+}
+
+/* Botón flotante para abrir el chat */
+.boton-flotante-chat {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #008ab2;
+  color: white;
+  font-size: 1.8rem;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.boton-flotante-chat:hover {
+  background-color: #006a8e;
+}
+
+/* Chat flotante en esquina */
+.chat-flotante {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 999;
+  width: 400px;
+  max-height: 80vh;
 }

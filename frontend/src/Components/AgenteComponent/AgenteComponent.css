@@ -1,0 +1,138 @@
+body, .min-h-screen {
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'El Messiri', sans-serif;
+  background: #fffdf7;
+}
+
+.main-chat-bg,
+.min-h-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-box {
+  background: #fef8e8;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 2rem 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 2px solid #e5e0d5;
+}
+
+/* Título */
+.chat-box h1 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #004b75;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Área de mensajes */
+.chat-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding-right: 0.5rem;
+}
+
+/* Burbuja de mensaje */
+.mensaje {
+  display: flex;
+  flex-direction: column;
+}
+
+.mensaje.usuario .burbuja {
+  align-self: flex-end;
+  background: #008ab2;
+  color: white;
+  border-radius: 1em 1em 0.2em 1em;
+  padding: 0.7em 1em;
+  max-width: 300px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.mensaje.asistente .burbuja {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #004b75;
+  border: 2px solid #b0dbe7;
+  border-radius: 1em 1em 1em 0.2em;
+  padding: 0.7em 1em;
+  max-width: 300px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Input + botón */
+form.mt-4.flex {
+  display: flex;
+  gap: 0.5em;
+}
+
+input[type="text"].flex-1 {
+  flex: 1;
+  border: 2px solid #cbd5e1;
+  padding: 0.6em 1em;
+  border-radius: 0.8em;
+  font-size: 1rem;
+  background: #fffdf7;
+  outline: none;
+  transition: border 0.2s;
+}
+
+input[type="text"].flex-1:focus {
+  border-color: #008ab2;
+  background: white;
+}
+
+button.bg-blue-500 {
+  background: #004b75;
+  color: white;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 0.8em;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button.bg-blue-500:hover {
+  background: #006a8e;
+}
+
+button.bg-blue-500:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.text-red-500 {
+  color: #ef4444;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.chat-mensajes::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-mensajes::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.main-chat-bg {
+  background: transparent; /* ✅ para que no sobreescriba */
+}

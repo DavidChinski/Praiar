@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Backend de Praiar",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon server.js",
     "dev": "nodemon server.js",
@@ -11,14 +12,18 @@
   "author": "Praiar",
   "license": "ISC",
   "dependencies": {
+    "@llamaindex/ollama": "^0.1.5",
     "@supabase/supabase-js": "^2.50.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "llamaindex": "^0.10.6",
     "mercadopago": "^2.8.0",
+    "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "zod": "^3.25.76"
   }
 }
