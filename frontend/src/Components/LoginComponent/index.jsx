@@ -1,11 +1,31 @@
 import './LoginComponent.css';
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+function getUserFromStorage() {
+  try {
+    const str =
+      window.localStorage.getItem("usuario") ||
+      window.sessionStorage.getItem("usuario");
+    if (str) return JSON.parse(str);
+    return null;
+  } catch {
+    return null;
+  }
+}
 function LoginComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const usuario = getUserFromStorage();
+    if (usuario) {
+      // Si ya está logueado, redirigir a home
+      navigate('/');
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,14 +47,13 @@ function LoginComponent() {
 
       // Guardar usuario en localStorage y redirigir
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      window.location.href = "/";
+      navigate('/');
     } catch (err) {
       setErrorMsg('Error de conexión con el servidor.');
     }
   };
 
   const handleSocialLogin = (provider) => {
-    // Esto sigue como antes, se maneja desde el frontend
     window.location.href = `/auth/${provider}`;
   };
 
@@ -46,6 +65,7 @@ function LoginComponent() {
         <form className="login-form" onSubmit={handleLogin}>
           <label className='subtitulo'>Email</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Ingrese su email" required />
+          
           <div className='password-container'>
             <label className='subtitulo'>Contraseña</label>
             <div className="password-wrapper">
@@ -56,17 +76,20 @@ function LoginComponent() {
                 placeholder="Ingrese su contraseña"
                 required
               />
-              <button type="button"
+              <button
+                type="button"
                 className={`eye-toggle${showPassword ? " cruz" : ""}`}
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label="Mostrar u ocultar contraseña"
               >
-                <span className="material-icons ojo-icon">{showPassword ? "visibility_off" : "visibility"}</span>
+                <span className="material-icons ojo-icon">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
             <button type="button" className="link-btn">¿Olvidaste tu contraseña?</button>
           </div>
-          
+
           {errorMsg && <p className="error">{errorMsg}</p>}
           <button type="submit" className="secondary">Inicia Sesión</button>
         </form>

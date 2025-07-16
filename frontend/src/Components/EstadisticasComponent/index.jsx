@@ -79,7 +79,7 @@ export default function EstadisticasComponent() {
         const user = usuario || getUserFromStorage();
         if (!user || !user.esPropietario || !user.auth_id) {
           setLoading(false);
-          setError("No sos propietario. No se pueden mostrar estadísticas.");
+          setError("No sos propietario. No tienes acceso.");
           return;
         }
         // Ciudades
@@ -148,7 +148,7 @@ export default function EstadisticasComponent() {
           padding: "1rem",
         }}
       >
-        <h1 style={{ marginBottom: "1rem" }}>No tienes acceso a esta página</h1>
+        <h1 style={{ marginBottom: "1rem" }}>No sos propietario. No tienes acceso.</h1>
         <button
           onClick={() => navigate(-1)}
           style={{
