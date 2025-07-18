@@ -2,6 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import BusquedaHomeSearch from "../../assets/BusquedaHome.png";
 
 // NUEVOS COMPONENTES
 import ElementoAutocomplete from "./ElementoAutocomplete";
@@ -18,25 +23,34 @@ const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
 const EXTEND_FACTOR = 100;
 
+
+
 function CarpasDelBalneario(props) {
   const navigate = useNavigate();
   const location = useLocation();
   const balnearioId = props.id || location.state?.id;
-  let fechaInicio = props.fechaInicio || location.state?.fechaInicio;
-  let fechaFin = props.fechaFin || location.state?.fechaFin;
-  if (!fechaInicio || !fechaFin) {
-    const today = new Date();
-    fechaInicio = today.toISOString().split('T')[0];
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    fechaFin = tomorrow.toISOString().split('T')[0];
-  }
+  const today = new Date();
+  const defaultInicio = today.toISOString().split('T')[0];
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const defaultFin = tomorrow.toISOString().split('T')[0];
+
+  const [rangoFechas, setRangoFechas] = useState([
+    {
+      startDate: new Date(props.fechaInicio || location.state?.fechaInicio || defaultInicio),
+      endDate: new Date(props.fechaFin || location.state?.fechaFin || defaultFin),
+      key: "selection",
+    },
+  ]);
+  const fechaInicio = rangoFechas[0].startDate.toISOString().split('T')[0];
+  const fechaFin = rangoFechas[0].endDate.toISOString().split('T')[0];
+  const [showCalendario, setShowCalendario] = useState(false);
 
   // Selección múltiple: si vienen props de selección, usarlas, sino estado interno
-  const [seleccionadas, setSeleccionadas] = [
-    props.seleccionadas,
-    props.setSeleccionadas
-  ];
+  const [seleccionadas, setSeleccionadas] = props.seleccionadas !== undefined
+  ? [props.seleccionadas, props.setSeleccionadas]
+  : useState([]);
+  
 
   const containerRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
@@ -554,13 +568,47 @@ function CarpasDelBalneario(props) {
         </div>
       )}
 
-      {fechaInicio && fechaFin ? (
+      {esDuenio ? (
+        <div className="busqueda-form">
+        <div className="input-group date-group">
+          <FontAwesomeIcon
+            icon="fa-solid fa-calendar-days"
+            className="iconFecha"
+            alt="Icono de fecha"
+            onClick={() => setShowCalendario(!showCalendario)}
+            style={{ cursor: "pointer" }}
+          />
+          <div className="input-wrapper">
+            <label className="subtitulo">Filtra tus fechas</label>
+            <div
+              className="date-summary input-estandar"
+              onClick={() => setShowCalendario(!showCalendario)}
+            >
+              {format(rangoFechas[0].startDate, "dd/MM/yyyy")} -{" "}
+              {format(rangoFechas[0].endDate, "dd/MM/yyyy")}
+            </div>
+            {showCalendario && (
+              <div className="calendario-container">
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={(item) => setRangoFechas([item.selection])}
+                  moveRangeOnFirstSelection={false}
+                  ranges={rangoFechas}
+                  months={2}
+                  direction="horizontal"
+                  rangeColors={["#005984"]}
+                  minDate={new Date()}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      ) : (
         <p>
           Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
           {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
         </p>
-      ) : (
-        <p>Por favor selecciona un rango de fechas para ver la disponibilidad.</p>
       )}
 
       {esDuenio && (
