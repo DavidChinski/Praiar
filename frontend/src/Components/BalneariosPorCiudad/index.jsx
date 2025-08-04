@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import './BalneariosPorCiudad.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosPorCiudad() {
   const { idCiudad } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { fechaInicio, fechaFin } = location.state || {};
   const [balnearios, setBalnearios] = useState([]);
   const [nombreCiudad, setNombreCiudad] = useState("");
   const [loading, setLoading] = useState(true);
@@ -54,9 +56,13 @@ function BalneariosPorCiudad() {
     setMapaDireccion(null);
   };
 
-  // AHORA solo enviamos el id en el state!
   const handleEntrar = (balneario) => {
-    navigate(`/balneario/${balneario.id_balneario}`, { state: { id: balneario.id_balneario } });
+    const state = { id: balneario.id_balneario };
+    if (fechaInicio && fechaFin) {
+      state.fechaInicio = fechaInicio;
+      state.fechaFin = fechaFin;
+    }
+    navigate(`/balneario/${balneario.id_balneario}`, { state });
   };
 
   if (loading) {
