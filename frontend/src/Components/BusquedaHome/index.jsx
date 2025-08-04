@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient.js';
 import './BusquedaHome.css';
 import { DateRange } from 'react-date-range';
 import { format } from 'date-fns';
@@ -15,7 +14,7 @@ function BusquedaHome() {
   const [ciudades, setCiudades] = useState([]);
   const [balnearios, setBalnearios] = useState([]);
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
-  const [balnearioSeleccionado, setBalnearioSeleccionado] = useState(null);
+  const [, setBalnearioSeleccionado] = useState(null);
   const [rangoFechas, setRangoFechas] = useState([
     { startDate: new Date(), endDate: new Date(), key: 'selection' }
   ]);
@@ -151,7 +150,7 @@ function BusquedaHome() {
         />
         {showSuggestions && (
           <div className="autocomplete-dropdown">
-            {ciudadMatches.map((ciudad, index) => (
+            {ciudadMatches.map((ciudad) => (
               <div
                 key={ciudad.id_ciudad}
                 className="autocomplete-option"
@@ -198,7 +197,7 @@ function BusquedaHome() {
           id="balneario"
           className="input-estandar"
           type="text"
-          placeholder="Ingresar el balneario"
+          placeholder="Ingresar el balneario (opcional)"
           value={balnearioInput}
           onChange={e => setBalnearioInput(e.target.value)}
           autoComplete="off"
@@ -206,7 +205,7 @@ function BusquedaHome() {
         />
         {(showAll || showSuggestions) && (
           <div className="autocomplete-dropdown">
-            {suggestions.map((balneario, index) => (
+            {suggestions.map((balneario) => (
               <div
                 key={balneario.id_balneario}
                 className="autocomplete-option"
@@ -234,6 +233,7 @@ function BusquedaHome() {
 
   // Validar si hay algún balneario que coincida con el input (parcial o exacto)
   function getBalnearioIdFromInput() {
+    if (balnearioInput.trim().length === 0) return null;
     const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const inputNorm = normalizar(balnearioInput);
     // 1. Busca coincidencia exacta
@@ -245,8 +245,11 @@ function BusquedaHome() {
     return seleccionado ? seleccionado.id_balneario : null;
   }
 
-  // El botón se habilita si hay input y hay al menos un balneario que coincida
-  const isSearchEnabled = ciudadSeleccionada && balnearioInput.trim().length > 0 && getBalnearioIdFromInput();
+  // El botón se habilita si hay ciudad seleccionada y
+  // (no se ingresó balneario o el balneario escrito es válido)
+  const isSearchEnabled =
+    ciudadSeleccionada &&
+    (balnearioInput.trim().length === 0 || getBalnearioIdFromInput());
 
   return (
     <div className="busqueda-home">
@@ -294,7 +297,7 @@ function BusquedaHome() {
                 <div className="input-group" style={{ position: "relative" }}>
                   <FontAwesomeIcon icon="fa-solid fa-umbrella-beach" className="icon"/>
                   <div className="input-wrapper">
-                    <label htmlFor="balneario" className='subtitulo'>Balnearios</label>
+                    <label htmlFor="balneario" className='subtitulo'>Balnearios (opcional)</label>
                     {renderBalnearioMatch()}
                   </div>
                 </div>
@@ -311,7 +314,7 @@ function BusquedaHome() {
                   <div className="input-wrapper">
                     <label className='subtitulo'>Fecha</label>
                     <div className="date-summary input-estandar" onClick={() => setShowCalendario(!showCalendario)}>
-                      {format(rangoFechas[0].startDate, 'dd/MM/yyyy')} - {format(rangoFechas[0].endDate, 'dd/MM/yyyy')}
+                      {format(rangoFechas[0].startDate, 'MM/dd/yyyy')} - {format(rangoFechas[0].endDate, 'MM/dd/yyyy')}
                     </div>
                     {showCalendario && (
                       <div className="calendario-container" style={{ position: 'absolute', zIndex: 999, left: '-330px' }}>
@@ -335,16 +338,27 @@ function BusquedaHome() {
                   className="search-button"
                   onClick={() => {
                     const idBalneario = getBalnearioIdFromInput();
+                    const fechaInicio = rangoFechas[0].startDate
+                      .toISOString()
+                      .split('T')[0];
+                    const fechaFin = rangoFechas[0].endDate
+                      .toISOString()
+                      .split('T')[0];
+
                     if (idBalneario) {
                       navigate(`/balneario/${idBalneario}`, {
                         state: {
-                          fechaInicio: rangoFechas[0].startDate.toISOString().split('T')[0],
-                          fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0],
+                          fechaInicio,
+                          fechaFin,
                           id: idBalneario
                         }
                       });
+                    } else if (ciudadSeleccionada) {
+                      navigate(`/ciudades/${ciudadSeleccionada}/balnearios`, {
+                        state: { fechaInicio, fechaFin }
+                      });
                     } else {
-                      alert('Seleccioná un balneario válido.');
+                      alert('Seleccioná una localidad válida.');
                     }
                   }}
                   disabled={!isSearchEnabled}
