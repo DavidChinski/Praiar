@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import './BalneariosPorCiudad.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosPorCiudad() {
   const { idCiudad } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { fechaInicio, fechaFin } = location.state || {};
   const [balnearios, setBalnearios] = useState([]);
   const [nombreCiudad, setNombreCiudad] = useState("");
   const [loading, setLoading] = useState(true);
   const [mapaDireccion, setMapaDireccion] = useState(null);
+  const [disponibilidad, setDisponibilidad] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -45,6 +48,35 @@ function BalneariosPorCiudad() {
     fetchData();
   }, [idCiudad]);
 
+  useEffect(() => {
+    async function fetchDisponibilidad() {
+      if (!fechaInicio || !fechaFin || balnearios.length === 0) return;
+
+      const disponibilidadTemp = {};
+
+      await Promise.all(
+        balnearios.map(async (balneario) => {
+          try {
+            const [carpasRes, reservasRes] = await Promise.all([
+              fetch(`http://localhost:3000/api/balneario/${balneario.id_balneario}/carpas`).then(r => r.json()),
+              fetch(`http://localhost:3000/api/balneario/${balneario.id_balneario}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`).then(r => r.json())
+            ]);
+
+            const totalCarpas = Array.isArray(carpasRes) ? carpasRes.length : 0;
+            const reservadas = new Set((reservasRes || []).map(r => r.id_ubicacion));
+            disponibilidadTemp[balneario.id_balneario] = totalCarpas - reservadas.size;
+          } catch (err) {
+            console.error('Error consultando disponibilidad:', err);
+          }
+        })
+      );
+
+      setDisponibilidad(disponibilidadTemp);
+    }
+
+    fetchDisponibilidad();
+  }, [balnearios, fechaInicio, fechaFin]);
+
   const abrirMapa = (direccionBalneario) => {
     const direccionCompleta = `${direccionBalneario}, ${nombreCiudad}`;
     setMapaDireccion(direccionCompleta);
@@ -54,9 +86,13 @@ function BalneariosPorCiudad() {
     setMapaDireccion(null);
   };
 
-  // AHORA solo enviamos el id en el state!
   const handleEntrar = (balneario) => {
-    navigate(`/balneario/${balneario.id_balneario}`, { state: { id: balneario.id_balneario } });
+    const state = { id: balneario.id_balneario };
+    if (fechaInicio && fechaFin) {
+      state.fechaInicio = fechaInicio;
+      state.fechaFin = fechaFin;
+    }
+    navigate(`/balneario/${balneario.id_balneario}`, { state });
   };
 
   if (loading) {
@@ -89,7 +125,9 @@ function BalneariosPorCiudad() {
                       </p>
                       <p>
                         <FontAwesomeIcon icon="fa-solid fa-tent" className="iconoCard"/>
-                        Cantidad de carpas
+                        {fechaInicio && fechaFin
+                          ? `${disponibilidad[balneario.id_balneario] ?? 'Consultando...'} carpas disponibles`
+                          : 'Cantidad de carpas'}
                       </p>
                     </div>
                     <button

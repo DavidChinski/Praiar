@@ -16,19 +16,20 @@ function CarpaItem({
   handleEditarCarpa,
   fechaInicio,
   fechaFin,
-  idBalneario 
+  idBalneario
 }) {
+  const idUbicacion = carpa.id_ubicacion ?? carpa.id_carpa;
   return (
     <div
-      key={carpa.id_carpa}
-      className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
+      key={idUbicacion}
+      className={`carpa ${carpaReservada(idUbicacion) ? "reservada" : "libre"} tipo-${tipo}`}
       style={{ left: `${left}px`, top: `${top}px` }}
       onMouseDown={() =>
-        esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
+        esDuenio && setDragging({ tipo: "carpa", id: idUbicacion })
       }
       onClick={() => {
-        if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
-          navigate(`/reservaubicacion/${carpa.id_carpa}`, {
+        if (!esDuenio && usuarioLogueado && !carpaReservada(idUbicacion)) {
+          navigate(`/reservaubicacion/${idUbicacion}`, {
             state: { fechaInicio, fechaFin, id_balneario: idBalneario }
           });
         }

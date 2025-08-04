@@ -258,6 +258,9 @@ function CarpasDelBalneario(props) {
     });
   };
 
+  const reservasSet = new Set(reservas.map(r => r.id_ubicacion));
+  const carpasDisponibles = carpas.filter(c => !reservasSet.has(c.id_ubicacion ?? c.id_carpa)).length;
+
   // Servicios toggle
   async function toggleServicio(servicioId, tiene) {
     if (!balnearioId) return;
@@ -605,10 +608,13 @@ function CarpasDelBalneario(props) {
         </div>
       </div>
       ) : (
-        <p>
-          Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
-          {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
-        </p>
+        <>
+          <p>
+            Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
+            {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
+          </p>
+          <p>{carpasDisponibles} ubicaciones disponibles</p>
+        </>
       )}
 
       {esDuenio && (
