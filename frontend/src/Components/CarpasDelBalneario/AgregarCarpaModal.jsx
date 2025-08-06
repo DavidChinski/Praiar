@@ -7,29 +7,36 @@ function AgregarCarpaModal({
   setNuevaCarpa,
   tiposUbicacion,
   handleAgregarCarpa,
-  precios, // array de precios existentes [{id_tipo_ubicacion, dia, semana, ...}]
-  onAgregarPrecio // función para agregar un precio nuevo
+  precios,
+  onAgregarPrecio
 }) {
   const [nuevoPrecio, setNuevoPrecio] = useState({ dia: "", semana: "", quincena: "", mes: "" });
 
   if (!mostrarAgregarCarpa) return null;
 
-  // ¿El tipo seleccionado ya tiene precio?
-  const tipoTienePrecio = nuevaCarpa.id_tipo_ubicacion &&
-    precios.some(p => String(p.id_tipo_ubicacion) === String(nuevaCarpa.id_tipo_ubicacion));
+  const tipoTienePrecio =
+    !!nuevaCarpa.id_tipo_ubicacion &&
+    precios.some(
+      (p) =>
+        p.id_tipo_ubicacion !== undefined &&
+        String(p.id_tipo_ubicacion) === String(nuevaCarpa.id_tipo_ubicacion)
+    );
 
   // Handler para agregar precio y luego la carpa
-  const agregarConPrecio = () => {
+  const agregarConPrecio = async () => {
     if (!nuevoPrecio.dia || !nuevoPrecio.semana || !nuevoPrecio.quincena || !nuevoPrecio.mes) {
       alert("Debe completar todos los precios.");
       return;
     }
-    onAgregarPrecio({
+    // Guardar precio y, solo si fue correcto, agregar la carpa
+    const ok = await onAgregarPrecio({
       id_tipo_ubicacion: nuevaCarpa.id_tipo_ubicacion,
       ...nuevoPrecio
     });
-    setNuevoPrecio({ dia: "", semana: "", quincena: "", mes: "" });
-    handleAgregarCarpa();
+    if (ok) {
+      setNuevoPrecio({ dia: "", semana: "", quincena: "", mes: "" });
+      handleAgregarCarpa();
+    }
   };
 
   return (

@@ -519,12 +519,52 @@ function CarpasDelBalneario(props) {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!nuevaCarpa.id_tipo_ubicacion) return alert("Seleccione el tipo");
+  
+    // Parámetros de la grilla (ajusta si tus carpas son más grandes)
+    const STEP_X = 100; // ancho de una carpa
+    const STEP_Y = 100; // alto de una carpa
+    const MAX_X = 10; // columnas
+    const MAX_Y = 10; // filas
+  
+    // Juntar todas las posiciones ocupadas (carpas y elementos)
+    const ocupadas = new Set();
+    carpas.forEach(c => {
+      const x = Number.isFinite(c.x) ? c.x : 0;
+      const y = Number.isFinite(c.y) ? c.y : 0;
+      ocupadas.add(`${x},${y}`);
+    });
+    elementos.forEach(e => {
+      const x = Number.isFinite(e.x) ? e.x : 0;
+      const y = Number.isFinite(e.y) ? e.y : 0;
+      ocupadas.add(`${x},${y}`);
+    });
+  
+    // Buscar la primer celda libre en la grilla
+    let libreX = null, libreY = null;
+    outer: for (let y = 0; y < MAX_Y; y++) {
+      for (let x = 0; x < MAX_X; x++) {
+        const key = `${x * STEP_X},${y * STEP_Y}`;
+        if (!ocupadas.has(key)) {
+          libreX = x * STEP_X;
+          libreY = y * STEP_Y;
+          break outer;
+        }
+      }
+    }
+    if (libreX === null || libreY === null) {
+      alert("No hay espacio libre para agregar una nueva carpa/sombrilla.");
+      return;
+    }
+  
+    // Crear la carpa en la posición libre encontrada
     const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...nuevaCarpa,
-        id_usuario: usuario.auth_id
+        id_usuario: usuario.auth_id,
+        x: libreX,
+        y: libreY
       })
     });
     if (res.ok) {
@@ -541,8 +581,8 @@ function CarpasDelBalneario(props) {
         .then(data => {
           setCarpas(data.map((c, i) => ({
             ...c,
-            x: c.x ?? i * 100,
-            y: c.y ?? 0,
+            x: Number.isFinite(c.x) ? c.x : i * STEP_X,
+            y: Number.isFinite(c.y) ? c.y : 0,
           })));
         });
     } else {
