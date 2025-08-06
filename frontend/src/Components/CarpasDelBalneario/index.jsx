@@ -18,6 +18,7 @@ import AgregarCarpaModal from "./AgregarCarpaModal";
 import EditarCarpaModal from "./EditarCarpaModal";
 import PreciosBalnearioTabla from "./PreciosBalnearioTabla";
 import EditarPrecioModal from "./EditarPrecioModal";
+import ReservaManualModal from "./ReservaManualModal";
 
 const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
@@ -113,6 +114,55 @@ function CarpasDelBalneario(props) {
     .fill(resenias)
     .flat();
   const baseIndex = resenias.length * Math.floor(EXTEND_FACTOR / 2);
+
+
+  const [mostrarReservaManual, setMostrarReservaManual] = useState(false);
+  const [carpaParaReservar, setCarpaParaReservar] = useState(null);
+
+  function handleReservarManual(carpa) {
+    setCarpaParaReservar(carpa);
+    setMostrarReservaManual(true);
+  }
+
+  async function reservarManual(datosReserva, onComplete) {
+    if (!balnearioId || !carpaParaReservar) return;
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    // Armá el body como espera el backend:
+    const body = {
+      id_usuario: usuario?.auth_id || usuario?.id_usuario || "", // soporte para ambos
+      id_ubicaciones: [carpaParaReservar.id_carpa],
+      id_balneario: balnearioId,
+      fecha_inicio: datosReserva.fecha_inicio,
+      fecha_salida: datosReserva.fecha_salida,
+      metodo_pago: "manual",
+      nombre: datosReserva.nombre,
+      apellido: datosReserva.apellido || "",
+      email: datosReserva.email,
+      telefono: datosReserva.telefono,
+      direccion: "",
+      ciudad: "",
+      codigo_postal: "",
+      pais: "",
+      precio_total: 0
+    };
+    // DEBUG: console.log(body);
+    const res = await fetch(`http://localhost:3000/api/reserva`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      fetch(`http://localhost:3000/api/balneario/${balnearioId}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
+        .then(res => res.json())
+        .then(data => setReservas(Array.isArray(data) ? data : []));
+      onComplete();
+      alert("Reserva creada con éxito");
+    } else {
+      const error = await res.json();
+      alert(error.error || "Error al crear reserva");
+      onComplete();
+    }
+  }
 
   useEffect(() => {
     if (resenias.length > 0) {
@@ -670,6 +720,7 @@ function CarpasDelBalneario(props) {
                 setSeleccionadas={setSeleccionadas}
                 soloSeleccion={props.soloSeleccion}
                 reservaSeleccionMultiple={props.reservaSeleccionMultiple}
+                onReservarManual={esDuenio ? handleReservarManual : undefined}
               />
             </div>
           );
@@ -743,6 +794,14 @@ function CarpasDelBalneario(props) {
         reseniaNueva={reseniaNueva}
         setReseniaNueva={setReseniaNueva}
         agregarResenia={agregarResenia}
+      />
+      <ReservaManualModal
+        mostrar={mostrarReservaManual}
+        setMostrar={setMostrarReservaManual}
+        carpa={carpaParaReservar}
+        fechaInicio={fechaInicio}
+        fechaFin={fechaFin}
+        onReservar={reservarManual}
       />
     </div>
   );

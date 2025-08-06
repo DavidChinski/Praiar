@@ -16,18 +16,19 @@ function CarpaItem({
   handleEditarCarpa,
   fechaInicio,
   fechaFin,
-  idBalneario 
+  idBalneario,
+  onReservarManual
 }) {
   return (
     <div
       key={carpa.id_carpa}
       className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
       style={{ left: `${left}px`, top: `${top}px` }}
-      onMouseDown={() =>
-        esDuenio && setDragging({ tipo: "carpa", id: carpa.id_carpa })
-      }
       onClick={() => {
-        if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
+        // Dueño y usuario común: solo pueden reservar si está libre
+        if (esDuenio && onReservarManual && !carpaReservada(carpa.id_carpa)) {
+          onReservarManual(carpa);
+        } else if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
           navigate(`/reservaubicacion/${carpa.id_carpa}`, {
             state: { fechaInicio, fechaFin, id_balneario: idBalneario }
           });
@@ -61,8 +62,29 @@ function CarpaItem({
       <div className="acciones">
         {esDuenio && (
           <>
-            <button className="boton-agregar-servicio" onClick={() => eliminarCarpa(carpa.id_carpa)}>🗑</button>
-            <button className="boton-agregar-servicio" onClick={() => handleEditarCarpa(carpa)}>✏️</button>
+            {/* Handler de drag exclusivo */}
+            <span
+              className="boton-agregar-servicio"
+              title="Mover carpa"
+              onMouseDown={e => {
+                e.stopPropagation();
+                setDragging({ tipo: "carpa", id: carpa.id_carpa });
+              }}
+            >🔄️</span>
+            <button
+              className="boton-agregar-servicio"
+              onClick={e => {
+                e.stopPropagation();
+                eliminarCarpa(carpa.id_carpa);
+              }}
+            >🗑</button>
+            <button
+              className="boton-agregar-servicio"
+              onClick={e => {
+                e.stopPropagation();
+                handleEditarCarpa(carpa);
+              }}
+            >✏️</button>
           </>
         )}
       </div>
