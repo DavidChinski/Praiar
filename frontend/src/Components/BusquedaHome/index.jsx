@@ -232,8 +232,9 @@ function BusquedaHome() {
     );
   }
 
-  // Validar si hay algún balneario que coincida con el input (parcial o exacto)
+  // CORREGIDO: Solo busca balneario si el input NO está vacío
   function getBalnearioIdFromInput() {
+    if (!balnearioInput.trim()) return null; // <--- Esta línea evita el problema!
     const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const inputNorm = normalizar(balnearioInput);
     // 1. Busca coincidencia exacta
@@ -245,8 +246,38 @@ function BusquedaHome() {
     return seleccionado ? seleccionado.id_balneario : null;
   }
 
-  // El botón se habilita si hay input y hay al menos un balneario que coincida
-  const isSearchEnabled = ciudadSeleccionada && balnearioInput.trim().length > 0 && getBalnearioIdFromInput();
+  // El botón se habilita si hay ciudad seleccionada (aunque no haya balneario) o balneario válido
+  const isSearchEnabled =
+    ciudadSeleccionada && (
+      balnearioInput.trim().length === 0 // Solo ciudad
+      || getBalnearioIdFromInput() // Balneario válido
+    );
+
+  // Manejo de búsqueda
+  function handleBuscar() {
+    const idBalneario = getBalnearioIdFromInput();
+    const fechaInicio = rangoFechas[0].startDate.toISOString().split('T')[0];
+    const fechaFin = rangoFechas[0].endDate.toISOString().split('T')[0];
+
+    if (idBalneario) {
+      navigate(`/balneario/${idBalneario}`, {
+        state: {
+          fechaInicio,
+          fechaFin,
+          id: idBalneario
+        }
+      });
+    } else if (ciudadSeleccionada) {
+      navigate(`/ciudades/${ciudadSeleccionada}/balnearios`, {
+        state: {
+          fechaInicio,
+          fechaFin
+        }
+      });
+    } else {
+      alert('Seleccioná una localidad o un balneario válido.');
+    }
+  }
 
   return (
     <div className="busqueda-home">
@@ -333,20 +364,7 @@ function BusquedaHome() {
                 {/* Botón buscar */}
                 <button
                   className="search-button"
-                  onClick={() => {
-                    const idBalneario = getBalnearioIdFromInput();
-                    if (idBalneario) {
-                      navigate(`/balneario/${idBalneario}`, {
-                        state: {
-                          fechaInicio: rangoFechas[0].startDate.toISOString().split('T')[0],
-                          fechaFin: rangoFechas[0].endDate.toISOString().split('T')[0],
-                          id: idBalneario
-                        }
-                      });
-                    } else {
-                      alert('Seleccioná un balneario válido.');
-                    }
-                  }}
+                  onClick={handleBuscar}
                   disabled={!isSearchEnabled}
                 >
                   <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />

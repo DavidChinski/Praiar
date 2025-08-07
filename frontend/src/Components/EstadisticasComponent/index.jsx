@@ -291,7 +291,7 @@ export default function EstadisticasComponent() {
   // --- UI ---
   return (
     <div className="estadisticas-container">
-      <h2 className="estadisticas-title">Estadísticas de Balnearios</h2>
+      <h2 className="estadisticas-title">Estadísticas de tus Balnearios</h2>
       <div className="estadisticas-charts-row">
         <div className="estadisticas-chart-block">
           <Pie data={balneariosPorCiudadChart} />

@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import './BalneariosPorCiudad.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function BalneariosPorCiudad() {
   const { idCiudad } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [balnearios, setBalnearios] = useState([]);
   const [nombreCiudad, setNombreCiudad] = useState("");
   const [loading, setLoading] = useState(true);
   const [mapaDireccion, setMapaDireccion] = useState(null);
+
+  // Lee fechas desde location.state (pueden venir de la búsqueda)
+  const fechaInicio = location.state?.fechaInicio || null;
+  const fechaFin = location.state?.fechaFin || null;
 
   useEffect(() => {
     async function fetchData() {
@@ -56,7 +61,13 @@ function BalneariosPorCiudad() {
 
   // AHORA solo enviamos el id en el state!
   const handleEntrar = (balneario) => {
-    navigate(`/balneario/${balneario.id_balneario}`, { state: { id: balneario.id_balneario } });
+    navigate(`/balneario/${balneario.id_balneario}`, {
+      state: {
+        id: balneario.id_balneario,
+        fechaInicio,
+        fechaFin
+      }
+    });
   };
 
   if (loading) {
@@ -67,6 +78,12 @@ function BalneariosPorCiudad() {
     <>
       <div className="balnearios-container">
         <h1>Balnearios en {nombreCiudad}</h1>
+        {/* Si hay fechas, las mostramos */}
+        {(fechaInicio && fechaFin) && (
+          <div className="periodo-busqueda">
+            <strong>Período buscado:</strong> {fechaInicio} - {fechaFin}
+          </div>
+        )}
 
         {balnearios.length === 0 ? (
           <p>No hay balnearios registrados en {nombreCiudad}.</p>
