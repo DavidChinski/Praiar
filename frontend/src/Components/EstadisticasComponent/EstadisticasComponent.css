@@ -3,7 +3,7 @@
   min-height: 40vh;
   font-family: 'El Messiri', sans-serif;
   padding: 2.5rem 6vw;
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   background: #fafbfc;
 }
@@ -16,181 +16,546 @@
   margin-bottom: 2rem;
 }
 
+/* ---------- Estados de carga y error ---------- */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #0099cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #d32f2f;
+  background: #ffebee;
+  border-radius: 1rem;
+  margin: 1rem 0;
+}
+
+.access-denied {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.access-denied h1 {
+  color: #003f5e;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.volver-button {
+  background-color: #0099cc;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.volver-button:hover {
+  background-color: #0077a6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 153, 204, 0.3);
+}
+
+/* ---------- Resumen de estadísticas ---------- */
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 63, 94, 0.08);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 63, 94, 0.12);
+}
+
+.stat-card h3 {
+  color: #003f5e;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.stat-card p {
+  color: #005984;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ---------- Secciones ---------- */
+.charts-section,
+.table-section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  color: #003f5e;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #0099cc, #41b6e6);
+  border-radius: 2px;
+}
+
 /* ---------- Gráficos ---------- */
 .estadisticas-charts-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
   margin-bottom: 2rem;
 }
 
 .estadisticas-chart-block {
-  flex: 1;
-  min-width: 320px;
   background: white;
   border-radius: 1.5rem;
   box-shadow: 0 8px 20px rgba(0, 63, 94, 0.07);
-  padding: 1.2rem 1rem 1.8rem 1rem;
+  padding: 1.5rem;
+  position: relative;
+  min-height: 350px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.estadisticas-chart-block.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-title {
+  color: #003f5e;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e8f0fe;
+}
+
+.estadisticas-chart-block canvas {
+  flex: 1;
+  max-height: 300px;
 }
 
 /* ---------- Tabla de balnearios ---------- */
+.table-container {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.10);
+}
+
 .tabla-balnearios {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.10);
-  margin-top: 2.5rem;
 }
 
 .tabla-balnearios th,
 .tabla-balnearios td {
-  padding: 1rem;
+  padding: 1.2rem 1rem;
   text-align: center;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .tabla-balnearios th {
-  background-color: #005984;
+  background: linear-gradient(135deg, #005984, #0077b6);
   color: white;
   font-weight: 600;
+  font-size: 1rem;
+}
+
+.tabla-balnearios tr:hover {
+  background-color: #f8f9fa;
 }
 
 .tabla-balnearios tr:last-child td {
   border-bottom: none;
 }
 
+.tabla-balnearios td a {
+  color: #0099cc;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.tabla-balnearios td a:hover {
+  color: #0077a6;
+  text-decoration: underline;
+}
+
 /* ---------- Botón Ver ---------- */
 .ver-button {
-  background-color: #0099cc;
+  background: linear-gradient(135deg, #0099cc, #41b6e6);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 0.75rem;
   cursor: pointer;
   font-size: 0.95rem;
   font-family: inherit;
-  transition: background-color 0.2s ease, transform 0.12s;
+  transition: all 0.3s ease;
   font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 153, 204, 0.3);
 }
 
 .ver-button:hover {
-  background-color: #0077a6;
-  transform: scale(1.07);
+  background: linear-gradient(135deg, #0077a6, #0099cc);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 153, 204, 0.4);
 }
 
 /* ---------- Card Detalle ---------- */
 .balneario-detalle-card {
   margin-top: 2.5rem;
-  padding: 2rem 1.2rem 1.5rem 1.2rem;
-  background: #e8f0fe;
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(0, 63, 94, 0.11);
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #e8f0fe, #f0f8ff);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 63, 94, 0.15);
   position: relative;
-  max-width: 580px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  border: 1px solid #d0e3ff;
 }
 
 .cerrar-button {
   position: absolute;
-  top: env(safe-area-inset-top, 10px);
-  right: env(safe-area-inset-right, 14px);
-  font-size: 22px;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 24px;
   background: none;
   border: none;
   cursor: pointer;
-  color: #002537;
+  color: #003f5e;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cerrar-button:hover {
+  background-color: rgba(0, 63, 94, 0.1);
+  transform: scale(1.1);
 }
 
 .balneario-detalle-card h3 {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   color: #003f5e;
-  margin-bottom: 1.2rem;
+  margin-bottom: 2rem;
   text-align: center;
+  font-weight: 700;
 }
 
-.balneario-detalle-card ul {
+/* ---------- Estadísticas del detalle ---------- */
+.detalle-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+}
+
+.detalle-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem;
+  border-bottom: 1px solid #e8f0fe;
+}
+
+.detalle-stat:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: #005984;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.stat-value {
+  color: #003f5e;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.stat-value.highlight {
+  color: #0099cc;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ---------- Gráfico del detalle ---------- */
+.chart-bar {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+}
+
+.chart-bar h4 {
+  color: #003f5e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.chart-bar canvas {
+  max-height: 250px;
+}
+
+/* ---------- Secciones de reseñas y reservas ---------- */
+.reseñas-section,
+.reservas-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+}
+
+.reseñas-section h4,
+.reservas-section h4 {
+  color: #003f5e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e8f0fe;
+}
+
+.no-data {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* ---------- Lista de reseñas ---------- */
+.reseñas-list {
   list-style: none;
-  padding: 0 0 0 0;
-  margin: 0 0 1.2rem 0;
-  color: #005984;
-  font-size: 1.05rem;
+  padding: 0;
+  margin: 0;
 }
 
-.balneario-detalle-card li {
-  margin-bottom: 0.4rem;
-}
-
-.balneario-detalle-card .chart-bar {
-  margin: 1.2rem 0 0.7rem 0;
-}
-
-.balneario-detalle-card h4 {
-  margin: 1.3rem 0 0.5rem 0;
-  font-size: 1.11rem;
-  color: #005984;
-  font-weight: 600;
-}
-
-.balneario-detalle-card .reseñas-list li {
+.reseña-item {
+  padding: 1rem;
+  border-bottom: 1px solid #e8f0fe;
   margin-bottom: 0.5rem;
-  font-size: 0.98rem;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
 }
 
-.balneario-detalle-card .reseña-estrella {
-  color: #e3b505;
-  margin-left: 7px;
+.reseña-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
-.balneario-detalle-card .reseña-likes {
-  color: #e3b505;
-  margin-left: 10px;
+.reseña-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.reseña-usuario {
+  color: #003f5e;
+  font-size: 1rem;
+}
+
+.reseña-estrellas {
+  color: #005984;
   font-weight: 600;
 }
 
-.balneario-detalle-card .reservas-list {
-  font-size: 0.98rem;
+.reseña-estrella {
+  color: #e3b505;
+  margin-left: 4px;
+}
+
+.reseña-comentario {
+  color: #333;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.reseña-likes {
+  color: #0099cc;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ---------- Lista de reservas ---------- */
+.reservas-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reserva-item {
+  padding: 1rem;
+  border-bottom: 1px solid #e8f0fe;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reserva-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.reserva-fechas {
+  color: #003f5e;
+  font-weight: 500;
+}
+
+.reserva-carpa {
+  color: #005984;
+  font-size: 0.9rem;
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1020px) {
+@media (max-width: 1200px) {
   .estadisticas-charts-row {
-    flex-direction: column;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
-  .estadisticas-chart-block {
-    min-width: 0;
-    width: 100%;
+  
+  .stats-summary {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
-  .balneario-detalle-card {
-    max-width: 97vw;
-    padding: 1.2rem 0.6rem 1.1rem 0.6rem;
-  }
+}
+
+@media (max-width: 768px) {
   .estadisticas-container {
     padding: 1.5rem 2vw;
   }
-  .tabla-balnearios th,
-  .tabla-balnearios td {
-    padding: 0.75rem;
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 620px) {
-  .estadisticas-container {
-    padding: 1.2rem 0.5vw;
-  }
+  
   .estadisticas-title {
     font-size: 2rem;
   }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .estadisticas-chart-block {
+    min-height: 300px;
+    padding: 1rem;
+  }
+  
+  .detalle-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .balneario-detalle-card {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .tabla-balnearios th,
+  .tabla-balnearios td {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .reserva-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
-a{
-  color: #000;
+@media (max-width: 480px) {
+  .estadisticas-container {
+    padding: 1rem 1vw;
+  }
+  
+  .estadisticas-title {
+    font-size: 1.8rem;
+  }
+  
+  .stats-summary {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .stat-card h3 {
+    font-size: 2rem;
+  }
+  
+  .balneario-detalle-card {
+    padding: 1rem;
+  }
+  
+  .detalle-stats {
+    padding: 1rem;
+  }
+}
+
+/* ---------- Enlaces ---------- */
+a {
+  color: #0099cc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0077a6;
 }
