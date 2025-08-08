@@ -55,6 +55,7 @@ function RegistrarComponent() {
       }
 
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      window.dispatchEvent(new Event('authChanged'));
       setSuccessMsg('Usuario registrado correctamente.');
       navigate('/');
     } catch (err) {

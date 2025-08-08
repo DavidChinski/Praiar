@@ -66,9 +66,22 @@ function Navbar() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('usuario');
-    if (storedUser) {
-      setUsuario(JSON.parse(storedUser));
-    }
+    setUsuario(storedUser ? JSON.parse(storedUser) : null);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const syncFromStorage = () => {
+      const storedUser = localStorage.getItem('usuario');
+      setUsuario(storedUser ? JSON.parse(storedUser) : null);
+    };
+
+    window.addEventListener('storage', syncFromStorage);
+    window.addEventListener('authChanged', syncFromStorage);
+
+    return () => {
+      window.removeEventListener('storage', syncFromStorage);
+      window.removeEventListener('authChanged', syncFromStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -98,9 +111,9 @@ function Navbar() {
 
       if (response.ok) {
         localStorage.removeItem('usuario');
+        window.dispatchEvent(new Event('authChanged'));
         setUsuario(null);
         navigate('/');
-        window.location.reload();
       } else {
         const data = await response.json();
         alert('Error al cerrar sesión: ' + (data?.error || ''));

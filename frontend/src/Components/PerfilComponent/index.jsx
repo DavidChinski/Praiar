@@ -56,9 +56,8 @@ function PerfilComponent() {
     localStorage.removeItem('usuario');
     // Opcional: eliminá el token de Supabase si lo estás usando
     // localStorage.removeItem('supabase.auth.token');
-
+    window.dispatchEvent(new Event('authChanged'));
     navigate('/');
-    window.location.reload(); // Forzá recarga si querés reiniciar estado global
   } catch (error) {
     console.error('Error inesperado en logout:', error);
     alert('Error al cerrar sesión.');
@@ -96,6 +95,7 @@ function PerfilComponent() {
 
       setUsuario(data.usuario);
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      window.dispatchEvent(new Event('authChanged'));
       setShowEditModal(false);
     } catch (error) {
       alert('Error de conexión con el servidor.');

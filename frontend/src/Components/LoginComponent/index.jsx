@@ -45,8 +45,9 @@ function LoginComponent() {
         return;
       }
 
-      // Guardar usuario en localStorage y redirigir
+      // Guardar usuario en localStorage, notificar y redirigir
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      window.dispatchEvent(new Event('authChanged'));
       navigate('/');
     } catch (err) {
       setErrorMsg('Error de conexión con el servidor.');

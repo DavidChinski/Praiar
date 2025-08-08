@@ -34,6 +34,7 @@ const AuthCallback = () => {
       // Guardás en localStorage (como hacés en el login)
       if (usuario) {
         localStorage.setItem('usuario', JSON.stringify(usuario));
+        window.dispatchEvent(new Event('authChanged'));
 
         // Ahora chequeás si tiene los datos completos (esto depende de tu lógica)
         const datosCompletos = usuario.telefono && usuario.direccion; // ejemplo

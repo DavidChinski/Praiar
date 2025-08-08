@@ -68,12 +68,13 @@ const InformacionExtra = () => {
         return;
       }
 
-      // Guardar en localStorage y redirigir
+      // Guardar en localStorage, notificar y redirigir
       localStorage.setItem('usuario', JSON.stringify({
         ...existingUser,
         dni,
         telefono,
       }));
+      window.dispatchEvent(new Event('authChanged'));
       navigate('/');
     } else {
       // No existe → hacemos INSERT
@@ -99,8 +100,9 @@ const InformacionExtra = () => {
         return;
       }
 
-      // Guardar en localStorage y redirigir
+      // Guardar en localStorage, notificar y redirigir
       localStorage.setItem('usuario', JSON.stringify(insertedUser));
+      window.dispatchEvent(new Event('authChanged'));
       navigate('/');
     }
   };
