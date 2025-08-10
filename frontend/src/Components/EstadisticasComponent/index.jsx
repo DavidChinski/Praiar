@@ -69,6 +69,25 @@ export default function EstadisticasComponent() {
     setUsuario(getUserFromStorage());
   }, []);
 
+  // Manejar tecla Escape para cerrar modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && selectedBalneario) {
+        setSelectedBalneario(null);
+      }
+    };
+
+    if (selectedBalneario) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedBalneario]);
+
   // Cargar ciudades y balnearios del usuario si es dueño
   useEffect(() => {
     async function cargarDatos() {
@@ -475,15 +494,21 @@ export default function EstadisticasComponent() {
       </div>
 
       {selectedBalneario && (
-        <BalnearioDetalle
-          balneario={balnearios.find(
-            (b) => b.id_balneario === selectedBalneario
-          )}
-          ciudades={ciudades}
-          reseñas={reseñasPorBalneario[selectedBalneario] || []}
-          reservas={reservasPorBalneario[selectedBalneario] || []}
-          onClose={() => setSelectedBalneario(null)}
-        />
+        <div className="balneario-detalle-overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setSelectedBalneario(null);
+          }
+        }}>
+          <BalnearioDetalle
+            balneario={balnearios.find(
+              (b) => b.id_balneario === selectedBalneario
+            )}
+            ciudades={ciudades}
+            reseñas={reseñasPorBalneario[selectedBalneario] || []}
+            reservas={reservasPorBalneario[selectedBalneario] || []}
+            onClose={() => setSelectedBalneario(null)}
+          />
+        </div>
       )}
     </div>
   );
@@ -522,14 +547,14 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
   
   return (
     <div className="balneario-detalle-card">
-      <button className="cerrar-button" onClick={onClose}>
+      <button className="cerrar-button" onClick={onClose} title="Cerrar">
         ✕
       </button>
-      <h3>Detalle de {balneario.nombre}</h3>
+      <h3>📊 Detalle de {balneario.nombre}</h3>
       
       <div className="detalle-stats">
         <div className="detalle-stat">
-          <span className="stat-label">Ciudad:</span>
+          <span className="stat-label">🏙️ Ciudad:</span>
           <span className="stat-value">
             {ciudades.find((c) => c.id_ciudad === balneario.id_ciudad)?.nombre ||
               balneario.ciudad ||
@@ -537,35 +562,35 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
           </span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">ID:</span>
+          <span className="stat-label">🆔 ID:</span>
           <span className="stat-value">{balneario.id_balneario}</span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">Dirección:</span>
+          <span className="stat-label">📍 Dirección:</span>
           <span className="stat-value">{balneario.direccion || "-"}</span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">Teléfono:</span>
+          <span className="stat-label">📞 Teléfono:</span>
           <span className="stat-value">{balneario.telefono || "-"}</span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">Reservas:</span>
+          <span className="stat-label">📅 Reservas:</span>
           <span className="stat-value highlight">{reservas.length}</span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">Likes (reseñas):</span>
+          <span className="stat-label">👍 Likes (reseñas):</span>
           <span className="stat-value highlight">
             {reseñas.reduce((acc, r) => acc + (r.likes || 0), 0)}
           </span>
         </div>
         <div className="detalle-stat">
-          <span className="stat-label">Reseñas:</span>
+          <span className="stat-label">⭐ Reseñas:</span>
           <span className="stat-value highlight">{reseñas.length}</span>
         </div>
       </div>
       
       <div className="chart-bar">
-        <h4>Distribución de Estrellas</h4>
+        <h4>📈 Distribución de Estrellas</h4>
         <Bar
           data={rankingEstrellas}
           options={{ 
@@ -587,14 +612,14 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
       </div>
       
       <div className="reseñas-section">
-        <h4>Últimas reseñas</h4>
-        {reseñas.length === 0 && <p className="no-data">No hay reseñas aún.</p>}
+        <h4>💬 Últimas reseñas</h4>
+        {reseñas.length === 0 && <p className="no-data">📝 No hay reseñas aún.</p>}
         <ul className="reseñas-list">
           {reseñas.map((r) => (
             <li key={r.id_reseña} className="reseña-item">
               <div className="reseña-header">
                 <b className="reseña-usuario">
-                  {r.usuario_nombre || "Usuario"}
+                  👤 {r.usuario_nombre || "Usuario"}
                 </b>
                 <span className="reseña-estrellas">
                   {r.estrellas}<span className="reseña-estrella">★</span>
@@ -608,16 +633,16 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
       </div>
       
       <div className="reservas-section">
-        <h4>Reservas recientes</h4>
-        {reservas.length === 0 && <p className="no-data">No hay reservas aún.</p>}
+        <h4>🏕️ Reservas recientes</h4>
+        {reservas.length === 0 && <p className="no-data">📋 No hay reservas aún.</p>}
         <ul className="reservas-list">
           {reservas.slice(-5).map((r, i) => (
             <li key={i} className="reserva-item">
               <span className="reserva-fechas">
-                {r.fecha_inicio} a {r.fecha_salida}
+                📅 {r.fecha_inicio} a {r.fecha_salida}
               </span>
               <span className="reserva-carpa">
-                Carpa ID: {r.id_ubicacion || r.ubicacion_id_carpa}
+                🏕️ Carpa ID: {r.id_ubicacion || r.ubicacion_id_carpa}
               </span>
             </li>
           ))}

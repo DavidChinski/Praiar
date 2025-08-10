@@ -57,6 +57,9 @@ function ReseniasSection({
                             : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
                         }
                         alt={resenia?.usuario_nombre || "Usuario"}
+                        onError={(e) => {
+                          e.target.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+                        }}
                       />
                       <div className="resenia-usuario">
                         <span className="resenia-usuario-nombre">

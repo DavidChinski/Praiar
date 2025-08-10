@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarDays, faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
@@ -84,6 +85,91 @@ function CarpasDelBalneario(props) {
     quincena: "",
     mes: "",
   });
+
+  // ==== FUNCIONALIDAD DE ZOOM ====
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  // Función para hacer zoom in
+  const handleZoomIn = () => {
+    setZoom(prevZoom => Math.min(prevZoom * 1.2, 3));
+  };
+
+  // Función para hacer zoom out
+  const handleZoomOut = () => {
+    setZoom(prevZoom => Math.max(prevZoom / 1.2, 0.3));
+  };
+
+  // Función para resetear zoom
+  const handleResetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  // Función para manejar el inicio del arrastre del mapa
+  const handleMouseDown = (e) => {
+    if (e.button === 0) { // Solo botón izquierdo del mouse
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - pan.x,
+        y: e.clientY - pan.y
+      });
+    }
+  };
+
+  // Función para manejar el movimiento del mouse durante el arrastre
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  // Función para manejar el fin del arrastre
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Función para manejar el scroll del mouse para zoom
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.3, Math.min(3, zoom * delta));
+    
+    // Calcular el punto de zoom relativo al cursor
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Ajustar el pan para mantener el punto del cursor en la misma posición
+    const zoomRatio = newZoom / zoom;
+    setPan(prevPan => ({
+      x: mouseX - (mouseX - prevPan.x) * zoomRatio,
+      y: mouseY - (mouseY - prevPan.y) * zoomRatio
+    }));
+    
+    setZoom(newZoom);
+  };
+
+  // Prevenir el scroll por defecto en el contenedor del mapa
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      const preventScroll = (e) => {
+        e.preventDefault();
+      };
+      
+      container.addEventListener('wheel', preventScroll, { passive: false });
+      
+      return () => {
+        container.removeEventListener('wheel', preventScroll);
+      };
+    }
+  }, []);
 
   // AUTOCOMPLETADO DE ELEMENTOS
   const [todosElementos] = useState([
@@ -281,6 +367,7 @@ function CarpasDelBalneario(props) {
     fetch(url)
       .then(res => res.json())
       .then(data => {
+        console.log('Reseñas cargadas:', data.resenias);
         setResenias(data.resenias || []);
         setLoadingResenias(false);
       })
@@ -332,7 +419,7 @@ function CarpasDelBalneario(props) {
   async function agregarResenia() {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario || !usuario.auth_id) {
+    if (!usuario || !usuario.id_usuario) {
       alert("Debes iniciar sesión para dejar una reseña.");
       return;
     }
@@ -347,7 +434,7 @@ function CarpasDelBalneario(props) {
     const body = {
       comentario: reseniaNueva.comentario,
       estrellas: Number(reseniaNueva.estrellas),
-      id_usuario: usuario.id_usuario // puede venir como id_usuario o auth_id
+      id_usuario: usuario.id_usuario
     };
     const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`, {
       method: "POST",
@@ -658,123 +745,190 @@ function CarpasDelBalneario(props) {
         </div>
       )}
 
-      {esDuenio ? (
-        <div className="busqueda-form">
-        <div className="input-group date-group">
-          <FontAwesomeIcon
-            icon="fa-solid fa-calendar-days"
-            className="iconFecha"
-            alt="Icono de fecha"
-            onClick={() => setShowCalendario(!showCalendario)}
-            style={{ cursor: "pointer" }}
-          />
-          <div className="input-wrapper">
-            <label className="subtitulo">Filtra tus fechas</label>
-            <div
-              className="date-summary input-estandar"
-              onClick={() => setShowCalendario(!showCalendario)}
-            >
-              {format(rangoFechas[0].startDate, "dd/MM/yyyy")} -{" "}
-              {format(rangoFechas[0].endDate, "dd/MM/yyyy")}
-            </div>
-            {showCalendario && (
-              <div className="calendario-container">
-                <DateRange
-                  editableDateInputs={true}
-                  onChange={(item) => setRangoFechas([item.selection])}
-                  moveRangeOnFirstSelection={false}
-                  ranges={rangoFechas}
-                  months={2}
-                  direction="horizontal"
-                  rangeColors={["#005984"]}
-                  minDate={new Date()}
-                />
+      <div className="main-content-layout">
+        {/* Panel izquierdo con elementos de gestión */}
+        <div className="management-panel">
+          {esDuenio ? (
+            <>
+              {/* Filtro de fechas */}
+              <div className="panel-section">
+                <h3 className="panel-title">📅 Filtro de Fechas</h3>
+                <div className="date-filter-container">
+                  <FontAwesomeIcon
+                    icon={faCalendarDays}
+                    className="iconFecha"
+                    alt="Icono de fecha"
+                    onClick={() => setShowCalendario(!showCalendario)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <div className="input-wrapper">
+                    <label className="subtitulo">Selecciona el rango</label>
+                    <div
+                      className="date-summary input-estandar"
+                      onClick={() => setShowCalendario(!showCalendario)}
+                    >
+                      {format(rangoFechas[0].startDate, "dd/MM/yyyy")} -{" "}
+                      {format(rangoFechas[0].endDate, "dd/MM/yyyy")}
+                    </div>
+                    {showCalendario && (
+                      <div className="calendario-container">
+                        <DateRange
+                          editableDateInputs={true}
+                          onChange={(item) => setRangoFechas([item.selection])}
+                          moveRangeOnFirstSelection={false}
+                          ranges={rangoFechas}
+                          months={2}
+                          direction="horizontal"
+                          rangeColors={["#005984"]}
+                          minDate={new Date()}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-      ) : (
-        <p>
-          Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
-          {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
-        </p>
-      )}
 
-      {esDuenio && (
-        <div className="toolbar">
-          <div style={{ minWidth: 250 }}>
-            <label className="subtitulo" style={{ marginBottom: 4, display: "block" }}>
-              Agregar elemento
-            </label>
-            <ElementoAutocomplete
-              elementoInput={elementoInput}
-              setElementoInput={setElementoInput}
-              elementoMatches={elementoMatches}
-              setElementoMatches={setElementoMatches}
-              agregarElementoTipo={agregarElementoTipo}
-              elementoInputRef={elementoInputRef}
-              elementoDropdownRef={elementoDropdownRef}
-            />
-          </div>
-          <button className="boton-agregar-servicio" onClick={() => setMostrarAgregarCarpa(true)}>
-            Agregar carpa/sombrilla
-          </button>
-          <Link className="boton-agregar-servicio" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>Tus Reservas</Link>
-        </div>
-      )}
+              {/* Agregar elementos */}
+              <div className="panel-section">
+                <h3 className="panel-title">➕ Agregar Elementos</h3>
+                <div className="add-elements-container">
+                  <div className="element-input-group">
+                    <label className="subtitulo">Tipo de elemento</label>
+                    <ElementoAutocomplete
+                      elementoInput={elementoInput}
+                      setElementoInput={setElementoInput}
+                      elementoMatches={elementoMatches}
+                      setElementoMatches={setElementoMatches}
+                      agregarElementoTipo={agregarElementoTipo}
+                      elementoInputRef={elementoInputRef}
+                      elementoDropdownRef={elementoDropdownRef}
+                    />
+                  </div>
+                  <button className="panel-button primary" onClick={() => setMostrarAgregarCarpa(true)}>
+                    <FontAwesomeIcon icon={faPlus} /> Agregar Carpa/Sombrilla
+                  </button>
+                </div>
+              </div>
 
-      <div
-        className="carpa-container"
-        ref={containerRef}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-      >
-        {carpas.map((carpa) => {
-          const tipo = getTipoCarpa(carpa);
-          const left = carpa.x;
-          const top = carpa.y;
-          return (
-            <div
-              key={carpa.id_carpa}
-              className="carpa-wrapper"
-              style={{ position: "absolute", left, top, zIndex: 1 }}
-            >
-              <CarpaItem
-                carpa={carpa}
-                tipo={tipo}
-                left={0}
-                top={0}
-                esDuenio={esDuenio}
-                dragging={dragging}
-                setDragging={setDragging}
-                carpaReservada={carpaReservada}
-                usuarioLogueado={usuarioLogueado}
-                navigate={navigate}
-                eliminarCarpa={eliminarCarpa}
-                handleEditarCarpa={handleEditarCarpa}
-                fechaInicio={fechaInicio}
-                fechaFin={fechaFin}
-                idBalneario={balnearioId}
-                seleccionadas={seleccionadas}
-                setSeleccionadas={setSeleccionadas}
-                soloSeleccion={props.soloSeleccion}
-                reservaSeleccionMultiple={props.reservaSeleccionMultiple}
-                onReservarManual={esDuenio ? handleReservarManual : undefined}
-              />
+              {/* Acciones rápidas */}
+              <div className="panel-section">
+                <h3 className="panel-title">🚀 Acciones Rápidas</h3>
+                <div className="quick-actions">
+                  <Link className="panel-button secondary" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>
+                    <FontAwesomeIcon icon={faList} /> Ver Reservas
+                  </Link>
+                  <button className="panel-button secondary" onClick={() => setMostrarModalServicios(true)}>
+                    <FontAwesomeIcon icon={faCog} /> Gestionar Servicios
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="panel-section">
+              <h3 className="panel-title">📅 Disponibilidad</h3>
+              <div className="availability-info">
+                <p>
+                  Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
+                  {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
+                </p>
+              </div>
             </div>
-          );
-        })}
+          )}
+        </div>
 
-        {elementos.map((el) => (
-          <ElementoItem
-            key={el.id_elemento}
-            el={el}
-            esDuenio={esDuenio}
-            setDragging={setDragging}
-            rotarElemento={rotarElemento}
-          />
-        ))}
+        {/* Contenedor del mapa a la derecha */}
+        <div className="map-container-wrapper">
+          {/* Controles de zoom */}
+          <div className="zoom-controls">
+            <button 
+              className="zoom-btn zoom-in" 
+              onClick={handleZoomIn}
+              title="Acercar (o usar rueda del mouse)"
+            >
+              <FontAwesomeIcon icon={faSearchPlus} />
+            </button>
+            <button 
+              className="zoom-btn zoom-out" 
+              onClick={handleZoomOut}
+              title="Alejar (o usar rueda del mouse)"
+            >
+              <FontAwesomeIcon icon={faSearchMinus} />
+            </button>
+            <button 
+              className="zoom-btn zoom-reset" 
+              onClick={handleResetZoom}
+              title="Restablecer vista"
+            >
+              <FontAwesomeIcon icon={faExpandArrowsAlt} />
+            </button>
+            <div className="zoom-level-indicator">
+              {Math.round(zoom * 100)}%
+            </div>
+            <div className="zoom-hint">
+              💡 Usa la rueda del mouse para hacer zoom
+            </div>
+          </div>
+          
+          <div
+            className="carpa-container"
+            ref={containerRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onWheel={handleWheel}
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transformOrigin: '0 0',
+              cursor: isDragging ? 'grabbing' : 'grab'
+            }}
+          >
+            {carpas.map((carpa) => {
+              const tipo = getTipoCarpa(carpa);
+              const left = carpa.x;
+              const top = carpa.y;
+              return (
+                <div
+                  key={carpa.id_carpa}
+                  className="carpa-wrapper"
+                  style={{ position: "absolute", left, top, zIndex: 1 }}
+                >
+                  <CarpaItem
+                    carpa={carpa}
+                    tipo={tipo}
+                    left={0}
+                    top={0}
+                    esDuenio={esDuenio}
+                    dragging={dragging}
+                    setDragging={setDragging}
+                    carpaReservada={carpaReservada}
+                    usuarioLogueado={usuarioLogueado}
+                    navigate={navigate}
+                    eliminarCarpa={eliminarCarpa}
+                    handleEditarCarpa={handleEditarCarpa}
+                    fechaInicio={fechaInicio}
+                    fechaFin={fechaFin}
+                    idBalneario={balnearioId}
+                    seleccionadas={seleccionadas}
+                    setSeleccionadas={setSeleccionadas}
+                    soloSeleccion={props.soloSeleccion}
+                    reservaSeleccionMultiple={props.reservaSeleccionMultiple}
+                    onReservarManual={esDuenio ? handleReservarManual : undefined}
+                  />
+                </div>
+              );
+            })}
+
+            {elementos.map((el) => (
+              <ElementoItem
+                key={el.id_elemento}
+                el={el}
+                esDuenio={esDuenio}
+                setDragging={setDragging}
+                rotarElemento={rotarElemento}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       <ServiciosSection

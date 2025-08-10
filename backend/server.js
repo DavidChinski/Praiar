@@ -1297,7 +1297,8 @@ app.get('/api/balneario/:id/resenias', async (req, res) => {
         usuarios (
           id_usuario,
           nombre,
-          apellido
+          apellido,
+          imagen
         )
       `)
       .eq('id_balneario', balnearioId);
@@ -1332,9 +1333,12 @@ app.get('/api/balneario/:id/resenias', async (req, res) => {
       usuario_nombre: r.usuarios?.nombre
         ? r.usuarios.nombre + (r.usuarios.apellido ? " " + r.usuarios.apellido : "")
         : undefined,
+      usuario_imagen: r.usuarios?.imagen || null,
       likes: likesPorResenia[r.id_reseña] || 0,
       dioLike: !!likesDelUsuario[r.id_reseña]
     }));
+
+    console.log('Reseñas procesadas:', reseñas);
 
     res.json({ resenias: reseñas });
   } catch (e) {

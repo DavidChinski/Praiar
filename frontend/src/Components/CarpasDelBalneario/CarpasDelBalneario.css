@@ -153,18 +153,9 @@
   background: #003F5E;
 }
 
-/* Toolbar */
+/* Toolbar - Mantenido para compatibilidad pero no usado en el nuevo diseño */
 .toolbar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 24px;
-  border-radius: 14px;
-  padding: 16px 24px;
-  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  display: none; /* Oculto en el nuevo diseño */
 }
 
 .toolbar-dropdown {
@@ -263,16 +254,141 @@
   to   { opacity: 1; transform: translateY(0);}
 }
 
+/* Contenedor del mapa */
+.map-container-wrapper {
+  flex: 1;
+  min-height: 500px;
+  background: linear-gradient(135deg, #f8faff, #f0f7fa);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 63, 94, 0.08);
+  border: 1px solid rgba(0, 63, 94, 0.05);
+  position: relative;
+}
+
+/* Controles de zoom */
+.zoom-controls {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  color: #005984;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
+  border: 1px solid rgba(0, 63, 94, 0.1);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.zoom-btn:hover {
+  background: linear-gradient(135deg, #f0f7fa, #e8f4f8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 63, 94, 0.2);
+}
+
+.zoom-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 63, 94, 0.15);
+}
+
+.zoom-btn.zoom-in {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+}
+
+.zoom-btn.zoom-in:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.zoom-btn.zoom-out {
+  background: linear-gradient(135deg, #FF9800, #f57c00);
+  color: white;
+}
+
+.zoom-btn.zoom-out:hover {
+  background: linear-gradient(135deg, #f57c00, #ef6c00);
+}
+
+.zoom-btn.zoom-reset {
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+  color: white;
+}
+
+.zoom-btn.zoom-reset:hover {
+  background: linear-gradient(135deg, #1976D2, #1565C0);
+}
+
+/* Indicador de nivel de zoom */
+.zoom-level-indicator {
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  color: #005984;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid rgba(0, 63, 94, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
+  backdrop-filter: blur(10px);
+  min-width: 50px;
+}
+
+/* Sugerencia de zoom */
+.zoom-hint {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 10px;
+  text-align: center;
+  border: 1px solid #ffeaa7;
+  box-shadow: 0 2px 8px rgba(133, 100, 4, 0.15);
+  backdrop-filter: blur(10px);
+  min-width: 120px;
+  line-height: 1.2;
+}
+
+/* Ajustes para el contenedor de carpas con zoom */
 .carpa-container {
   position: relative;
-  width: 96%;
+  width: 100%;
   height: 500px;
-  margin: 30px auto 12px auto;
+  margin: 0;
   border-radius: 12px;
   border: 1px solid #aaa;
   overflow: hidden;
   background: #f0f7fa;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
+  transition: cursor 0.1s ease;
+  will-change: transform;
+  user-select: none;
 }
 
 /* Carpas orden y disposición */
@@ -631,14 +747,22 @@
 }
 
 .resenia-avatar {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
   background: #eaeaea;
   display: inline-block;
-  margin-right: 5px;
-  border: 1.2px solid #d2dbe8;
+  margin-right: 8px;
+  border: 2px solid #d2dbe8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.resenia-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #339dff;
 }
 
 .resenia-usuario {
@@ -846,3 +970,386 @@ button {
 }
 
 /* Asegura que las flechas del carrusel sean consistentes con .flecha-abajo */
+
+/* Layout principal con panel lateral */
+.main-content-layout {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+  align-items: flex-start;
+  min-height: 600px;
+}
+
+/* Panel de gestión izquierdo */
+.management-panel {
+  flex: 0 0 320px;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 63, 94, 0.1);
+  border: 1px solid rgba(0, 63, 94, 0.08);
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.management-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.management-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.management-panel::-webkit-scrollbar-thumb {
+  background: #005984;
+  border-radius: 3px;
+}
+
+.management-panel::-webkit-scrollbar-thumb:hover {
+  background: #003f5e;
+}
+
+/* Secciones del panel */
+.panel-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 63, 94, 0.1);
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #005984;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Contenedor del filtro de fechas */
+.date-filter-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.date-filter-container .iconFecha {
+  margin-top: 1.5rem;
+  color: #005984;
+  font-size: 1.2rem;
+}
+
+.date-filter-container .input-wrapper {
+  flex: 1;
+}
+
+.date-filter-container .subtitulo {
+  font-size: 0.9rem;
+  color: #005984;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.date-filter-container .date-summary {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-filter-container .date-summary:hover {
+  box-shadow: 0 2px 12px rgba(0, 89, 132, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Contenedor para agregar elementos */
+.add-elements-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.element-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.element-input-group .subtitulo {
+  font-size: 0.9rem;
+  color: #005984;
+  font-weight: 500;
+}
+
+/* Botones del panel */
+.panel-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  min-height: 44px;
+}
+
+.panel-button.primary {
+  background: linear-gradient(135deg, #005984, #0077b6);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 89, 132, 0.2);
+}
+
+.panel-button.primary:hover {
+  background: linear-gradient(135deg, #004a68, #005984);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 89, 132, 0.3);
+}
+
+.panel-button.secondary {
+  background: linear-gradient(135deg, #ffffff, #f0f7fa);
+  color: #005984;
+  border: 2px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
+}
+
+.panel-button.secondary:hover {
+  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.15);
+  border-color: #0077b6;
+}
+
+/* Acciones rápidas */
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Información de disponibilidad para usuarios no propietarios */
+.availability-info {
+  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 89, 132, 0.1);
+}
+
+.availability-info p {
+  margin: 0;
+  color: #005984;
+  font-size: 0.95rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Contenedor del calendario */
+.calendario-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 63, 94, 0.1);
+  margin-top: 0.5rem;
+}
+
+/* Estilos para el input de fecha */
+.date-summary.input-estandar {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Estilos para el autocomplete de elementos */
+.input-autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-autocomplete-wrapper .input-estandar {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid rgba(0, 89, 132, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.autocomplete-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.autocomplete-option:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-option:hover {
+  background-color: #f8faff;
+}
+
+.autocomplete-option .suggestion-text {
+  color: #005984;
+  font-size: 0.9rem;
+}
+
+.autocomplete-option .typed-text {
+  font-weight: 600;
+}
+
+.autocomplete-option .completion-text {
+  color: #666;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1200px) {
+  .main-content-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .management-panel {
+    flex: none;
+    width: 100%;
+    position: static;
+    max-height: none;
+    order: 1;
+  }
+  
+  .map-container-wrapper {
+    width: 100%;
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-layout {
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .management-panel {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .map-container-wrapper {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .zoom-controls {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+  
+  .zoom-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+  
+  .zoom-level-indicator {
+    font-size: 11px;
+    padding: 0.4rem;
+    min-width: 45px;
+  }
+  
+  .zoom-hint {
+    font-size: 9px;
+    padding: 0.4rem;
+    min-width: 110px;
+  }
+  
+  .panel-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .panel-title {
+    font-size: 1rem;
+  }
+  
+  .panel-button {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-layout {
+    gap: 0.8rem;
+    margin: 0.8rem 0;
+  }
+  
+  .management-panel {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .map-container-wrapper {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .zoom-controls {
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .zoom-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+  
+  .zoom-level-indicator {
+    font-size: 10px;
+    padding: 0.3rem;
+    min-width: 40px;
+  }
+  
+  .zoom-hint {
+    font-size: 8px;
+    padding: 0.3rem;
+    min-width: 100px;
+  }
+  
+  .panel-button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+    min-height: 40px;
+  }
+  
+  .panel-title {
+    font-size: 0.95rem;
+  }
+}

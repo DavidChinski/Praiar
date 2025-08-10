@@ -250,68 +250,160 @@
 }
 
 /* ---------- Card Detalle ---------- */
+.balneario-detalle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 63, 94, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .balneario-detalle-card {
-  margin-top: 2.5rem;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #e8f0fe, #f0f8ff);
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 63, 94, 0.15);
+  margin: 0;
+  padding: 3rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 2rem;
+  box-shadow: 
+    0 20px 60px rgba(0, 63, 94, 0.25),
+    0 8px 32px rgba(0, 153, 204, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  border: 1px solid #d0e3ff;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(208, 227, 255, 0.3);
+  animation: slideIn 0.4s ease-out;
+  transform-origin: center;
+  scrollbar-width: thin;
+  scrollbar-color: #0099cc #f0f8ff;
+}
+
+.balneario-detalle-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.balneario-detalle-card::-webkit-scrollbar-track {
+  background: #f0f8ff;
+  border-radius: 4px;
+}
+
+.balneario-detalle-card::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #0099cc, #41b6e6);
+  border-radius: 4px;
+}
+
+.balneario-detalle-card::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0077a6, #0099cc);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .cerrar-button {
   position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  font-size: 24px;
-  background: none;
+  top: 1.5rem;
+  right: 2rem;
+  font-size: 20px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
   border: none;
   cursor: pointer;
-  color: #003f5e;
+  color: white;
   transition: all 0.3s ease;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+  font-weight: 600;
 }
 
 .cerrar-button:hover {
-  background-color: rgba(0, 63, 94, 0.1);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #ee5a52, #d63031);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 .balneario-detalle-card h3 {
-  font-size: 1.6rem;
+  font-size: 2rem;
   color: #003f5e;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   text-align: center;
   font-weight: 700;
+  background: linear-gradient(135deg, #003f5e, #005984);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.balneario-detalle-card h3::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #0099cc, #41b6e6);
+  border-radius: 2px;
 }
 
 /* ---------- Estadísticas del detalle ---------- */
 .detalle-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 63, 94, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(208, 227, 255, 0.4);
 }
 
 .detalle-stat {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem;
-  border-bottom: 1px solid #e8f0fe;
+  padding: 1.2rem;
+  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+}
+
+.detalle-stat:hover {
+  background: rgba(0, 153, 204, 0.05);
+  transform: translateX(5px);
 }
 
 .detalle-stat:last-child {
@@ -320,68 +412,122 @@
 
 .stat-label {
   color: #005984;
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #0099cc, #41b6e6);
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .stat-value {
   color: #003f5e;
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 153, 204, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 153, 204, 0.2);
 }
 
 .stat-value.highlight {
   color: #0099cc;
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 800;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, rgba(0, 153, 204, 0.15), rgba(65, 182, 230, 0.1));
+  border: 2px solid rgba(0, 153, 204, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 153, 204, 0.2);
 }
 
 /* ---------- Gráfico del detalle ---------- */
 .chart-bar {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+  margin: 2.5rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 63, 94, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(208, 227, 255, 0.4);
 }
 
 .chart-bar h4 {
   color: #003f5e;
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.chart-bar h4::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #0099cc, #41b6e6);
+  border-radius: 2px;
 }
 
 .chart-bar canvas {
-  max-height: 250px;
+  max-height: 300px;
 }
 
 /* ---------- Secciones de reseñas y reservas ---------- */
 .reseñas-section,
 .reservas-section {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.08);
+  margin-top: 2.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 63, 94, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(208, 227, 255, 0.4);
 }
 
 .reseñas-section h4,
 .reservas-section h4 {
   color: #003f5e;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e8f0fe;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid rgba(232, 240, 254, 0.8);
+  position: relative;
+}
+
+.reseñas-section h4::after,
+.reservas-section h4::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #0099cc, #41b6e6);
+  border-radius: 2px;
 }
 
 .no-data {
   color: #666;
   font-style: italic;
   text-align: center;
-  padding: 1rem;
+  padding: 2rem;
+  background: rgba(0, 153, 204, 0.05);
+  border-radius: 1rem;
+  border: 2px dashed rgba(0, 153, 204, 0.3);
 }
 
 /* ---------- Lista de reseñas ---------- */
@@ -392,11 +538,20 @@
 }
 
 .reseña-item {
-  padding: 1rem;
-  border-bottom: 1px solid #e8f0fe;
-  margin-bottom: 0.5rem;
-  border-radius: 0.5rem;
-  background: #f8f9fa;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.05);
+  border: 1px solid rgba(208, 227, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.reseña-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 63, 94, 0.1);
+  border-color: rgba(0, 153, 204, 0.4);
 }
 
 .reseña-item:last-child {
@@ -408,34 +563,48 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .reseña-usuario {
   color: #003f5e;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .reseña-estrellas {
   color: #005984;
-  font-weight: 600;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .reseña-estrella {
-  color: #e3b505;
+  color: #ffd700;
   margin-left: 4px;
+  font-size: 1.2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .reseña-comentario {
   color: #333;
-  margin: 0.5rem 0;
-  line-height: 1.4;
+  margin: 1rem 0;
+  line-height: 1.6;
+  font-size: 1rem;
 }
 
 .reseña-likes {
   color: #0099cc;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 153, 204, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 153, 204, 0.2);
 }
 
 /* ---------- Lista de reservas ---------- */
@@ -446,14 +615,23 @@
 }
 
 .reserva-item {
-  padding: 1rem;
-  border-bottom: 1px solid #e8f0fe;
-  margin-bottom: 0.5rem;
-  border-radius: 0.5rem;
-  background: #f8f9fa;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.05);
+  border: 1px solid rgba(208, 227, 255, 0.3);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: all 0.3s ease;
+}
+
+.reserva-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 63, 94, 0.1);
+  border-color: rgba(0, 153, 204, 0.4);
 }
 
 .reserva-item:last-child {
@@ -463,12 +641,18 @@
 
 .reserva-fechas {
   color: #003f5e;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .reserva-carpa {
   color: #005984;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 89, 132, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 89, 132, 0.2);
+  font-weight: 500;
 }
 
 /* ---------- Responsive ---------- */
@@ -507,6 +691,12 @@
   .balneario-detalle-card {
     padding: 1.5rem;
     margin: 1rem;
+    max-height: 95vh;
+    border-radius: 1.5rem;
+  }
+
+  .balneario-detalle-overlay {
+    padding: 1rem;
   }
   
   .tabla-balnearios th,
@@ -519,6 +709,31 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .cerrar-button {
+    top: 1rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .balneario-detalle-card h3 {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .detalle-stats {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .chart-bar,
+  .reseñas-section,
+  .reservas-section {
+    padding: 1.5rem;
+    margin-top: 2rem;
   }
 }
 
@@ -542,9 +757,54 @@
   
   .balneario-detalle-card {
     padding: 1rem;
+    max-height: 98vh;
+    border-radius: 1rem;
+  }
+
+  .balneario-detalle-overlay {
+    padding: 0.5rem;
   }
   
   .detalle-stats {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .cerrar-button {
+    top: 0.75rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .balneario-detalle-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-bar,
+  .reseñas-section,
+  .reservas-section {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .detalle-stat {
+    padding: 1rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .reseña-item,
+  .reserva-item {
     padding: 1rem;
   }
 }
