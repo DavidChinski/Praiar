@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDays, faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
@@ -46,7 +46,9 @@ function CarpasDelBalneario(props) {
   ]);
   const fechaInicio = rangoFechas[0].startDate.toISOString().split('T')[0];
   const fechaFin = rangoFechas[0].endDate.toISOString().split('T')[0];
-  const [showCalendario, setShowCalendario] = useState(false);
+  const [showCalendarioModal, setShowCalendarioModal] = useState(false);
+  const [actualizandoDisponibilidad, setActualizandoDisponibilidad] = useState(false);
+  const [rangoFechasDraft, setRangoFechasDraft] = useState(rangoFechas);
 
   // Selección múltiple: si vienen props de selección, usarlas, sino estado interno
   const [seleccionadas, setSeleccionadas] = props.seleccionadas !== undefined
@@ -55,6 +57,7 @@ function CarpasDelBalneario(props) {
   
 
   const containerRef = useRef(null);
+  const modalContentRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
   const [elementos, setElementos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -170,6 +173,19 @@ function CarpasDelBalneario(props) {
       };
     }
   }, []);
+
+  // Cerrar modal con tecla ESC
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        setShowCalendarioModal(false);
+      }
+    }
+    if (showCalendarioModal) {
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
+    }
+  }, [showCalendarioModal]);
 
   // AUTOCOMPLETADO DE ELEMENTOS
   const [todosElementos] = useState([
@@ -344,9 +360,11 @@ function CarpasDelBalneario(props) {
   // Cargar reservas
   useEffect(() => {
     if (!fechaInicio || !fechaFin || !balnearioId) return;
+    setActualizandoDisponibilidad(true);
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/reservas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`)
       .then(res => res.json())
-      .then(data => setReservas(Array.isArray(data) ? data : []));
+      .then(data => setReservas(Array.isArray(data) ? data : []))
+      .finally(() => setActualizandoDisponibilidad(false));
   }, [balnearioId, fechaInicio, fechaFin]);
 
   // Cargar precios del balneario
@@ -738,7 +756,6 @@ function CarpasDelBalneario(props) {
       <div className="balneario-header">
         <div className="balneario-header-main">
           <h1 className="balneario-nombre">{balnearioInfo?.nombre || 'Balneario'}</h1>
-          
         </div>
         {balnearioInfo && (
           <div className="balneario-meta">
@@ -763,40 +780,26 @@ function CarpasDelBalneario(props) {
         <div className="management-panel">
           {esDuenio ? (
             <>
-              {/* Filtro de fechas */}
+              {/* Disponibilidad + cambiar fecha (dueño) */}
               <div className="panel-section">
-                <h3 className="panel-title">📅 Filtro de Fechas</h3>
-                <div className="date-filter-container">
-                  <FontAwesomeIcon
-                    icon={faCalendarDays}
-                    className="iconFecha"
-                    alt="Icono de fecha"
-                    onClick={() => setShowCalendario(!showCalendario)}
-                    style={{ cursor: "pointer" }}
-                  />
-                  <div className="input-wrapper">
-                    <label className="subtitulo">Selecciona el rango</label>
-                    <div
-                      className="date-summary input-estandar"
-                      onClick={() => setShowCalendario(!showCalendario)}
+                <h3 className="panel-title">📅 Disponibilidad</h3>
+                <div className="availability-row">
+                  <div className="availability-info">
+                    <p>
+                      Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
+                    </p>
+                  </div>
+                  <div className="availability-actions">
+                    <button
+                      className="cambiar-fecha-btn"
+                      onClick={() => {
+                        setShowCalendarioModal(true);
+                        setRangoFechasDraft(rangoFechas);
+                      }}
+                      disabled={actualizandoDisponibilidad}
                     >
-                      {format(rangoFechas[0].startDate, "dd/MM/yyyy")} -{" "}
-                      {format(rangoFechas[0].endDate, "dd/MM/yyyy")}
-                    </div>
-                    {showCalendario && (
-                      <div className="calendario-container">
-                        <DateRange
-                          editableDateInputs={true}
-                          onChange={(item) => setRangoFechas([item.selection])}
-                          moveRangeOnFirstSelection={false}
-                          ranges={rangoFechas}
-                          months={2}
-                          direction="horizontal"
-                          rangeColors={["#005984"]}
-                          minDate={new Date()}
-                        />
-                      </div>
-                    )}
+                      <span className="emoji">📅</span> Cambiar fecha
+                    </button>
                   </div>
                 </div>
               </div>
@@ -839,11 +842,24 @@ function CarpasDelBalneario(props) {
           ) : (
             <div className="panel-section">
               <h3 className="panel-title">📅 Disponibilidad</h3>
-              <div className="availability-info">
-                <p>
-                  Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al{" "}
-                  {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
-                </p>
+              <div className="availability-row">
+                <div className="availability-info">
+                  <p>
+                    Mostrando disponibilidad del {new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-ES')} al {new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-ES')}
+                  </p>
+                </div>
+                <div className="availability-actions">
+                  <button
+                    className="cambiar-fecha-btn"
+                    onClick={() => {
+                      setShowCalendarioModal(true);
+                      setRangoFechasDraft(rangoFechas);
+                    }}
+                    disabled={actualizandoDisponibilidad}
+                  >
+                    <span className="emoji">📅</span> Cambiar fecha
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -851,6 +867,12 @@ function CarpasDelBalneario(props) {
 
         {/* Contenedor del mapa a la derecha */}
         <div className="map-container-wrapper">
+          {actualizandoDisponibilidad && (
+            <div className="map-loading-overlay">
+              <div className="spinner" />
+              <span>Actualizando disponibilidad…</span>
+            </div>
+          )}
           {/* Leyenda del mapa */}
           <div className="map-legend">
             <div className="legend-item"><span className="legend-dot libre" /> Libre</div>
@@ -948,6 +970,59 @@ function CarpasDelBalneario(props) {
           </div>
         </div>
       </div>
+
+      {showCalendarioModal && (
+        <div
+          className="modal-fechas"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={(e) => {
+            // cerrar si clickea fuera del contenido
+            if (modalContentRef.current && !modalContentRef.current.contains(e.target)) {
+              setShowCalendarioModal(false);
+            }
+          }}
+        >
+          <div className="modal-fechas-content" ref={modalContentRef} onMouseDown={(e) => e.stopPropagation()}>
+            <button
+              className="modal-fechas-close"
+              aria-label="Cerrar"
+              onClick={() => setShowCalendarioModal(false)}
+            >
+              ✕
+            </button>
+            <h3 className="modal-fechas-title">Elegí tu rango de fechas</h3>
+            <DateRange
+              editableDateInputs={true}
+              onChange={(item) => setRangoFechasDraft([item.selection])}
+              moveRangeOnFirstSelection={false}
+              ranges={rangoFechasDraft}
+              months={2}
+              direction="horizontal"
+              rangeColors={["#005984"]}
+              minDate={new Date()}
+            />
+            <div className="modal-fechas-actions">
+              <button
+                className="panel-button primary"
+                onClick={() => {
+                  setRangoFechas(rangoFechasDraft);
+                  setShowCalendarioModal(false);
+                }}
+                disabled={actualizandoDisponibilidad}
+              >
+                Aceptar
+              </button>
+              <button
+                className="panel-button secondary"
+                onClick={() => setShowCalendarioModal(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ServiciosSection
         balnearioInfo={balnearioInfo}

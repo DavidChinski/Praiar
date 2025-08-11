@@ -13,6 +13,7 @@
   padding: 1.3rem 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 63, 94, 0.06);
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .balneario-header-main {
@@ -22,6 +23,8 @@
   gap: 1rem;
 }
 
+/* eliminado del header; ahora se usa en el panel */
+
 .balneario-nombre {
   margin: 0;
   font-size: 2rem;
@@ -30,16 +33,105 @@
   letter-spacing: 0.2px;
 }
 
-.balneario-fechas-chip {
-  background: #e9f2ff;
-  border: 1px solid #bcdcff;
-  color: #004a68;
-  padding: 8px 12px;
+/* chip eliminado del header */
+
+.cambiar-fecha-btn {
+  background: linear-gradient(135deg, #ffffff, #f0f7fa);
+  color: #005984;
+  border: 2px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
+  padding: 8px 14px;
   border-radius: 999px;
-  font-size: 0.95rem;
   font-weight: 600;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+.cambiar-fecha-btn:hover {
+  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  transform: translateY(-1px);
+}
+.cambiar-fecha-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cambiar-fecha-btn .emoji { margin-right: 6px; }
+
+/* popover in-panel */
+.calendar-popover {
+  position: relative;
+  margin-top: 10px;
+  background: #fff;
+  border: 1px solid rgba(0, 63, 94, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  padding: 8px;
+}
+.calendar-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 8px 6px 4px 6px;
+}
+
+.availability-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.availability-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+/* Modal central de fechas */
+.modal-fechas {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+}
+.modal-fechas-content {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 63, 94, 0.08);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  padding: 1rem 1.2rem 1rem 1.2rem;
+  width: min(820px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+.modal-fechas-title {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.25rem;
+  color: #003F5E;
+  font-weight: 700;
+}
+.modal-fechas-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding-top: 0.5rem;
+}
+.modal-fechas-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffdddd, #ffc2c2);
+  color: #8b1a1a;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(139, 26, 26, 0.2);
+}
+.modal-fechas-close:hover { filter: brightness(0.95); }
 
 .balneario-meta {
   display: grid;
@@ -325,6 +417,30 @@
   box-shadow: 0 4px 20px rgba(0, 63, 94, 0.08);
   border: 1px solid rgba(0, 63, 94, 0.05);
   position: relative;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.65);
+  z-index: 1200;
+  border-radius: 20px;
+}
+.map-loading-overlay .spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #cfe7f2;
+  border-top-color: #005984;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Leyenda del mapa */
