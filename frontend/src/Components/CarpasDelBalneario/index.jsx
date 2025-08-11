@@ -736,15 +736,28 @@ function CarpasDelBalneario(props) {
 
   return (
     <div className="carpas-del-balneario">
-      <h2>{balnearioInfo?.nombre || 'Carpas del Balneario'}</h2>
-
-      {balnearioInfo && (
-        <div className="balneario-info">
-          <p><strong>Dirección:</strong> {balnearioInfo.direccion}</p>
-          <p><strong>Ciudad:</strong> {Ciudad}</p>
-          <p><strong>Teléfono:</strong> {balnearioInfo.telefono}</p>
+      <div className="balneario-header">
+        <div className="balneario-header-main">
+          <h1 className="balneario-nombre">{balnearioInfo?.nombre || 'Balneario'}</h1>
+          
         </div>
-      )}
+        {balnearioInfo && (
+          <div className="balneario-meta">
+            <div className="meta-item">
+              <span className="meta-label">Dirección</span>
+              <span className="meta-value">{balnearioInfo.direccion || '-'}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Ciudad</span>
+              <span className="meta-value">{Ciudad || '-'}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Teléfono</span>
+              <a className="meta-value meta-link" href={balnearioInfo.telefono ? `tel:${balnearioInfo.telefono}` : undefined}>{balnearioInfo.telefono || '-'}</a>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="main-content-layout">
         {/* Panel izquierdo con elementos de gestión */}
@@ -839,6 +852,11 @@ function CarpasDelBalneario(props) {
 
         {/* Contenedor del mapa a la derecha */}
         <div className="map-container-wrapper">
+          {/* Leyenda del mapa */}
+          <div className="map-legend">
+            <div className="legend-item"><span className="legend-dot libre" /> Libre</div>
+            <div className="legend-item"><span className="legend-dot reservada" /> Reservada</div>
+          </div>
           {/* Controles de zoom */}
           <div className="zoom-controls">
             <button 

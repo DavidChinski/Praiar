@@ -1,9 +1,8 @@
-import CarpasDelBalneario from "../components/CarpasDelBalneario";
+import CarpasDelBalneario from "../Components/CarpasDelBalneario";
 
 function VistaBalneario() {
   return (
     <>
-      {/* Acá podés mostrar otros detalles del balneario */}
       <CarpasDelBalneario />
     </>
   );

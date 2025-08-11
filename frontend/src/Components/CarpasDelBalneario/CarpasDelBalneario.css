@@ -5,11 +5,72 @@
   margin: 0 auto;
 }
 
-.carpas-del-balneario > h2 {
-  text-align: center;
+/* Header moderno */
+.balneario-header {
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border: 1px solid rgba(0, 63, 94, 0.08);
+  border-radius: 20px;
+  padding: 1.3rem 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 63, 94, 0.06);
   margin-bottom: 1.5rem;
+}
+
+.balneario-header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.balneario-nombre {
+  margin: 0;
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 800;
+  color: #003F5E;
+  letter-spacing: 0.2px;
+}
+
+.balneario-fechas-chip {
+  background: #e9f2ff;
+  border: 1px solid #bcdcff;
+  color: #004a68;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.balneario-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem 1rem;
+  margin-top: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-label {
+  font-size: 0.8rem;
+  color: #5c7b8a;
+  font-weight: 600;
+}
+
+.meta-value {
+  font-size: 1.05rem;
+  color: #0e2b3d;
+}
+
+.meta-link {
+  color: #0e2b3d;
+  text-decoration: none;
+}
+.meta-link:hover {
+  text-decoration: underline;
 }
 
 .balneario-info {
@@ -266,6 +327,38 @@
   position: relative;
 }
 
+/* Leyenda del mapa */
+.map-legend {
+  position: absolute;
+  left: 1.5rem;
+  top: 1.5rem;
+  display: flex;
+  gap: 0.8rem;
+  z-index: 101;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0, 63, 94, 0.08);
+  border-radius: 12px;
+  padding: 6px 10px;
+  backdrop-filter: blur(4px);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #003F5E;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 2px solid transparent;
+}
+.legend-dot.libre { background: #dff7ea; border-color: #2bae66; }
+.legend-dot.reservada { background: #ffe1e1; border-color: #c62828; }
+
 /* Controles de zoom */
 .zoom-controls {
   position: absolute;
@@ -382,9 +475,12 @@
   height: 500px;
   margin: 0;
   border-radius: 12px;
-  border: 1px solid #aaa;
+  border: 1px solid #c8d8e0;
   overflow: hidden;
-  background: #f0f7fa;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
+    #f0f7fa;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
   transition: cursor 0.1s ease;
   will-change: transform;
@@ -410,15 +506,15 @@
 }
 
 .carpa.libre {
-  background-color: #33ff5e;
-  border: 2.5px solid #1aab27;
-  box-shadow: 0 0 10px #33ff5e55, 0 0 4px #1aab2755;
+  background-color: #dff7ea;
+  border: 2px solid #2bae66;
+  box-shadow: 0 2px 8px rgba(43, 174, 102, 0.15);
 }
 
 .carpa.reservada {
-  background-color: #ff3c3c;
-  border: 2.5px solid #a80021;
-  box-shadow: 0 0 10px #ff3c3c55, 0 0 4px #a8002155;
+  background-color: #ffe1e1;
+  border: 2px solid #c62828;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.15);
 }
 
 .carpa.reservada .carpa-imagen {
@@ -443,11 +539,11 @@
   left: 50%;
   transform: translateX(-50%);
   font-weight: bold;
-  background: white;
+  background: rgba(255,255,255,0.9);
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 13px;
-  border: 1px solid #ccc;
+  border: 1px solid #c8d8e0;
   z-index: 15;
   letter-spacing: 0.5px;
 }
