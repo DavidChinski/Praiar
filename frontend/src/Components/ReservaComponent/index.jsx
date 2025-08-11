@@ -219,19 +219,42 @@ function ReservaComponent() {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/reserva", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        setError(result.error || "Error al realizar la reserva.");
+      if (metodoPago === 'mercado pago') {
+        // Crear preferencia de pago y redirigir a Mercado Pago
+        const prefRes = await fetch('http://localhost:3000/api/mercadopago/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            descripcion: `Reserva ${balnearioInfo?.nombre || 'Praiar'} ${fechaInicio} - ${fechaSalida}`,
+            precio: precioTotal,
+            email: email.trim()
+          })
+        });
+        const prefData = await prefRes.json();
+        const redirectUrl = prefData?.sandbox_init_point || prefData?.init_point;
+        if (!prefRes.ok || !redirectUrl) {
+          setError(prefData?.error || 'No se pudo iniciar el pago con Mercado Pago.');
+          return;
+        }
+        // Guardar la reserva pendiente localmente para confirmarla al volver de MP
+        localStorage.setItem('reservaPendiente', JSON.stringify(body));
+        window.location.href = redirectUrl;
+        return;
       } else {
-        setExito("Reserva realizada con éxito.");
-        setTimeout(() => navigate("/tusreservas/null"), 2000);
+        const response = await fetch("http://localhost:3000/api/reserva", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          setError(result.error || "Error al realizar la reserva.");
+        } else {
+          setExito("Reserva realizada con éxito.");
+          setTimeout(() => navigate("/tusreservas/null"), 2000);
+        }
       }
     } catch (err) {
       setError("Error de conexión al realizar la reserva.");

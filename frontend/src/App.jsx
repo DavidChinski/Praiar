@@ -16,6 +16,9 @@ import BalneariosPorCiudad from "./Components/BalneariosPorCiudad";
 import InformacionExtra from './Pages/informacion-extra'
 import AuthCallback from './Pages/AuthCallback';
 import Error from "./Pages/Error";
+import PagoExitoso from './Pages/PagoExitoso';
+import PagoFallido from './Pages/PagoFallido';
+import PagoPendiente from './Pages/PagoPendiente';
 import Layout from './Layout';
 import EstadisticasComponent from "./Components/EstadisticasComponent"; 
 
@@ -33,6 +36,9 @@ function App() {
             <Route path="/ciudades/:idCiudad/balnearios" element={<BalneariosPorCiudad />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/informacion-extra" element={<InformacionExtra />} />
+            <Route path="/pago-exitoso" element={<PagoExitoso />} />
+            <Route path="/pago-fallido" element={<PagoFallido />} />
+            <Route path="/pago-pendiente" element={<PagoPendiente />} />
             <Route path="*" element={<Error />} />
 
             {/* Rutas protegidas */}

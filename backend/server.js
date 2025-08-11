@@ -5,6 +5,8 @@ import { supabase } from './supabaseClient.js';
 import nodemailer from 'nodemailer';
 import morgan from 'morgan';
 import { elAgente } from './Agente/src/agent.js';
+import 'dotenv/config';
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 
 
 const app = express();
@@ -15,10 +17,15 @@ app.use(morgan('dev'));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-/*const mercadopago = require('mercadopago');
-mercadopago.configure({
-  access_token: 'TU_ACCESS_TOKEN_AQUI' // Reemplazalo por tu token de producción o prueba
-});*/
+// Configuración de Mercado Pago (usar variable de entorno si está disponible)
+const mpClient = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN || 'TEST-7458708411825956-081107-eefe637f0d462ff5e480bb2dae31310b-86620570'
+});
+const mpPreference = new Preference(mpClient);
+
+// URLs base configurables
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
 
 app.post('/api/chat', async (req, res) => {
   const { message, session } = req.body;
@@ -685,6 +692,63 @@ app.delete('/api/balneario/carpas/:id_carpa', async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Error interno.' });
+  }
+});
+
+// === MERCADO PAGO: Crear preferencia y Webhook ===
+app.post('/api/mercadopago/create-preference', async (req, res) => {
+  try {
+    const { descripcion, precio, email } = req.body;
+    if (!precio || Number.isNaN(Number(precio))) {
+      return res.status(400).json({ error: 'Precio inválido.' });
+    }
+    const preference = {
+      items: [
+        {
+          title: descripcion || 'Reserva Praiar',
+          unit_price: Number(precio),
+          quantity: 1,
+          currency_id: 'ARS'
+        }
+      ],
+      ...(email ? { payer: { email } } : {}),
+      back_urls: {
+        success: `${FRONTEND_URL}/pago-exitoso`,
+        failure: `${FRONTEND_URL}/pago-fallido`,
+        pending: `${FRONTEND_URL}/pago-pendiente`
+      },
+      binary_mode: true,
+      notification_url: `${SERVER_URL}/api/mercadopago/webhook`,
+      statement_descriptor: 'Praiar'
+    };
+
+    // Log debug para verificar payload enviado a MP (sin datos sensibles)
+    console.log('MP Preference payload:', {
+      items: preference.items,
+      payer: preference.payer,
+      back_urls: preference.back_urls,
+      binary_mode: preference.binary_mode,
+      notification_url: preference.notification_url,
+      statement_descriptor: preference.statement_descriptor
+    });
+
+    const response = await mpPreference.create({ body: preference });
+    return res.json({ init_point: response.init_point, sandbox_init_point: response.sandbox_init_point, id: response.id });
+  } catch (error) {
+    console.error('Error creando preferencia MP:', error);
+    return res.status(500).json({ error: 'Error creando preferencia de pago.' });
+  }
+});
+
+// Webhook/IPN de Mercado Pago (stub para logging)
+app.post('/api/mercadopago/webhook', async (req, res) => {
+  try {
+    console.log('MercadoPago Webhook query:', req.query);
+    console.log('MercadoPago Webhook body:', req.body);
+    // TODO: Consultar estado del pago y actualizar la reserva si se implementa lógica de pre-reserva
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(200);
   }
 });
 
