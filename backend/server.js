@@ -21,13 +21,19 @@ mercadopago.configure({
 });*/
 
 app.post('/api/chat', async (req, res) => {
-  const { message } = req.body;
+  const { message, session } = req.body;
   if (!message) {
     return res.status(400).json({ error: 'No message provided' });
   }
 
   try {
-    const respuesta = await elAgente.run(message);
+    // Inyecta contexto de sesión al mensaje y ejecuta el agente con una sola firma
+    const sessionContextLine = session
+      ? `\n[Contexto de sesión]\n- isLoggedIn: ${!!session.isLoggedIn}\n- esPropietario: ${!!session.esPropietario}\n- auth_id: ${session.auth_id || 'N/A'}\n- nombre: ${session.nombre || 'N/A'}\n- email: ${session.email || 'N/A'}\n`
+      : `\n[Contexto de sesión]\n- isLoggedIn: false\n`;
+    const finalMessage = `${sessionContextLine}\n${message}`;
+
+    const respuesta = await elAgente.run(finalMessage);
     res.json({ response: respuesta });
   } catch (error) {
     console.error('Error en el agente:', error);

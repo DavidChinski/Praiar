@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
@@ -30,7 +30,8 @@ const EXTEND_FACTOR = 100;
 function CarpasDelBalneario(props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const balnearioId = props.id || location.state?.id;
+  const { id: routeId } = useParams();
+  const balnearioId = props.id ?? location.state?.id ?? routeId;
   const today = new Date();
   const defaultInicio = today.toISOString().split('T')[0];
   const tomorrow = new Date(today);
