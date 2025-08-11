@@ -593,14 +593,20 @@
   border-radius: 12px;
   border: 1px solid #c8d8e0;
   overflow: hidden;
-  background:
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
-    linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
-    #f0f7fa;
+  background: #f0f7fa;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
   transition: cursor 0.1s ease;
   will-change: transform;
   user-select: none;
+}
+
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
+    transparent;
 }
 
 /* Carpas orden y disposición */
@@ -642,6 +648,11 @@
   height: auto;
   color:#005A84;
   pointer-events: none;
+}
+
+/* Mejor feedback en hover y selección */
+.carpa.libre:hover {
+  filter: brightness(1.03);
 }
 
 .carpa:hover {

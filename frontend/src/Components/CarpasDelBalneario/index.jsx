@@ -112,15 +112,18 @@ function CarpasDelBalneario(props) {
     setPan({ x: 0, y: 0 });
   };
 
-  // Función para manejar el inicio del arrastre del mapa
+  // Función para manejar el inicio del arrastre del mapa (solo si no clickea sobre carpa/elemento)
   const handleMouseDown = (e) => {
-    if (e.button === 0) { // Solo botón izquierdo del mouse
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - pan.x,
-        y: e.clientY - pan.y
-      });
+    if (e.button !== 0) return;
+    const target = e.target;
+    if (target.closest && (target.closest('.carpa') || target.closest('.elemento'))) {
+      return; // no iniciar pan si está sobre un elemento interactivo
     }
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - pan.x,
+      y: e.clientY - pan.y
+    });
   };
 
   // Función para manejar el movimiento del mouse durante el arrastre
@@ -140,40 +143,23 @@ function CarpasDelBalneario(props) {
 
   // Función para manejar el scroll del mouse para zoom
   const handleWheel = (e) => {
+    // Solo hacer zoom si mantiene Ctrl presionado; de lo contrario, dejar que la página haga scroll
+    if (!e.ctrlKey) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.3, Math.min(3, zoom * delta));
-    
-    // Calcular el punto de zoom relativo al cursor
     const rect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
-    // Ajustar el pan para mantener el punto del cursor en la misma posición
     const zoomRatio = newZoom / zoom;
     setPan(prevPan => ({
       x: mouseX - (mouseX - prevPan.x) * zoomRatio,
       y: mouseY - (mouseY - prevPan.y) * zoomRatio
     }));
-    
     setZoom(newZoom);
   };
 
-  // Prevenir el scroll por defecto en el contenedor del mapa
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      const preventScroll = (e) => {
-        e.preventDefault();
-      };
-      
-      container.addEventListener('wheel', preventScroll, { passive: false });
-      
-      return () => {
-        container.removeEventListener('wheel', preventScroll);
-      };
-    }
-  }, []);
+  // Nota: ya no prevenimos el scroll por defecto; solo hacemos zoom con Ctrl + rueda.
 
   // Cerrar modal con tecla ESC
   useEffect(() => {
@@ -917,12 +903,15 @@ function CarpasDelBalneario(props) {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onWheel={handleWheel}
-            style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-              transformOrigin: '0 0',
-              cursor: isDragging ? 'grabbing' : 'grab'
-            }}
+            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
           >
+            <div
+              className="map-canvas"
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin: '0 0'
+              }}
+            >
             {carpas.map((carpa) => {
               const tipo = getTipoCarpa(carpa);
               const left = carpa.x;
@@ -968,6 +957,7 @@ function CarpasDelBalneario(props) {
                 rotarElemento={rotarElemento}
               />
             ))}
+            </div>
           </div>
         </div>
       </div>
