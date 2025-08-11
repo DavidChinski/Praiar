@@ -1,5 +1,5 @@
 import './PerfilComponent.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function PerfilComponent() {
@@ -69,6 +69,13 @@ function PerfilComponent() {
     setShowEditModal(true);
   };
 
+  const avatarFallback = useMemo(() => {
+    const nombre = formData.nombre || '';
+    const apellido = formData.apellido || '';
+    const iniciales = `${nombre?.[0] || ''}${apellido?.[0] || ''}`.toUpperCase();
+    return iniciales || 'U';
+  }, [formData.nombre, formData.apellido]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -106,25 +113,63 @@ function PerfilComponent() {
 
   return (
     <div className="perfil-wrapper">
-      <div className="perfil-header">
-        <img
-          src={usuario.imagen}
-          alt="Foto de perfil"
-          className="perfil-avatar"
-        />
+      <div className="perfil-banner" />
+      <div className="perfil-header modern">
+        <div className="avatar-wrapper">
+          {usuario.imagen ? (
+            <img src={usuario.imagen} alt="Foto de perfil" className="perfil-avatar" />
+          ) : (
+            <div className="perfil-avatar perfil-avatar-fallback">{avatarFallback}</div>
+          )}
+        </div>
         <div className="perfil-info">
-          <h2 className="perfil-nombre">{usuario.nombre} {usuario.apellido}</h2>
+          <div className="perfil-title-row">
+            <h2 className="perfil-nombre">{usuario.nombre} {usuario.apellido}</h2>
+            <span className={`badge ${usuario.esPropietario ? 'owner' : 'guest'}`}>
+              {usuario.esPropietario ? 'Propietario' : 'Cliente'}
+            </span>
+          </div>
+          <div className="perfil-chips">
+            {usuario.email ? <span className="chip">{usuario.email}</span> : null}
+            {usuario.telefono ? <span className="chip">{usuario.telefono}</span> : null}
+            {usuario.dni ? <span className="chip">DNI {usuario.dni}</span> : null}
+          </div>
           <div className="perfil-botones">
             <button className="btn-editar" onClick={handleEditProfile}>Editar perfil</button>
             <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
           </div>
         </div>
       </div>
-      <div className="perfil-datos">
-        <p><strong>Email:</strong> {usuario.email}</p>
-        <p><strong>DNI:</strong> {usuario.dni}</p>
-        <p><strong>Teléfono:</strong> {usuario.telefono}</p>
-        <p><strong>Propietario:</strong> {usuario.esPropietario ? 'Sí' : 'No'}</p>
+
+      <div className="perfil-grid">
+        <section className="perfil-card">
+          <h3>Información de la cuenta</h3>
+          <div className="info-list">
+            <div className="info-row"><span>Nombre</span><strong>{usuario.nombre}</strong></div>
+            <div className="info-row"><span>Apellido</span><strong>{usuario.apellido}</strong></div>
+            <div className="info-row"><span>Email</span><strong>{usuario.email || '-'}</strong></div>
+            <div className="info-row"><span>Teléfono</span><strong>{usuario.telefono || '-'}</strong></div>
+            <div className="info-row"><span>DNI</span><strong>{usuario.dni || '-'}</strong></div>
+            <div className="info-row"><span>Rol</span><strong>{usuario.esPropietario ? 'Propietario' : 'Cliente'}</strong></div>
+          </div>
+        </section>
+
+        <section className="perfil-card">
+          <h3>Accesos rápidos</h3>
+          <div className="acciones-rapidas">
+            {usuario.esPropietario ? (
+              <>
+                <a className="quick-link" href="/tusbalnearios">Tus balnearios</a>
+                <a className="quick-link" href="/ciudades">Explorar balnearios</a>
+              </>
+            ) : (
+              <>
+                <a className="quick-link" href="/tusreservas">Tus reservas</a>
+                <a className="quick-link" href="/ciudades">Explorar balnearios</a>
+              </>
+            )}
+          </div>
+        </section>
       </div>
 
       {showEditModal && (

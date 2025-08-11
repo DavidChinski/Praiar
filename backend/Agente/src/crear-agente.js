@@ -17,6 +17,7 @@ Capacidades:
 - Listar balnearios con su ciudad
 - Listar ciudades
 - Filtrar balnearios por ciudad y servicios, o solo por servicios
+- Buscar disponibilidad por fechas (opcionalmente combinando ciudad y/o servicios)
 
 Guía contextual:
 - Invitado: sugerí registrarse/iniciar sesión y compartí el mapa: "/ciudades".
@@ -26,6 +27,16 @@ Guía contextual:
 Formato de respuesta:
 - Sé claro y breve. Usá listas con "- ".
 - Incluí rutas absolutas de la app (por ejemplo "/ciudades", "/tusbalnearios") para que el frontend pueda hacerlas clic.
+
+Notas sobre filtros:
+- El frontend puede enviar un bloque opcional de filtros al comienzo del mensaje con el formato:
+  [Filtros]\n
+  - fechaInicio=YYYY-MM-DD\n
+  - fechaFin=YYYY-MM-DD\n
+  - ciudad=NombreCiudad (opcional)\n
+  - servicios=Wi-Fi,Pileta (opcional, separados por coma)
+- Si hay fechaInicio y fechaFin, priorizá usar la herramienta "buscarDisponibilidad" combinándola con ciudad/servicios si también están presentes.
+- Si no hay fechas, usá las herramientas de búsqueda y filtrado existentes según corresponda.
 `.trim();
 
 const ollamaLLM = new Ollama({
@@ -132,6 +143,33 @@ const filtrarBalneariosPorServiciosTool = tool({
     },
 });
 
+// Busca balnearios disponibles en un rango de fechas opcional, combinable con ciudad y/o servicios
+const buscarDisponibilidadTool = tool({
+    name: "buscarDisponibilidad",
+    description: "Lista balnearios disponibles. Filtros opcionales: ciudad (parcial), servicios (debe cumplir TODOS), fechas (inicio y salida en formato YYYY-MM-DD). Si no se envían fechas, no filtra por disponibilidad.",
+    parameters: z.object({
+        ciudad: z.string().default("").describe("Nombre parcial de ciudad. Opcional."),
+        servicios: z.array(z.string()).default([]).describe("Nombres de servicios requeridos. Opcional."),
+        fechaInicio: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/).optional().describe("YYYY-MM-DD. Opcional, usar junto con fechaFin."),
+        fechaFin: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/).optional().describe("YYYY-MM-DD. Opcional, usar junto con fechaInicio."),
+    }),
+    execute: async ({ ciudad = "", servicios = [], fechaInicio, fechaFin }) => {
+        try {
+            if ((fechaInicio && !fechaFin) || (!fechaInicio && fechaFin)) {
+                return "Para filtrar por disponibilidad, enviá ambas fechas: 'fechaInicio' y 'fechaFin' (YYYY-MM-DD).";
+            }
+
+            const lista = await busqueda.listarBalneariosDisponibles({ ciudad, servicios, fechaInicio, fechaFin });
+            if (!lista || lista.length === 0) {
+                return "No hay balnearios que cumplan con esos filtros.";
+            }
+            return lista.map(bal => `- ${bal.nombre} — ${bal.ciudad || "Ciudad"} — ${bal.direccion} — /balneario/${bal.id_balneario}`).join('\n');
+        } catch (error) {
+            return `Error al buscar disponibilidad: ${error.message}`;
+        }
+    },
+});
+
 export function crearAgenteBalnearios({ verbose = true } = {}) {
     return agent({
         tools: [
@@ -139,7 +177,8 @@ export function crearAgenteBalnearios({ verbose = true } = {}) {
             listarBalneariosTool,
             listarCiudadesTool,
             filtrarBalneariosPorCiudadYServiciosTool,
-            filtrarBalneariosPorServiciosTool // Nuevo tool agregado
+            filtrarBalneariosPorServiciosTool, // Nuevo tool agregado
+            buscarDisponibilidadTool
         ],
         llm: ollamaLLM,
         verbose,

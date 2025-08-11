@@ -568,7 +568,7 @@
 
 .reseña-usuario {
   color: #003f5e;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
@@ -577,34 +577,49 @@
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 2px;
 }
 
 .reseña-estrella {
   color: #ffd700;
-  margin-left: 4px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .reseña-comentario {
   color: #333;
-  margin: 1rem 0;
+  margin: 0.5rem 0 0.75rem 0;
   line-height: 1.6;
   font-size: 1rem;
+  white-space: pre-wrap;
 }
 
 .reseña-likes {
   color: #0099cc;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(0, 153, 204, 0.1);
   border-radius: 0.75rem;
   border: 1px solid rgba(0, 153, 204, 0.2);
+}
+
+/* Encabezado reseña con avatar y nombre */
+.reseña-header-izq {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reseña-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 153, 204, 0.2);
 }
 
 /* ---------- Lista de reservas ---------- */

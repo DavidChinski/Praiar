@@ -618,15 +618,25 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
           {reseñas.map((r) => (
             <li key={r.id_reseña} className="reseña-item">
               <div className="reseña-header">
-                <b className="reseña-usuario">
-                  👤 {r.usuario_nombre || "Usuario"}
-                </b>
-                <span className="reseña-estrellas">
-                  {r.estrellas}<span className="reseña-estrella">★</span>
-                </span>
+                <div className="reseña-header-izq">
+                  <img
+                    className="reseña-avatar"
+                    src={r.usuario_imagen || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+                    alt={r.usuario_nombre || "Usuario"}
+                    onError={(e) => { e.currentTarget.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; }}
+                  />
+                  <div className="reseña-usuario">
+                    <span className="reseña-usuario-nombre">{r.usuario_nombre || "Usuario"}</span>
+                    <span className="reseña-estrellas">
+                      {[1,2,3,4,5].map(v => (
+                        <span key={v} className="reseña-estrella" style={{ color: v <= (r.estrellas || 0) ? "#ffb700" : "#ccc" }}>★</span>
+                      ))}
+                    </span>
+                  </div>
+                </div>
+                <span className="reseña-likes">👍 {r.likes || 0}</span>
               </div>
               <p className="reseña-comentario">{r.comentario}</p>
-              <span className="reseña-likes">👍 {r.likes || 0}</span>
             </li>
           ))}
         </ul>

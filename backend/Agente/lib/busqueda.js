@@ -52,7 +52,7 @@ class Busqueda {
       telefono: balneario.telefono,
       imagen: balneario.imagen,
       ciudad: balneario.ciudades ? balneario.ciudades.nombre : null,
-      ciudad_img: balneario.ciudades ? balneario.ciudades.imagen : null,
+      ciudad_img: balneario.ciudades ? balneario.ciudades.img : null,
     }));
   }
 
@@ -160,8 +160,118 @@ class Busqueda {
       telefono: balneario.telefono,
       imagen: balneario.imagen,
       ciudad: balneario.ciudades ? balneario.ciudades.nombre : null,
-      ciudad_img: balneario.ciudades ? balneario.ciudades.imagen : null,
+      ciudad_img: balneario.ciudades ? balneario.ciudades.img : null,
     }));
+  }
+
+  /**
+   * Lista balnearios disponibles con filtros opcionales de ciudad, servicios y rango de fechas.
+   * Si se proveen fechaInicio y fechaFin (YYYY-MM-DD), devuelve solo los balnearios que
+   * tengan al menos una ubicación libre en ese rango (sin reservas solapadas).
+   * - ciudad: string opcional (búsqueda parcial)
+   * - servicios: Array<string> opcional (debe cumplir TODOS)
+   * - fechaInicio, fechaFin: string opcional en formato YYYY-MM-DD (ambos o ninguno)
+   */
+  async listarBalneariosDisponibles({ ciudad = '', servicios = [], fechaInicio = null, fechaFin = null } = {}) {
+    // 1) Obtener candidatos por ciudad/servicios si corresponde
+    let candidatos = [];
+    const tieneCiudad = typeof ciudad === 'string' && ciudad.trim() !== '';
+    const tieneServicios = Array.isArray(servicios) && servicios.length > 0;
+
+    if (tieneCiudad && tieneServicios) {
+      candidatos = await this.filtrarBalneariosPorCiudadYServicios(ciudad, servicios);
+    } else if (tieneCiudad) {
+      const porCiudad = await this.buscarBalneariosPorCiudad(ciudad);
+      // Normalizar a la misma forma de salida que listarBalneariosConCiudades
+      const ids = porCiudad.map(b => b.id_balneario);
+      if (ids.length === 0) return [];
+      const { data: balnearios, error } = await supabase
+        .from('balnearios')
+        .select(`
+          id_balneario,
+          nombre,
+          direccion,
+          telefono,
+          imagen,
+          id_ciudad,
+          ciudades (
+            id_ciudad,
+            nombre,
+            img
+          )
+        `)
+        .in('id_balneario', ids);
+      if (error) throw error;
+      candidatos = (balnearios || []).map(balneario => ({
+        id_balneario: balneario.id_balneario,
+        nombre: balneario.nombre,
+        direccion: balneario.direccion,
+        telefono: balneario.telefono,
+        imagen: balneario.imagen,
+        ciudad: balneario.ciudades ? balneario.ciudades.nombre : null,
+        ciudad_img: balneario.ciudades ? balneario.ciudades.img : null,
+      }));
+    } else if (tieneServicios) {
+      candidatos = await this.filtrarBalneariosPorCiudadYServicios('', servicios);
+    } else {
+      candidatos = await this.listarBalneariosConCiudades();
+    }
+
+    if (!fechaInicio || !fechaFin) {
+      return candidatos;
+    }
+
+    // 2) Filtrar por disponibilidad en el rango indicado
+    const idsBalnearios = candidatos.map(b => b.id_balneario);
+    if (idsBalnearios.length === 0) return [];
+
+    // 2.a) Traer ubicaciones de estos balnearios
+    const { data: ubicaciones, error: ubicacionesError } = await supabase
+      .from('ubicaciones')
+      .select('id_ubicacion, id_balneario')
+      .in('id_balneario', idsBalnearios);
+    if (ubicacionesError) throw ubicacionesError;
+
+    const ubicacionesPorBalneario = new Map();
+    (ubicaciones || []).forEach(u => {
+      if (!ubicacionesPorBalneario.has(u.id_balneario)) {
+        ubicacionesPorBalneario.set(u.id_balneario, []);
+      }
+      ubicacionesPorBalneario.get(u.id_balneario).push(u.id_ubicacion);
+    });
+
+    // 2.b) Traer reservas solapadas del rango para esos balnearios
+    let reservasQuery = supabase
+      .from('reservas')
+      .select('id_balneario, Reservas_Ubicaciones ( id_ubicacion ), fecha_inicio, fecha_salida')
+      .in('id_balneario', idsBalnearios)
+      .lte('fecha_inicio', fechaFin)
+      .gte('fecha_salida', fechaInicio);
+    const { data: reservas, error: reservasError } = await reservasQuery;
+    if (reservasError) throw reservasError;
+
+    const ubicacionesReservadas = new Set();
+    (reservas || []).forEach(r => {
+      (r.Reservas_Ubicaciones || []).forEach(v => {
+        if (v?.id_ubicacion != null) {
+          ubicacionesReservadas.add(v.id_ubicacion);
+        }
+      });
+    });
+
+    // 2.c) Quedarse con balnearios que tengan al menos una ubicación no reservada
+    const resultado = candidatos
+      .map(b => {
+        const todas = ubicacionesPorBalneario.get(b.id_balneario) || [];
+        if (todas.length === 0) {
+          return { ...b, disponibles: 0 };
+        }
+        const libres = todas.filter(idU => !ubicacionesReservadas.has(idU));
+        return { ...b, disponibles: libres.length };
+      })
+      .filter(b => b.disponibles > 0);
+
+    return resultado;
   }
 }
 

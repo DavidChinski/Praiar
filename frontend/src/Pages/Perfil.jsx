@@ -1,5 +1,5 @@
 import React from "react";
-import PerfilComponent from '../components/PerfilComponent/'
+import PerfilComponent from '../Components/PerfilComponent'
 
 function Perfil() {
   return (

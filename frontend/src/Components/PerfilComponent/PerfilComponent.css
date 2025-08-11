@@ -14,28 +14,43 @@
 }
 
 .perfil-wrapper {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
+  max-width: 980px;
+  margin: 40px auto 80px auto;
+  padding: 0 24px;
   font-family: 'Arial', sans-serif;
   color: var(--text-primary);
-  background: var(--white);
-  min-height: 100vh;
+  /* Override local background tone to evitar tono piel */
+  --background-color: #F3F9FD;
+  background: #ffffff;
+  min-height: calc(100vh - 120px);
   position: relative;
+}
+
+.perfil-banner {
+  height: 120px;
+  border-radius: var(--border-radius);
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  filter: saturate(0.85);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: -70px;
 }
 
 .perfil-header {
   background: var(--white);
   border-radius: var(--border-radius);
-  padding: 40px;
-  margin-bottom: 30px;
+  padding: 28px 28px 28px 22px;
+  margin: 0 auto 30px auto;
   box-shadow: var(--shadow-lg);
   border: 2px solid var(--accent-color);
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 28px;
   position: relative;
   overflow: hidden;
+}
+
+.perfil-header.modern {
+  transform: translateY(-50px);
 }
 
 .perfil-header::before {
@@ -48,15 +63,28 @@
   background: var(--primary-color);
 }
 
+.avatar-wrapper {
+  position: relative;
+}
+
 .perfil-avatar {
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--accent-color);
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   position: relative;
+}
+
+.perfil-avatar-fallback {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 42px;
+  color: var(--primary-color);
+  background: var(--background-color);
 }
 
 .perfil-avatar:hover {
@@ -70,12 +98,48 @@
 }
 
 .perfil-nombre {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
   margin-bottom: 20px;
   color: var(--primary-color);
   line-height: 1.2;
   font-family: "El Messiri", sans-serif;
+}
+
+.perfil-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  border: 2px solid var(--accent-color);
+  background: var(--background-color);
+  color: var(--text-primary);
+}
+
+.badge.owner {
+  border-color: var(--secondary-color);
+}
+
+.perfil-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  border: 1px solid var(--accent-color);
+  background: var(--white);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
 }
 
 .perfil-botones {
@@ -115,61 +179,72 @@
 .btn-logout {
   background: var(--background-color);
   color: var(--text-primary);
-  border-color: #ff6b6b;
+  border-color: #b12e2e;
 }
 
 .btn-logout:hover {
-  background: #ff6b6b;
+  background: #b12e2e;
   color: var(--white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-.perfil-datos {
+/* Nueva grilla y tarjetas */
+.perfil-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+
+.perfil-card {
+  grid-column: span 12;
   background: var(--white);
-  border-radius: var(--border-radius);
-  padding: 40px;
-  box-shadow: var(--shadow-lg);
   border: 2px solid var(--accent-color);
-  position: relative;
-  overflow: hidden;
-}
-
-.perfil-datos::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--secondary-color);
-}
-
-.perfil-datos p {
-  margin: 0 0 20px 0;
-  padding: 16px 20px;
-  background: var(--background-color);
   border-radius: var(--border-radius);
-  border-left: 4px solid var(--primary-color);
-  transition: all 0.3s ease;
-  font-size: 16px;
-  line-height: 1.6;
+  box-shadow: var(--shadow-lg);
+  padding: 22px;
 }
 
-.perfil-datos p:hover {
-  background: var(--accent-color);
-  transform: translateX(8px);
-  box-shadow: var(--shadow-sm);
-}
-
-.perfil-datos p:last-child {
-  margin-bottom: 0;
-}
-
-.perfil-datos strong {
-  font-weight: bold;
+.perfil-card h3 {
+  margin: 0 0 16px 0;
   color: var(--primary-color);
-  margin-right: 8px;
+  font-family: "El Messiri", sans-serif;
+}
+
+.info-list {
+  display: grid;
+  gap: 10px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  background: var(--background-color);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.acciones-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-link {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--accent-color);
+  color: var(--primary-color);
+  background: var(--white);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.quick-link:hover { 
+  background: #E3F2FA; 
 }
 
 .modal-overlay-perfil {
@@ -328,6 +403,10 @@
     gap: 30px;
   }
 
+  .perfil-header.modern {
+    transform: translateY(-40px);
+  }
+
   .perfil-nombre {
     font-size: 2rem;
     text-align: center;
@@ -367,6 +446,9 @@
     width: 100%;
     padding: 16px 24px;
   }
+  .perfil-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
@@ -401,7 +483,7 @@
   }
 }
 
-.perfil-header, .perfil-datos {
+.perfil-header, .perfil-card {
   animation: slideInLeft 0.8s ease;
 }
 
@@ -417,11 +499,11 @@
 }
 
 /* Efectos de hover mejorados */
-.perfil-datos p strong {
+.perfil-card .info-row span {
   position: relative;
 }
 
-.perfil-datos p strong::after {
+.perfil-card .info-row span::after {
   content: '';
   position: absolute;
   bottom: -2px;
@@ -432,6 +514,6 @@
   transition: width 0.3s ease;
 }
 
-.perfil-datos p:hover strong::after {
+.perfil-card .info-row:hover span::after {
   width: 100%;
 }
