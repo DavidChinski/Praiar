@@ -1,8 +1,27 @@
+function getSesionContext() {
+  try {
+    const raw = localStorage.getItem('usuario');
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    return {
+      isLoggedIn: true,
+      auth_id: user?.auth_id || user?.id || null,
+      esPropietario: !!user?.esPropietario,
+      nombre: user?.nombre || null,
+      apellido: user?.apellido || null,
+      email: user?.email || null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function enviarMensajeAlBackend(mensaje) {
+  const session = getSesionContext();
   const res = await fetch('http://localhost:3000/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: mensaje }),
+    body: JSON.stringify({ message: mensaje, session }),
   });
   if (!res.ok) {
     const error = await res.json();

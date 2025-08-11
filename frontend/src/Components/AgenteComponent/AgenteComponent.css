@@ -21,6 +21,7 @@ body, .min-h-screen {
   width: 100%;
   max-width: 400px;
   min-height: 500px;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -40,6 +41,8 @@ body, .min-h-screen {
 .chat-mensajes {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
   margin-bottom: 1.2rem;
   display: flex;
   flex-direction: column;
@@ -69,9 +72,30 @@ body, .min-h-screen {
   color: #004b75;
   border: 2px solid #b0dbe7;
   border-radius: 1em 1em 1em 0.2em;
-  padding: 0.7em 1em;
-  max-width: 300px;
+  padding: 0.9em 1.1em;
+  max-width: 520px;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* respeta saltos pero permite wrap */
+}
+
+/* Enlaces dentro de mensajes */
+.mensaje .burbuja a {
+  color: #006a8e;
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+/* Listas dentro de mensajes */
+.mensaje .burbuja ul {
+  margin: 0.5em 0 0.5em 1.2em;
+  padding: 0;
+}
+.mensaje .burbuja li {
+  margin: 0.25em 0;
 }
 
 /* Input + botón */
