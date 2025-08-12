@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import morgan from 'morgan';
 import { elAgente } from './Agente/src/agent.js';
 import 'dotenv/config';
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 
 const app = express();
@@ -17,11 +17,14 @@ app.use(morgan('dev'));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Configuración de Mercado Pago (usar variable de entorno si está disponible)
-const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN || 'TEST-7458708411825956-081107-eefe637f0d462ff5e480bb2dae31310b-86620570'
-});
+// Configuración de Mercado Pago (usar variable de entorno)
+const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
+if (!MP_ACCESS_TOKEN) {
+  console.warn('[MP] MP_ACCESS_TOKEN no configurado. Las rutas de pago devolverán error hasta configurarlo.');
+}
+const mpClient = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN || '' });
 const mpPreference = new Preference(mpClient);
+const mpPayment = new Payment(mpClient);
 
 // URLs base configurables
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -698,6 +701,9 @@ app.delete('/api/balneario/carpas/:id_carpa', async (req, res) => {
 // === MERCADO PAGO: Crear preferencia y Webhook ===
 app.post('/api/mercadopago/create-preference', async (req, res) => {
   try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ error: 'Mercado Pago no está configurado (MP_ACCESS_TOKEN faltante).' });
+    }
     const { descripcion, precio, email } = req.body;
     if (!precio || Number.isNaN(Number(precio))) {
       return res.status(400).json({ error: 'Precio inválido.' });
@@ -712,6 +718,10 @@ app.post('/api/mercadopago/create-preference', async (req, res) => {
         }
       ],
       ...(email ? { payer: { email } } : {}),
+      metadata: {
+        origen: 'Praiar',
+        descripcion: descripcion || 'Reserva Praiar',
+      },
       back_urls: {
         success: `${FRONTEND_URL}/pago-exitoso`,
         failure: `${FRONTEND_URL}/pago-fallido`,
@@ -740,15 +750,102 @@ app.post('/api/mercadopago/create-preference', async (req, res) => {
   }
 });
 
-// Webhook/IPN de Mercado Pago (stub para logging)
+// Checkout API: crea un pago directo con tarjeta/token (no usa Checkout Pro)
+// Body esperado: { amount: number, email: string, installments: number, token: string }
+app.post('/api/mercadopago/checkout-api/payment', async (req, res) => {
+  try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ error: 'Mercado Pago no está configurado (MP_ACCESS_TOKEN faltante).' });
+    }
+
+    const { amount, email, installments = 1, token } = req.body || {};
+    if (!amount || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+      return res.status(400).json({ error: 'Monto inválido.' });
+    }
+    if (!email || !token) {
+      return res.status(400).json({ error: 'Faltan datos de pago (email o token).' });
+    }
+
+    const payment = await mpPayment.create({
+      body: {
+        payer: { email },
+        token,
+        transaction_amount: Number(amount),
+        installments: Number(installments) || 1,
+      }
+    });
+
+    // Devuelvo status del pago para que el frontend actúe (approved/rejected/in_process)
+    res.json({ id: payment.id, status: payment.status, status_detail: payment.status_detail });
+  } catch (e) {
+    console.error('[MP][CHECKOUT-API] Error creando pago:', e?.message || e);
+    res.status(500).json({ error: 'Error creando pago con Checkout API.' });
+  }
+});
+
+// Webhook/IPN de Mercado Pago: consulta el pago y registra su estado
 app.post('/api/mercadopago/webhook', async (req, res) => {
   try {
-    console.log('MercadoPago Webhook query:', req.query);
-    console.log('MercadoPago Webhook body:', req.body);
-    // TODO: Consultar estado del pago y actualizar la reserva si se implementa lógica de pre-reserva
+    // MP puede enviar info en query (topic/id) o en body (data.id/type)
+    const query = req.query || {};
+    const body = req.body || {};
+
+    const type = (query.type || query.topic || body.type || '').toString();
+    const paymentId = (body?.data?.id || query['data.id'] || query.id || body?.id || body?.resource?.id || '').toString();
+
+    console.log('[MP][WEBHOOK] type/topic:', type, 'paymentId:', paymentId);
+
+    if (!MP_ACCESS_TOKEN) {
+      console.warn('[MP][WEBHOOK] Access token faltante. No se puede consultar el pago.');
+      return res.sendStatus(200);
+    }
+
+    if (type.includes('payment') && paymentId) {
+      try {
+        const payment = await mpPayment.get({ id: paymentId });
+        console.log('[MP][WEBHOOK] Payment status:', payment.status, 'preference_id:', payment.preference_id);
+        // Aquí podríamos conciliar reservas usando payment.preference_id / payment.metadata
+        // Por ahora, solo se registra el estado del pago.
+      } catch (err) {
+        console.error('[MP][WEBHOOK] Error consultando pago:', err?.message || err);
+      }
+    }
+
+    // Siempre responder 200 para evitar reintentos excesivos
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(200);
+  }
+});
+
+// Endpoint auxiliar: obtener detalles de un pago concreto (debug/validación)
+app.get('/api/mercadopago/payment/:id', async (req, res) => {
+  try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ error: 'Mercado Pago no está configurado (MP_ACCESS_TOKEN faltante).' });
+    }
+    const { id } = req.params;
+    const payment = await mpPayment.get({ id });
+    res.json({ id: payment.id, status: payment.status, status_detail: payment.status_detail, preference_id: payment.preference_id, metadata: payment.metadata });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo obtener el pago.' });
+  }
+});
+
+// Endpoint auxiliar: validar estado de pago por payment_id recibido en back_urls
+app.post('/api/mercadopago/validate', async (req, res) => {
+  try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ error: 'Mercado Pago no está configurado (MP_ACCESS_TOKEN faltante).' });
+    }
+    const { payment_id } = req.body;
+    if (!payment_id) {
+      return res.status(400).json({ error: 'payment_id es requerido.' });
+    }
+    const payment = await mpPayment.get({ id: String(payment_id) });
+    res.json({ approved: payment.status === 'approved', status: payment.status, payment });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo validar el pago.' });
   }
 });
 
