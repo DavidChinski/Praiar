@@ -1,38 +1,102 @@
-/* ---------- Fondo y título ---------- */
-.estadisticas-container {
-  min-height: 40vh;
-  font-family: 'El Messiri', sans-serif;
-  padding: 2.5rem 6vw;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #fafbfc;
+/* Importar fuentes modernas */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ---------- Variables CSS ---------- */
+:root {
+  --primary-color: #1e3a8a;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e40af;
+  --secondary-color: #2563eb;
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --info-color: #0284c7;
+  --danger-color: #dc2626;
+  
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
 }
 
-.estadisticas-title {
-  color: #003f5e !important;
-  font-size: 2.5rem;
-  font-weight: 600;
+/* ---------- Reset y base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+/* ---------- Contenedor principal ---------- */
+.estadisticas-container {
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 2rem 1rem;
+}
+
+/* ---------- Header del Dashboard ---------- */
+.dashboard-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+}
+
+.dashboard-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.025em;
+}
+
+.dashboard-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
 }
 
 /* ---------- Estados de carga y error ---------- */
-.loading-spinner {
+.loading-container,
+.error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 60vh;
+  text-align: center;
   padding: 3rem;
 }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #e0e0e0;
-  border-top: 4px solid #0099cc;
+.loading-spinner {
+  margin-bottom: 2rem;
+}
+
+.spinner-ring {
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--border-light);
+  border-top: 4px solid var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -40,76 +104,205 @@
   100% { transform: rotate(360deg); }
 }
 
-.error-message {
-  text-align: center;
-  padding: 2rem;
-  color: #d32f2f;
-  background: #ffebee;
-  border-radius: 1rem;
-  margin: 1rem 0;
+.loading-container h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
 }
 
+.loading-container p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.error-container {
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.error-icon {
+  color: var(--danger-color);
+  margin-bottom: 1.5rem;
+}
+
+.error-container h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.error-container p {
+  color: var(--text-secondary);
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+}
+
+.retry-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.retry-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Acceso denegado ---------- */
 .access-denied {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.access-denied-icon {
+  color: var(--warning-color);
+  margin-bottom: 2rem;
 }
 
 .access-denied h1 {
-  color: #003f5e;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.access-denied p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
 }
 
 .volver-button {
-  background-color: #0099cc;
+  background: var(--primary-color);
   color: white;
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-family: inherit;
-  transition: all 0.3s ease;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .volver-button:hover {
-  background-color: #0077a6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 153, 204, 0.3);
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ---------- Resumen de estadísticas ---------- */
 .stats-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
 .stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 63, 94, 0.08);
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--bg-primary);
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 63, 94, 0.12);
+  box-shadow: var(--shadow-xl);
 }
 
-.stat-card h3 {
-  color: #003f5e;
+.stat-card.secondary:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  background-color: #ffffff !important;
+}
+
+.stat-card.primary {
+  border-left: 4px solid var(--primary-color);
+}
+
+.stat-card.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.stat-card.info {
+  border-left: 4px solid var(--info-color);
+}
+
+.stat-card.warning {
+  border-left: 4px solid var(--warning-color);
+}
+
+.stat-card.secondary {
+  border-left: 4px solid var(--secondary-color);
+}
+
+.stat-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.stat-card.primary .stat-icon {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+}
+
+.stat-card.success .stat-icon {
+  background: linear-gradient(135deg, var(--success-color), #10b981);
+}
+
+.stat-card.info .stat-icon {
+  background: linear-gradient(135deg, var(--info-color), #0ea5e9);
+}
+
+.stat-card.warning .stat-icon {
+  background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+}
+
+.stat-card.secondary .stat-icon {
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-light));
+}
+
+.stat-content h3 {
   font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+  line-height: 1;
 }
 
-.stat-card p {
-  color: #005984;
+.stat-content p {
+  color: var(--text-secondary);
   font-size: 1rem;
   font-weight: 500;
   margin: 0;
@@ -121,42 +314,39 @@
   margin-bottom: 3rem;
 }
 
-.section-title {
-  color: #003f5e;
-  font-size: 1.8rem;
-  font-weight: 600;
+.section-header {
   text-align: center;
-  margin-bottom: 2rem;
-  position: relative;
+  margin-bottom: 2.5rem;
 }
 
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #0099cc, #41b6e6);
-  border-radius: 2px;
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.section-description {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
 }
 
 /* ---------- Gráficos ---------- */
 .estadisticas-charts-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
 }
 
 .estadisticas-chart-block {
-  background: white;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 20px rgba(0, 63, 94, 0.07);
-  padding: 1.5rem;
-  position: relative;
-  min-height: 350px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  border: 1px solid var(--border-light);
+  min-height: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -165,99 +355,136 @@
   grid-column: 1 / -1;
 }
 
-.chart-title {
-  color: #003f5e;
-  font-size: 1.2rem;
-  font-weight: 600;
+.chart-header {
+  margin-bottom: 1.5rem;
   text-align: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e8f0fe;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.chart-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 .estadisticas-chart-block canvas {
   flex: 1;
-  max-height: 300px;
+  max-height: 320px;
 }
 
 /* ---------- Tabla de balnearios ---------- */
 .table-container {
-  background: white;
-  border-radius: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.10);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
 }
 
 .tabla-balnearios {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  background-color: var(--bg-primary);
 }
 
 .tabla-balnearios th,
 .tabla-balnearios td {
-  padding: 1.2rem 1rem;
-  text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 1.25rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .tabla-balnearios th {
-  background: linear-gradient(135deg, #005984, #0077b6);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .tabla-balnearios tr:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
 }
 
 .tabla-balnearios tr:last-child td {
   border-bottom: none;
 }
 
-.tabla-balnearios td a {
-  color: #0099cc;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+.balneario-info {
+  display: flex;
+  align-items: center;
 }
 
-.tabla-balnearios td a:hover {
-  color: #0077a6;
+.balneario-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.balneario-link:hover {
+  color: var(--primary-dark);
   text-decoration: underline;
+}
+
+.location-text {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.metric-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
 }
 
 /* ---------- Botón Ver ---------- */
 .ver-button {
-  background: linear-gradient(135deg, #0099cc, #41b6e6);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  font-size: 0.95rem;
-  font-family: inherit;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 153, 204, 0.3);
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .ver-button:hover {
-  background: linear-gradient(135deg, #0077a6, #0099cc);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 153, 204, 0.4);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-/* ---------- Card Detalle ---------- */
+.ver-button svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Modal de detalle ---------- */
 .balneario-detalle-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 63, 94, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -267,51 +494,22 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .balneario-detalle-card {
-  margin: 0;
-  padding: 3rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  border-radius: 2rem;
-  box-shadow: 
-    0 20px 60px rgba(0, 63, 94, 0.25),
-    0 8px 32px rgba(0, 153, 204, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: var(--bg-primary);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
   position: relative;
-  max-width: 800px;
+  max-width: 1000px;
   width: 100%;
   max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid rgba(208, 227, 255, 0.3);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
   animation: slideIn 0.4s ease-out;
   transform-origin: center;
-  scrollbar-width: thin;
-  scrollbar-color: #0099cc #f0f8ff;
-}
-
-.balneario-detalle-card::-webkit-scrollbar {
-  width: 8px;
-}
-
-.balneario-detalle-card::-webkit-scrollbar-track {
-  background: #f0f8ff;
-  border-radius: 4px;
-}
-
-.balneario-detalle-card::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #0099cc, #41b6e6);
-  border-radius: 4px;
-}
-
-.balneario-detalle-card::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #0077a6, #0099cc);
 }
 
 @keyframes slideIn {
@@ -325,348 +523,392 @@
   }
 }
 
+/* ---------- Header del detalle ---------- */
+.detalle-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  padding: 2rem;
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.header-info h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: white;
+}
+
+.balneario-nombre {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0 0 1.5rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-stat {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
 .cerrar-button {
   position: absolute;
   top: 1.5rem;
   right: 2rem;
-  font-size: 20px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   cursor: pointer;
   color: white;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   width: 44px;
   height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
-  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .cerrar-button:hover {
-  background: linear-gradient(135deg, #ee5a52, #d63031);
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
 }
 
-.balneario-detalle-card h3 {
-  font-size: 2rem;
-  color: #003f5e;
-  margin-bottom: 2.5rem;
-  text-align: center;
-  font-weight: 700;
-  background: linear-gradient(135deg, #003f5e, #005984);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-}
-
-.balneario-detalle-card h3::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background: linear-gradient(90deg, #0099cc, #41b6e6);
-  border-radius: 2px;
-}
-
-/* ---------- Estadísticas del detalle ---------- */
-.detalle-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+/* ---------- Contenido del detalle ---------- */
+.detalle-content {
   padding: 2rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  border-radius: 1.5rem;
-  box-shadow: 
-    0 8px 32px rgba(0, 63, 94, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(208, 227, 255, 0.4);
+  max-height: calc(90vh - 250px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--bg-secondary);
 }
 
-.detalle-stat {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.2rem;
-  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
-  transition: all 0.3s ease;
-  border-radius: 0.75rem;
-}
-
-.detalle-stat:hover {
-  background: rgba(0, 153, 204, 0.05);
-  transform: translateX(5px);
-}
-
-.detalle-stat:last-child {
-  border-bottom: none;
-}
-
-.stat-label {
-  color: #005984;
-  font-weight: 600;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.stat-label::before {
-  content: '';
+.detalle-content::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
-  background: linear-gradient(135deg, #0099cc, #41b6e6);
-  border-radius: 50%;
-  display: inline-block;
 }
 
-.stat-value {
-  color: #003f5e;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 0.5rem 1rem;
-  background: rgba(0, 153, 204, 0.1);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(0, 153, 204, 0.2);
+.detalle-content::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
 }
 
-.stat-value.highlight {
-  color: #0099cc;
-  font-weight: 800;
-  font-size: 1.3rem;
-  background: linear-gradient(135deg, rgba(0, 153, 204, 0.15), rgba(65, 182, 230, 0.1));
-  border: 2px solid rgba(0, 153, 204, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 153, 204, 0.2);
+.detalle-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  border-radius: 4px;
 }
 
-/* ---------- Gráfico del detalle ---------- */
-.chart-bar {
-  margin: 2.5rem 0;
-  padding: 2rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  border-radius: 1.5rem;
-  box-shadow: 
-    0 8px 32px rgba(0, 63, 94, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(208, 227, 255, 0.4);
+.detalle-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
 }
 
-.chart-bar h4 {
-  color: #003f5e;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  position: relative;
+.detalle-section {
+  margin-bottom: 2.5rem;
 }
 
-.chart-bar h4::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #0099cc, #41b6e6);
-  border-radius: 2px;
-}
-
-.chart-bar canvas {
-  max-height: 300px;
-}
-
-/* ---------- Secciones de reseñas y reservas ---------- */
-.reseñas-section,
-.reservas-section {
-  margin-top: 2.5rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  border-radius: 1.5rem;
-  box-shadow: 
-    0 8px 32px rgba(0, 63, 94, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(208, 227, 255, 0.4);
-}
-
-.reseñas-section h4,
-.reservas-section h4 {
-  color: #003f5e;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 3px solid rgba(232, 240, 254, 0.8);
-  position: relative;
-}
-
-.reseñas-section h4::after,
-.reservas-section h4::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #0099cc, #41b6e6);
-  border-radius: 2px;
-}
-
-.no-data {
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 2rem;
-  background: rgba(0, 153, 204, 0.05);
-  border-radius: 1rem;
-  border: 2px dashed rgba(0, 153, 204, 0.3);
-}
-
-/* ---------- Lista de reseñas ---------- */
-.reseñas-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.reseña-item {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
-  margin-bottom: 1rem;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.05);
-  border: 1px solid rgba(208, 227, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.reseña-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 63, 94, 0.1);
-  border-color: rgba(0, 153, 204, 0.4);
-}
-
-.reseña-item:last-child {
-  border-bottom: none;
+.detalle-section:last-child {
   margin-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.section-title svg {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+/* ---------- Grid de información ---------- */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  background: var(--bg-secondary);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.info-item:hover {
+  background: var(--bg-primary);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.info-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* ---------- Contenedor de gráfico ---------- */
+.chart-container {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  height: 300px;
+}
+
+/* ---------- Estados vacíos ---------- */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-color);
+}
+
+.empty-state svg {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ---------- Contenedor de reseñas ---------- */
+.reseñas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reseña-card {
+  background: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.reseña-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .reseña-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1rem;
 }
 
-.reseña-usuario {
-  color: #003f5e;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.reseña-estrellas {
-  color: #005984;
-  font-weight: 700;
+.reseña-user {
   display: flex;
   align-items: center;
-  gap: 2px;
-}
-
-.reseña-estrella {
-  color: #ffd700;
-  font-size: 1.1rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.reseña-comentario {
-  color: #333;
-  margin: 0.5rem 0 0.75rem 0;
-  line-height: 1.6;
-  font-size: 1rem;
-  white-space: pre-wrap;
-}
-
-.reseña-likes {
-  color: #0099cc;
-  font-weight: 700;
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  background: rgba(0, 153, 204, 0.1);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(0, 153, 204, 0.2);
-}
-
-/* Encabezado reseña con avatar y nombre */
-.reseña-header-izq {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .reseña-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(0, 153, 204, 0.2);
+  border: 2px solid var(--border-light);
 }
 
-/* ---------- Lista de reservas ---------- */
-.reservas-list {
-  list-style: none;
-  padding: 0;
+.reseña-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reseña-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.reseña-rating {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 0.875rem;
+}
+
+.reseña-likes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.reseña-text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
   margin: 0;
 }
 
-.reserva-item {
+/* ---------- Ver más reseñas ---------- */
+.ver-mas-reseñas {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.ver-mas-button {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.ver-mas-button:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.ver-mas-button svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Contenedor de reservas ---------- */
+.reservas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reserva-card {
+  background: var(--bg-primary);
   padding: 1.5rem;
-  border-bottom: 1px solid rgba(232, 240, 254, 0.6);
-  margin-bottom: 1rem;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.05);
-  border: 1px solid rgba(208, 227, 255, 0.3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.reserva-item:hover {
+.reserva-card:hover {
+  border-color: var(--primary-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 63, 94, 0.1);
-  border-color: rgba(0, 153, 204, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
-.reserva-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
+.reserva-info {
+  display: flex;
+  gap: 2rem;
 }
 
-.reserva-fechas {
-  color: #003f5e;
+.reserva-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.date-value {
   font-weight: 600;
-  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
 }
 
-.reserva-carpa {
-  color: #005984;
-  font-size: 1rem;
+.reserva-details {
+  display: flex;
+  align-items: center;
+}
+
+.carpa-id {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
   padding: 0.5rem 1rem;
-  background: rgba(0, 89, 132, 0.1);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(0, 89, 132, 0.2);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
   font-weight: 500;
 }
 
@@ -677,37 +919,42 @@
   }
   
   .stats-summary {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .estadisticas-container {
-    padding: 1.5rem 2vw;
+    padding: 1rem 0.5rem;
   }
   
-  .estadisticas-title {
-    font-size: 2rem;
+  .dashboard-title {
+    font-size: 2.25rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1.1rem;
   }
   
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
   
   .estadisticas-chart-block {
-    min-height: 300px;
-    padding: 1rem;
+    min-height: 350px;
+    padding: 1.5rem;
   }
   
   .detalle-stats {
     grid-template-columns: 1fr;
+    margin: 1.5rem;
+    padding: 1.5rem;
   }
   
   .balneario-detalle-card {
-    padding: 1.5rem;
     margin: 1rem;
     max-height: 95vh;
-    border-radius: 1.5rem;
+    border-radius: var(--radius-xl);
   }
 
   .balneario-detalle-overlay {
@@ -716,14 +963,14 @@
   
   .tabla-balnearios th,
   .tabla-balnearios td {
-    padding: 0.8rem 0.5rem;
+    padding: 1rem 0.75rem;
     font-size: 0.9rem;
   }
   
   .reserva-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .cerrar-button {
@@ -731,34 +978,31 @@
     right: 1.5rem;
     width: 40px;
     height: 40px;
-    font-size: 18px;
   }
 
-  .balneario-detalle-card h3 {
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
+  .detalle-header {
+    padding: 2rem 1.5rem 1.5rem;
   }
 
-  .detalle-stats {
-    padding: 1.5rem;
-    gap: 1rem;
+  .detalle-header h3 {
+    font-size: 1.5rem;
   }
 
   .chart-bar,
   .reseñas-section,
   .reservas-section {
     padding: 1.5rem;
-    margin-top: 2rem;
+    margin: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .estadisticas-container {
-    padding: 1rem 1vw;
+    padding: 0.5rem;
   }
   
-  .estadisticas-title {
-    font-size: 1.8rem;
+  .dashboard-title {
+    font-size: 2rem;
   }
   
   .stats-summary {
@@ -766,14 +1010,18 @@
     gap: 1rem;
   }
   
-  .stat-card h3 {
+  .stat-card {
+    padding: 1.5rem;
+  }
+  
+  .stat-content h3 {
     font-size: 2rem;
   }
   
   .balneario-detalle-card {
     padding: 1rem;
     max-height: 98vh;
-    border-radius: 1rem;
+    border-radius: var(--radius-lg);
   }
 
   .balneario-detalle-overlay {
@@ -790,47 +1038,34 @@
     right: 1rem;
     width: 36px;
     height: 36px;
-    font-size: 16px;
   }
 
-  .balneario-detalle-card h3 {
-    font-size: 1.4rem;
-    margin-bottom: 1.5rem;
+  .detalle-header h3 {
+    font-size: 1.25rem;
   }
 
   .chart-bar,
   .reseñas-section,
   .reservas-section {
     padding: 1rem;
-    margin-top: 1.5rem;
+    margin: 1rem;
   }
 
   .detalle-stat {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .stat-label {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .stat-value {
-    font-size: 1rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.75rem;
   }
 
   .reseña-item,
   .reserva-item {
     padding: 1rem;
   }
-}
-
-/* ---------- Enlaces ---------- */
-a {
-  color: #0099cc;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: #0077a6;
 }

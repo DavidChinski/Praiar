@@ -39,18 +39,18 @@ function getUserFromStorage() {
   }
 }
 
-// Paleta de azules para los gráficos
-const bluePalette = [
-  "#003f5e",
-  "#005984",
-  "#0077b6",
-  "#0099cc",
-  "#41b6e6",
-  "#73c2fb",
-  "#bde0fe",
-  "#8ecae6",
-  "#1976d2",
-  "#90caf9",
+// Paleta de colores azules moderna y profesional
+const modernPalette = [
+  "#1e3a8a", // Azul profundo
+  "#3b82f6", // Azul principal
+  "#60a5fa", // Azul claro
+  "#93c5fd", // Azul muy claro
+  "#1e40af", // Azul oscuro
+  "#2563eb", // Azul medio
+  "#0ea5e9", // Azul cielo
+  "#0284c7", // Azul marino
+  "#0369a1", // Azul profundo
+  "#075985", // Azul muy profundo
 ];
 
 export default function EstadisticasComponent() {
@@ -98,7 +98,7 @@ export default function EstadisticasComponent() {
         const user = usuario || getUserFromStorage();
         if (!user || !user.esPropietario || !user.auth_id) {
           setLoading(false);
-          setError("No sos propietario. No tienes acceso.");
+          setError("No tienes permisos de propietario para acceder a estas estadísticas.");
           return;
         }
         // Ciudades
@@ -144,7 +144,7 @@ export default function EstadisticasComponent() {
         setReseñasPorBalneario(reseñasPorB);
         setReservasPorBalneario(reservasPorB);
       } catch (e) {
-        setError("Error al cargar estadísticas");
+        setError("Error al cargar las estadísticas. Por favor, intenta nuevamente.");
       } finally {
         setLoading(false);
       }
@@ -159,12 +159,18 @@ export default function EstadisticasComponent() {
     return (
       <div className="estadisticas-container">
         <div className="access-denied">
-          <h1>No sos propietario. No tienes acceso.</h1>
+          <div className="access-denied-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.9 1 3 1.9 3 3V21C3 22.1 3.9 23 5 23H19C20.1 23 21 22.1 21 21V9ZM19 9H14V4H5V21H19V9Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h1>Acceso Restringido</h1>
+          <p>Necesitas permisos de propietario para acceder a las estadísticas de balnearios.</p>
           <button
             onClick={() => navigate(-1)}
             className="volver-button"
           >
-            Volver a la página anterior
+            Volver
           </button>
         </div>
       </div>
@@ -174,10 +180,12 @@ export default function EstadisticasComponent() {
   if (loading) {
     return (
       <div className="estadisticas-container">
-        <h2 className="estadisticas-title">Estadísticas de Balnearios</h2>
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Cargando estadísticas...</p>
+        <div className="loading-container">
+          <div className="loading-spinner">
+            <div className="spinner-ring"></div>
+          </div>
+          <h2>Cargando Dashboard</h2>
+          <p>Preparando tus estadísticas...</p>
         </div>
       </div>
     );
@@ -186,9 +194,17 @@ export default function EstadisticasComponent() {
   if (error) {
     return (
       <div className="estadisticas-container">
-        <h2 className="estadisticas-title">Estadísticas de Balnearios</h2>
-        <div className="error-message">
+        <div className="error-container">
+          <div className="error-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h2>Error de Carga</h2>
           <p>{error}</p>
+          <button onClick={() => window.location.reload()} className="retry-button">
+            Reintentar
+          </button>
         </div>
       </div>
     );
@@ -213,7 +229,9 @@ export default function EstadisticasComponent() {
           .map((c) => balneariosPorCiudad[c.id_ciudad]),
         backgroundColor: ciudades
           .filter((c) => balneariosPorCiudad[c.id_ciudad])
-          .map((_, i) => bluePalette[i % bluePalette.length]),
+          .map((_, i) => modernPalette[i % modernPalette.length]),
+        borderWidth: 2,
+        borderColor: '#ffffff',
       },
     ],
   };
@@ -227,7 +245,9 @@ export default function EstadisticasComponent() {
         data: balnearios.map(
           (b) => reservasPorBalneario[b.id_balneario]?.length || 0
         ),
-        backgroundColor: balnearios.map((_, i) => bluePalette[i % bluePalette.length]),
+        backgroundColor: balnearios.map((_, i) => modernPalette[i % modernPalette.length]),
+        borderWidth: 0,
+        borderRadius: 8,
       },
     ],
   };
@@ -237,14 +257,16 @@ export default function EstadisticasComponent() {
     labels: balnearios.map((b) => b.nombre),
     datasets: [
       {
-        label: "Likes (suma reseñas)",
+        label: "Likes totales",
         data: balnearios.map((b) =>
           (reseñasPorBalneario[b.id_balneario] || []).reduce(
             (acc, r) => acc + (r.likes || 0),
             0
           )
         ),
-        backgroundColor: balnearios.map((_, i) => bluePalette[(i + 2) % bluePalette.length]),
+        backgroundColor: balnearios.map((_, i) => modernPalette[(i + 2) % modernPalette.length]),
+        borderWidth: 0,
+        borderRadius: 8,
       },
     ],
   };
@@ -262,7 +284,9 @@ export default function EstadisticasComponent() {
       {
         label: "Cantidad",
         data: Object.values(estrellasCount),
-        backgroundColor: Object.keys(estrellasCount).map((_, i) => bluePalette[i % bluePalette.length]),
+        backgroundColor: Object.keys(estrellasCount).map((_, i) => modernPalette[i % modernPalette.length]),
+        borderWidth: 0,
+        borderRadius: 6,
       },
     ],
   };
@@ -277,63 +301,129 @@ export default function EstadisticasComponent() {
   });
   const reservasPorMes = {
     labels: [
-      "Ene",
-      "Feb",
-      "Mar",
-      "Abr",
-      "May",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dic",
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
     ],
     datasets: [
       {
         label: "Reservas por mes",
         data: reservasPorMesArr.map((r) => r.total),
-        backgroundColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
-        borderColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
-        pointBackgroundColor: reservasPorMesArr.map((_, i) => bluePalette[i % bluePalette.length]),
-        tension: 0.3,
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#3b82f6',
+        borderWidth: 3,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        tension: 0.4,
         fill: true,
       },
     ],
   };
 
+  // Calcular estadísticas adicionales
+  const totalReservas = Object.values(reservasPorBalneario).flat().length;
+  const totalReseñas = Object.values(reseñasPorBalneario).flat().length;
+  const totalLikes = Object.values(reseñasPorBalneario).flat().reduce((acc, r) => acc + (r.likes || 0), 0);
+  const promedioEstrellas = totalReseñas > 0 
+    ? (Object.values(reseñasPorBalneario).flat().reduce((acc, r) => acc + (r.estrellas || 0), 0) / totalReseñas).toFixed(1)
+    : 0;
+
   // --- UI ---
   return (
     <div className="estadisticas-container">
-      <h2 className="estadisticas-title">Estadísticas de tus Balnearios</h2>
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Dashboard de Gestión</h1>
+        <p className="dashboard-subtitle">Análisis completo de tus balnearios</p>
+      </div>
       
       {/* Resumen de estadísticas */}
       <div className="stats-summary">
-        <div className="stat-card">
-          <h3>{balnearios.length}</h3>
-          <p>Balnearios</p>
+        <div className="stat-card primary">
+          <div className="stat-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <h3>{balnearios.length}</h3>
+            <p>Balnearios Activos</p>
+          </div>
         </div>
-        <div className="stat-card">
-          <h3>{Object.values(reservasPorBalneario).flat().length}</h3>
-          <p>Reservas Totales</p>
+        <div className="stat-card success">
+          <div className="stat-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <h3>{totalReservas}</h3>
+            <p>Reservas Totales</p>
+          </div>
         </div>
-        <div className="stat-card">
-          <h3>{Object.values(reseñasPorBalneario).flat().length}</h3>
-          <p>Reseñas</p>
+        <div className="stat-card info">
+          <div className="stat-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <h3>{totalReseñas}</h3>
+            <p>Reseñas Recibidas</p>
+          </div>
         </div>
-        <div className="stat-card">
-          <h3>{Object.values(reseñasPorBalneario).flat().reduce((acc, r) => acc + (r.likes || 0), 0)}</h3>
-          <p>Likes Totales</p>
+        <div className="stat-card warning">
+          <div className="stat-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 9V5A3 3 0 0 0 8 5V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="2" y="9" width="20" height="12" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
+              <circle cx="12" cy="15" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <h3>{totalLikes}</h3>
+            <p>Likes Totales</p>
+          </div>
+        </div>
+        <div className="stat-card secondary">
+          <div className="stat-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <h3>{promedioEstrellas}</h3>
+            <p>Promedio Estrellas</p>
+          </div>
         </div>
       </div>
 
       {/* Gráficos principales */}
       <div className="charts-section">
-        <h3 className="section-title">Análisis General</h3>
+        <div className="section-header">
+          <h2 className="section-title">Análisis de Rendimiento</h2>
+          <p className="section-description">Métricas clave para optimizar tu negocio</p>
+        </div>
+        
         <div className="estadisticas-charts-row">
           <div className="estadisticas-chart-block">
-            <h4 className="chart-title">Balnearios por Ciudad</h4>
+            <div className="chart-header">
+              <h4 className="chart-title">Distribución por Ciudad</h4>
+              <p className="chart-subtitle">Balnearios por ubicación geográfica</p>
+            </div>
             <Pie 
               data={balneariosPorCiudadChart} 
               options={{
@@ -345,8 +435,11 @@ export default function EstadisticasComponent() {
                     labels: {
                       padding: 20,
                       font: {
-                        size: 12
-                      }
+                        size: 12,
+                        family: 'Inter, sans-serif'
+                      },
+                      usePointStyle: true,
+                      pointStyle: 'circle'
                     }
                   }
                 }
@@ -354,7 +447,10 @@ export default function EstadisticasComponent() {
             />
           </div>
           <div className="estadisticas-chart-block">
-            <h4 className="chart-title">Reservas por Balneario</h4>
+            <div className="chart-header">
+              <h4 className="chart-title">Reservas por Balneario</h4>
+              <p className="chart-subtitle">Volumen de reservas por establecimiento</p>
+            </div>
             <Bar
               data={reservasPorBalnearioChart}
               options={{ 
@@ -367,7 +463,20 @@ export default function EstadisticasComponent() {
                   y: {
                     beginAtZero: true,
                     ticks: {
-                      stepSize: 1
+                      stepSize: 1,
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    },
+                    grid: {
+                      color: 'rgba(0,0,0,0.05)'
+                    }
+                  },
+                  x: {
+                    ticks: {
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
                     }
                   }
                 }
@@ -378,7 +487,10 @@ export default function EstadisticasComponent() {
         
         <div className="estadisticas-charts-row">
           <div className="estadisticas-chart-block">
-            <h4 className="chart-title">Reservas por Mes</h4>
+            <div className="chart-header">
+              <h4 className="chart-title">Tendencia de Reservas</h4>
+              <p className="chart-subtitle">Evolución mensual de reservas</p>
+            </div>
             <Line 
               data={reservasPorMes} 
               options={{
@@ -391,7 +503,20 @@ export default function EstadisticasComponent() {
                   y: {
                     beginAtZero: true,
                     ticks: {
-                      stepSize: 1
+                      stepSize: 1,
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    },
+                    grid: {
+                      color: 'rgba(0,0,0,0.05)'
+                    }
+                  },
+                  x: {
+                    ticks: {
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
                     }
                   }
                 }
@@ -399,7 +524,10 @@ export default function EstadisticasComponent() {
             />
           </div>
           <div className="estadisticas-chart-block">
-            <h4 className="chart-title">Likes por Balneario</h4>
+            <div className="chart-header">
+              <h4 className="chart-title">Engagement por Balneario</h4>
+              <p className="chart-subtitle">Likes totales por establecimiento</p>
+            </div>
             <Bar
               data={likesPorBalnearioChart}
               options={{ 
@@ -412,7 +540,20 @@ export default function EstadisticasComponent() {
                   y: {
                     beginAtZero: true,
                     ticks: {
-                      stepSize: 1
+                      stepSize: 1,
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    },
+                    grid: {
+                      color: 'rgba(0,0,0,0.05)'
+                    }
+                  },
+                  x: {
+                    ticks: {
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
                     }
                   }
                 }
@@ -423,7 +564,10 @@ export default function EstadisticasComponent() {
         
         <div className="estadisticas-charts-row">
           <div className="estadisticas-chart-block full-width">
-            <h4 className="chart-title">Distribución de Estrellas</h4>
+            <div className="chart-header">
+              <h4 className="chart-title">Calificación de Clientes</h4>
+              <p className="chart-subtitle">Distribución de estrellas en reseñas</p>
+            </div>
             <Bar
               data={rankingEstrellas}
               options={{ 
@@ -436,7 +580,20 @@ export default function EstadisticasComponent() {
                   y: {
                     beginAtZero: true,
                     ticks: {
-                      stepSize: 1
+                      stepSize: 1,
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    },
+                    grid: {
+                      color: 'rgba(0,0,0,0.05)'
+                    }
+                  },
+                  x: {
+                    ticks: {
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
                     }
                   }
                 }
@@ -448,42 +605,61 @@ export default function EstadisticasComponent() {
 
       {/* Tabla de balnearios */}
       <div className="table-section">
-        <h3 className="section-title">Mis Balnearios</h3>
+        <div className="section-header">
+          <h2 className="section-title">Gestión de Balnearios</h2>
+          <p className="section-description">Vista detallada de todos tus establecimientos</p>
+        </div>
         <div className="table-container">
           <table className="tabla-balnearios">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Ciudad</th>
+                <th>Nombre del Balneario</th>
+                <th>Ubicación</th>
                 <th>Reservas</th>
                 <th>Likes</th>
-                <th>Detalle</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {balnearios.map((b) => (
                 <tr key={b.id_balneario}>
-                  <td><Link to={`/balneario/${b.id_balneario}`}>{b.nombre}</Link></td>
                   <td>
-                    {ciudades.find((c) => c.id_ciudad === b.id_ciudad)?.nombre ||
-                      b.ciudad ||
-                      "-"}
+                    <div className="balneario-info">
+                      <Link to={`/balneario/${b.id_balneario}`} className="balneario-link">
+                        {b.nombre}
+                      </Link>
+                    </div>
                   </td>
                   <td>
-                    {(reservasPorBalneario[b.id_balneario] || []).length}
+                    <span className="location-text">
+                      {ciudades.find((c) => c.id_ciudad === b.id_ciudad)?.nombre ||
+                        b.ciudad ||
+                        "Sin ubicación"}
+                    </span>
                   </td>
                   <td>
-                    {(reseñasPorBalneario[b.id_balneario] || []).reduce(
-                      (acc, r) => acc + (r.likes || 0),
-                      0
-                    )}
+                    <span className="metric-value">
+                      {(reservasPorBalneario[b.id_balneario] || []).length}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="metric-value">
+                      {(reseñasPorBalneario[b.id_balneario] || []).reduce(
+                        (acc, r) => acc + (r.likes || 0),
+                        0
+                      )}
+                    </span>
                   </td>
                   <td>
                     <button
                       className="ver-button"
                       onClick={() => setSelectedBalneario(b.id_balneario)}
                     >
-                      Ver más
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
+                      Ver Detalle
                     </button>
                   </td>
                 </tr>
@@ -515,20 +691,6 @@ export default function EstadisticasComponent() {
 }
 
 function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) {
-  // Paleta de azules para los gráficos
-  const bluePalette = [
-    "#003f5e",
-    "#005984",
-    "#0077b6",
-    "#0099cc",
-    "#41b6e6",
-    "#73c2fb",
-    "#bde0fe",
-    "#8ecae6",
-    "#1976d2",
-    "#90caf9",
-  ];
-
   // Estadísticas por balneario
   const estrellasCount = {};
   reseñas.forEach((r) => {
@@ -540,123 +702,228 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
       {
         label: "Cantidad",
         data: Object.values(estrellasCount),
-        backgroundColor: Object.keys(estrellasCount).map((_, i) => bluePalette[i % bluePalette.length]),
+        backgroundColor: Object.keys(estrellasCount).map((_, i) => modernPalette[i % modernPalette.length]),
+        borderWidth: 0,
+        borderRadius: 6,
       },
     ],
   };
+
+  // Calcular estadísticas adicionales
+  const totalLikes = reseñas.reduce((acc, r) => acc + (r.likes || 0), 0);
+  const promedioEstrellas = reseñas.length > 0 
+    ? (reseñas.reduce((acc, r) => acc + (r.estrellas || 0), 0) / reseñas.length).toFixed(1)
+    : 0;
   
   return (
     <div className="balneario-detalle-card">
-      <button className="cerrar-button" onClick={onClose} title="Cerrar">
-        ✕
-      </button>
-      <h3>📊 Detalle de {balneario.nombre}</h3>
-      
-      <div className="detalle-stats">
-        <div className="detalle-stat">
-          <span className="stat-label">🏙️ Ciudad:</span>
-          <span className="stat-value">
-            {ciudades.find((c) => c.id_ciudad === balneario.id_ciudad)?.nombre ||
-              balneario.ciudad ||
-              "-"}
-          </span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">🆔 ID:</span>
-          <span className="stat-value">{balneario.id_balneario}</span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">📍 Dirección:</span>
-          <span className="stat-value">{balneario.direccion || "-"}</span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">📞 Teléfono:</span>
-          <span className="stat-value">{balneario.telefono || "-"}</span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">📅 Reservas:</span>
-          <span className="stat-value highlight">{reservas.length}</span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">👍 Likes (reseñas):</span>
-          <span className="stat-value highlight">
-            {reseñas.reduce((acc, r) => acc + (r.likes || 0), 0)}
-          </span>
-        </div>
-        <div className="detalle-stat">
-          <span className="stat-label">⭐ Reseñas:</span>
-          <span className="stat-value highlight">{reseñas.length}</span>
+      <div className="detalle-header">
+        <div className="header-content">
+          <div className="header-info">
+            <h3>Análisis Detallado</h3>
+            <p className="balneario-nombre">{balneario.nombre}</p>
+            <div className="header-stats">
+              <div className="header-stat">
+                <span className="stat-number">{reservas.length}</span>
+                <span className="stat-label">Reservas</span>
+              </div>
+              <div className="header-stat">
+                <span className="stat-number">{reseñas.length}</span>
+                <span className="stat-label">Reseñas</span>
+              </div>
+              <div className="header-stat">
+                <span className="stat-number">{totalLikes}</span>
+                <span className="stat-label">Likes</span>
+              </div>
+              <div className="header-stat">
+                <span className="stat-number">{promedioEstrellas}</span>
+                <span className="stat-label">Promedio</span>
+              </div>
+            </div>
+          </div>
+          <button className="cerrar-button" onClick={onClose} title="Cerrar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
       </div>
       
-      <div className="chart-bar">
-        <h4>📈 Distribución de Estrellas</h4>
-        <Bar
-          data={rankingEstrellas}
-          options={{ 
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-              legend: { display: false } 
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  stepSize: 1
+      <div className="detalle-content">
+        <div className="detalle-section">
+          <h4 className="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 10C20 14.4183 16.4183 18 12 18C7.58172 18 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 6V10L15 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Información General
+          </h4>
+          <div className="info-grid">
+            <div className="info-item">
+              <span className="info-label">Ubicación</span>
+              <span className="info-value">
+                {ciudades.find((c) => c.id_ciudad === balneario.id_ciudad)?.nombre ||
+                  balneario.ciudad ||
+                  "No especificada"}
+              </span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">ID del Balneario</span>
+              <span className="info-value">{balneario.id_balneario}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Dirección</span>
+              <span className="info-value">{balneario.direccion || "No especificada"}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Teléfono</span>
+              <span className="info-value">{balneario.telefono || "No especificado"}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="detalle-section">
+          <h4 className="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3V21H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 9L12 6L16 10L21 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Distribución de Calificaciones
+          </h4>
+          <div className="chart-container">
+            <Bar
+              data={rankingEstrellas}
+              options={{ 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                  legend: { display: false } 
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      stepSize: 1,
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    },
+                    grid: {
+                      color: 'rgba(0,0,0,0.05)'
+                    }
+                  },
+                  x: {
+                    ticks: {
+                      font: {
+                        family: 'Inter, sans-serif'
+                      }
+                    }
+                  }
                 }
-              }
-            }
-          }}
-        />
-      </div>
-      
-      <div className="reseñas-section">
-        <h4>💬 Últimas reseñas</h4>
-        {reseñas.length === 0 && <p className="no-data">📝 No hay reseñas aún.</p>}
-        <ul className="reseñas-list">
-          {reseñas.map((r) => (
-            <li key={r.id_reseña} className="reseña-item">
-              <div className="reseña-header">
-                <div className="reseña-header-izq">
-                  <img
-                    className="reseña-avatar"
-                    src={r.usuario_imagen || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
-                    alt={r.usuario_nombre || "Usuario"}
-                    onError={(e) => { e.currentTarget.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; }}
-                  />
-                  <div className="reseña-usuario">
-                    <span className="reseña-usuario-nombre">{r.usuario_nombre || "Usuario"}</span>
-                    <span className="reseña-estrellas">
-                      {[1,2,3,4,5].map(v => (
-                        <span key={v} className="reseña-estrella" style={{ color: v <= (r.estrellas || 0) ? "#ffb700" : "#ccc" }}>★</span>
-                      ))}
-                    </span>
+              }}
+            />
+          </div>
+        </div>
+        
+        <div className="detalle-section">
+          <h4 className="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Reseñas de Clientes
+          </h4>
+          {reseñas.length === 0 ? (
+            <div className="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <h5>No hay reseñas disponibles</h5>
+              <p>Los clientes aún no han dejado reseñas para este balneario.</p>
+            </div>
+          ) : (
+            <div className="reseñas-container">
+              {reseñas.slice(0, 3).map((r) => (
+                <div key={r.id_reseña} className="reseña-card">
+                  <div className="reseña-header">
+                    <div className="reseña-user">
+                      <img
+                        className="reseña-avatar"
+                        src={r.usuario_imagen || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+                        alt={r.usuario_nombre || "Usuario"}
+                        onError={(e) => { e.currentTarget.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; }}
+                      />
+                      <div className="reseña-info">
+                        <span className="reseña-name">{r.usuario_nombre || "Usuario"}</span>
+                        <div className="reseña-rating">
+                          {[1,2,3,4,5].map(v => (
+                            <span key={v} className="star" style={{ color: v <= (r.estrellas || 0) ? "#fbbf24" : "#e5e7eb" }}>★</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="reseña-likes">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 9V5A3 3 0 0 0 8 5V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <rect x="2" y="9" width="20" height="12" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
+                        <circle cx="12" cy="15" r="1" fill="currentColor"/>
+                      </svg>
+                      {r.likes || 0}
+                    </div>
+                  </div>
+                  <p className="reseña-text">{r.comentario}</p>
+                </div>
+              ))}
+              {reseñas.length > 3 && (
+                <div className="ver-mas-reseñas">
+                  <button className="ver-mas-button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7 13L12 8L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Ver {reseñas.length - 3} reseñas más
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+        <div className="detalle-section">
+          <h4 className="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Reservas Recientes
+          </h4>
+          {reservas.length === 0 ? (
+            <div className="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <h5>No hay reservas registradas</h5>
+              <p>Aún no se han realizado reservas para este balneario.</p>
+            </div>
+          ) : (
+            <div className="reservas-container">
+              {reservas.slice(-5).map((r, i) => (
+                <div key={i} className="reserva-card">
+                  <div className="reserva-info">
+                    <div className="reserva-dates">
+                      <span className="date-label">Desde</span>
+                      <span className="date-value">{r.fecha_inicio}</span>
+                    </div>
+                    <div className="reserva-dates">
+                      <span className="date-label">Hasta</span>
+                      <span className="date-value">{r.fecha_salida}</span>
+                    </div>
+                  </div>
+                  <div className="reserva-details">
+                    <span className="carpa-id">Carpa ID: {r.id_ubicacion || r.ubicacion_id_carpa}</span>
                   </div>
                 </div>
-                <span className="reseña-likes">👍 {r.likes || 0}</span>
-              </div>
-              <p className="reseña-comentario">{r.comentario}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-      
-      <div className="reservas-section">
-        <h4>🏕️ Reservas recientes</h4>
-        {reservas.length === 0 && <p className="no-data">📋 No hay reservas aún.</p>}
-        <ul className="reservas-list">
-          {reservas.slice(-5).map((r, i) => (
-            <li key={i} className="reserva-item">
-              <span className="reserva-fechas">
-                📅 {r.fecha_inicio} a {r.fecha_salida}
-              </span>
-              <span className="reserva-carpa">
-                🏕️ Carpa ID: {r.id_ubicacion || r.ubicacion_id_carpa}
-              </span>
-            </li>
-          ))}
-        </ul>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
