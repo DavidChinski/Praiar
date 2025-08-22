@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import BalneariosComponent from '../components/BalneariosComponent/';
 import CrearBalneario from '../Components/CrearBalneario';
+import ReservasPendientes from '../Components/ReservasPendientes';
+import './TusBalnearios.css';
 function getUserFromStorage() {
   try {
     const str =
@@ -69,10 +71,52 @@ function TusBalnearios() {
     </div>
   );
 
+  const [activeTab, setActiveTab] = useState('balnearios'); // Agregar estado para pestañas
+
   return (
-    <div id="seccion-inferior">
-      <BalneariosComponent />
-      <CrearBalneario />
+    <div className="tus-balnearios">
+      <h1>Tus Balnearios</h1>
+      
+      {/* Pestañas de navegación */}
+      <div className="tabs-navigation">
+        <button 
+          className={`tab-button ${activeTab === 'balnearios' ? 'active' : ''}`}
+          onClick={() => setActiveTab('balnearios')}
+        >
+          🏖️ Mis Balnearios
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'reservas' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reservas')}
+        >
+          📋 Reservas Pendientes
+        </button>
+      </div>
+
+      {/* Contenido de las pestañas */}
+      {activeTab === 'balnearios' && (
+        <div className="tab-content">
+          {/* Contenido existente de balnearios */}
+          <BalneariosComponent />
+          <CrearBalneario />
+        </div>
+      )}
+
+      {activeTab === 'reservas' && (
+        <div className="tab-content">
+          {/* Assuming 'balnearios' state holds the list of balnearios */}
+          {/* This part needs to be updated to fetch or pass the actual balnearios data */}
+          {/* For now, we'll just show a placeholder or a message */}
+          <p>Aquí se mostrarán las reservas pendientes de tus balnearios.</p>
+          {/* Example: If you had a state for balnearios, you'd loop through it here */}
+          {/* {balnearios.map(balneario => ( */}
+          {/*   <div key={balneario.id_balneario} className="balneario-reservas-section"> */}
+          {/*     <h2>Reservas de {balneario.nombre}</h2> */}
+          {/*     <ReservasPendientes idBalneario={balneario.id_balneario} /> */}
+          {/*   </div> */}
+          {/* ))} */}
+        </div>
+      )}
     </div>
   );
 }

@@ -2,11 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import { supabase } from './supabaseClient.js';
-import nodemailer from 'nodemailer';
 import morgan from 'morgan';
 import { elAgente } from './Agente/src/agent.js';
 import 'dotenv/config';
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+import { 
+  transporter, 
+  createReservaNotificationEmail, 
+  createApprovalEmail, 
+  createRejectionEmail 
+} from './emailConfig.js';
 
 
 const app = express();
@@ -1276,35 +1281,39 @@ app.post('/api/reserva', async (req, res) => {
       .eq("auth_id", id_usuario)
       .single();
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'praiar.info@gmail.com',
-        pass: 'hbtt hyzt ktwp team'
-      }
-    });
+    // Preparar datos para el email
+    const emailData = {
+      id_reserva: reservaInsertada.id_reserva,
+      clienteNombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Usuario ${id_usuario}`,
+      clienteEmail: usuario?.email || 'No disponible',
+      clienteTelefono: codigoPais + telefono.trim(),
+      balnearioNombre: balneario.nombre,
+      ubicaciones: id_ubicaciones.map(id => ({ id_ubicacion: id })),
+      fechaInicio: fecha_inicio,
+      fechaSalida: fecha_salida,
+      precioTotal: precioTotalFinal,
+      metodoPago: metodo_pago,
+      direccion: direccion.trim(),
+      ciudad: ciudad.trim(),
+      codigoPostal: codigoPostal.trim(),
+      pais: pais.trim()
+    };
 
+    // Crear y enviar email de notificación
+    const emailContent = createReservaNotificationEmail(emailData);
     const mailOptions = {
-      from: '"Reservas" <praiar.info@gmail.com>',
+      from: '"Reservas Praiar" <praiar.info@gmail.com>',
       to: duenio.email,
-      subject: `Nueva reserva en ${balneario.nombre}`,
-      text: `
-¡Nueva reserva recibida!
-
-Cliente: ${usuario ? usuario.nombre + ' ' + usuario.apellido : 'ID usuario: ' + id_usuario}
-Email cliente: ${usuario?.email || 'No disponible'}
-
-Ubicaciones: ${id_ubicaciones.join(", ")}
-Fecha inicio: ${fecha_inicio}
-Fecha salida: ${fecha_salida}
-Método de pago: ${metodo_pago}
-Precio total: ${precioTotalFinal}
-      `
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error("Error enviando mail:", error);
+        console.error("Error enviando email de notificación:", error);
+      } else {
+        console.log("Email de notificación enviado exitosamente a:", duenio.email);
       }
     });
 
@@ -1548,6 +1557,232 @@ app.post('/api/resenias/:id_reseña/like', async (req, res) => {
   }
 });
 
+// === ENDPOINTS PARA APROBACIÓN/RECHAZO DE RESERVAS ===
+
+// POST /api/reserva/approve/:id_reserva
+app.post('/api/reserva/approve/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  
+  try {
+    // 1. Obtener datos de la reserva
+    const { data: reserva, error: reservaError } = await supabase
+      .from("reservas")
+      .select(`
+        *,
+        balnearios (
+          id_balneario,
+          nombre,
+          id_usuario
+        )
+      `)
+      .eq("id_reserva", id_reserva)
+      .single();
+
+    if (reservaError || !reserva) {
+      return res.status(404).json({ error: "Reserva no encontrada." });
+    }
+
+    // 2. Obtener datos del cliente
+    const { data: cliente, error: clienteError } = await supabase
+      .from("usuarios")
+      .select("nombre, apellido, email")
+      .eq("auth_id", reserva.id_usuario)
+      .single();
+
+    if (clienteError || !cliente) {
+      return res.status(500).json({ error: "No se pudo obtener información del cliente." });
+    }
+
+    // 3. Actualizar estado de la reserva (agregar campo estado si no existe)
+    const { error: updateError } = await supabase
+      .from("reservas")
+      .update({ 
+        estado: 'aprobada',
+        fecha_aprobacion: new Date().toISOString()
+      })
+      .eq("id_reserva", id_reserva);
+
+    if (updateError) {
+      console.error("Error actualizando estado de reserva:", updateError);
+      // Continuar aunque falle la actualización del estado
+    }
+
+    // 4. Enviar email de confirmación al cliente
+    const emailData = {
+      clienteNombre: `${cliente.nombre} ${cliente.apellido}`,
+      balnearioNombre: reserva.balnearios.nombre,
+      fechaInicio: reserva.fecha_inicio,
+      fechaSalida: reserva.fecha_salida,
+      precioTotal: reserva.precio_total,
+      metodoPago: reserva.metodo_pago
+    };
+
+    const emailContent = createApprovalEmail(emailData);
+    const mailOptions = {
+      from: '"Reservas Praiar" <praiar.info@gmail.com>',
+      to: cliente.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error enviando email de aprobación:", error);
+      } else {
+        console.log("Email de aprobación enviado exitosamente a:", cliente.email);
+      }
+    });
+
+    res.json({ 
+      mensaje: "Reserva aprobada exitosamente. Se notificó al cliente por email.",
+      reserva: {
+        id_reserva: reserva.id_reserva,
+        estado: 'aprobada'
+      }
+    });
+
+  } catch (error) {
+    console.error("Error aprobando reserva:", error);
+    res.status(500).json({ error: "Error interno del servidor al aprobar la reserva." });
+  }
+});
+
+// POST /api/reserva/reject/:id_reserva
+app.post('/api/reserva/reject/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  
+  try {
+    // 1. Obtener datos de la reserva
+    const { data: reserva, error: reservaError } = await supabase
+      .from("reservas")
+      .select(`
+        *,
+        balnearios (
+          id_balneario,
+          nombre,
+          id_usuario
+        )
+      `)
+      .eq("id_reserva", id_reserva)
+      .single();
+
+    if (reservaError || !reserva) {
+      return res.status(404).json({ error: "Reserva no encontrada." });
+    }
+
+    // 2. Obtener datos del cliente
+    const { data: cliente, error: clienteError } = await supabase
+      .from("usuarios")
+      .select("nombre, apellido, email")
+      .eq("auth_id", reserva.id_usuario)
+      .single();
+
+    if (clienteError || !cliente) {
+      return res.status(500).json({ error: "No se pudo obtener información del cliente." });
+    }
+
+    // 3. Actualizar estado de la reserva
+    const { error: updateError } = await supabase
+      .from("reservas")
+      .update({ 
+        estado: 'rechazada',
+        fecha_rechazo: new Date().toISOString()
+      })
+      .eq("id_reserva", id_reserva);
+
+    if (updateError) {
+      console.error("Error actualizando estado de reserva:", updateError);
+      // Continuar aunque falle la actualización del estado
+    }
+
+    // 4. Liberar las ubicaciones reservadas
+    const { data: reservasUbicaciones } = await supabase
+      .from("Reservas_Ubicaciones")
+      .select("id_ubicacion")
+      .eq("id_reserva", id_reserva);
+
+    if (reservasUbicaciones && reservasUbicaciones.length > 0) {
+      const ubicacionesIds = reservasUbicaciones.map(ru => ru.id_ubicacion);
+      
+      // Marcar ubicaciones como no reservadas
+      await supabase
+        .from("ubicaciones")
+        .update({ reservado: false })
+        .in("id_carpa", ubicacionesIds);
+
+      // Eliminar vínculos de reservas-ubicaciones
+      await supabase
+        .from("Reservas_Ubicaciones")
+        .delete()
+        .eq("id_reserva", id_reserva);
+    }
+
+    // 5. Enviar email de rechazo al cliente
+    const emailData = {
+      clienteNombre: `${cliente.nombre} ${cliente.apellido}`,
+      balnearioNombre: reserva.balnearios.nombre
+    };
+
+    const emailContent = createRejectionEmail(emailData);
+    const mailOptions = {
+      from: '"Reservas Praiar" <praiar.info@gmail.com>',
+      to: cliente.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error enviando email de rechazo:", error);
+      } else {
+        console.log("Email de rechazo enviado exitosamente a:", cliente.email);
+      }
+    });
+
+    res.json({ 
+      mensaje: "Reserva rechazada exitosamente. Se notificó al cliente por email y se liberaron las ubicaciones.",
+      reserva: {
+        id_reserva: reserva.id_reserva,
+        estado: 'rechazada'
+      }
+    });
+
+  } catch (error) {
+    console.error("Error rechazando reserva:", error);
+    res.status(500).json({ error: "Error interno del servidor al rechazar la reserva." });
+  }
+});
+
+// GET /api/reserva/status/:id_reserva
+app.get('/api/reserva/status/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  
+  try {
+    const { data: reserva, error } = await supabase
+      .from("reservas")
+      .select("id_reserva, estado, fecha_aprobacion, fecha_rechazo")
+      .eq("id_reserva", id_reserva)
+      .single();
+
+    if (error || !reserva) {
+      return res.status(404).json({ error: "Reserva no encontrada." });
+    }
+
+    res.json({ 
+      id_reserva: reserva.id_reserva,
+      estado: reserva.estado || 'pendiente',
+      fecha_aprobacion: reserva.fecha_aprobacion,
+      fecha_rechazo: reserva.fecha_rechazo
+    });
+
+  } catch (error) {
+    console.error("Error obteniendo estado de reserva:", error);
+    res.status(500).json({ error: "Error interno del servidor." });
+  }
+});
+
 /* POST /api/pago/mercadopago
 app.post('/api/pago/mercadopago', async (req, res) => {
   const { descripcion, precio, email } = req.body;
@@ -1562,10 +1797,10 @@ app.post('/api/pago/mercadopago', async (req, res) => {
         }
       ],
       payer: {
-        email
+          email
       },
       back_urls: {
-        success: "http://localhost:3000/pago-exitoso", 
+        success: "http://localhost:3000/pagp-exitoso", 
       },
       auto_return: "approved"
     };
