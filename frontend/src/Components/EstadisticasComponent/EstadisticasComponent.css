@@ -3,14 +3,16 @@
 
 /* ---------- Variables CSS ---------- */
 :root {
+  /* Paleta de colores azules profesional */
   --primary-color: #1e3a8a;
   --primary-light: #3b82f6;
   --primary-dark: #1e40af;
   --secondary-color: #2563eb;
-  --success-color: #059669;
-  --warning-color: #d97706;
-  --info-color: #0284c7;
-  --danger-color: #dc2626;
+  --accent-blue: #0ea5e9;
+  --light-blue: #60a5fa;
+  --very-light-blue: #93c5fd;
+  --dark-blue: #1e40af;
+  --deep-blue: #1e3a8a;
   
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
@@ -23,7 +25,8 @@
   --border-color: #e2e8f0;
   --border-light: #f1f5f9;
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  /* Sombras más sutiles y profesionales */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -44,26 +47,22 @@
 .estadisticas-container {
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 2rem 1rem;
+  background: var(--bg-secondary);
+  padding: 1.5rem 1rem;
 }
 
 /* ---------- Header del Dashboard ---------- */
 .dashboard-header {
   text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem 0;
+  margin-bottom: 2rem;
+  padding: 1.5rem 0;
 }
 
 .dashboard-title {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--text-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
   margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   letter-spacing: -0.025em;
 }
 
@@ -214,59 +213,53 @@
 /* ---------- Resumen de estadísticas ---------- */
 .stats-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
 }
 
 .stat-card {
   background: var(--bg-primary);
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  transition: all 0.3s ease;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
   border: 1px solid var(--border-light);
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-}
-
-.stat-card.secondary:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  background-color: #ffffff !important;
 }
 
 .stat-card.primary {
   border-left: 4px solid var(--primary-color);
 }
 
-.stat-card.success {
-  border-left: 4px solid var(--success-color);
-}
-
-.stat-card.info {
-  border-left: 4px solid var(--info-color);
-}
-
-.stat-card.warning {
-  border-left: 4px solid var(--warning-color);
-}
-
 .stat-card.secondary {
   border-left: 4px solid var(--secondary-color);
 }
 
+.stat-card.accent {
+  border-left: 4px solid var(--accent-blue);
+}
+
+.stat-card.light {
+  border-left: 4px solid var(--light-blue);
+}
+
+.stat-card.dark {
+  border-left: 4px solid var(--dark-blue);
+}
+
 .stat-icon {
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-lg);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,28 +267,28 @@
 }
 
 .stat-card.primary .stat-icon {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-}
-
-.stat-card.success .stat-icon {
-  background: linear-gradient(135deg, var(--success-color), #10b981);
-}
-
-.stat-card.info .stat-icon {
-  background: linear-gradient(135deg, var(--info-color), #0ea5e9);
-}
-
-.stat-card.warning .stat-icon {
-  background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+  background: var(--primary-color);
 }
 
 .stat-card.secondary .stat-icon {
-  background: linear-gradient(135deg, var(--secondary-color), var(--primary-light));
+  background: var(--secondary-color);
+}
+
+.stat-card.accent .stat-icon {
+  background: var(--accent-blue);
+}
+
+.stat-card.light .stat-icon {
+  background: var(--light-blue);
+}
+
+.stat-card.dark .stat-icon {
+  background: var(--dark-blue);
 }
 
 .stat-content h3 {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.25rem 0;
   line-height: 1;
@@ -303,7 +296,7 @@
 
 .stat-content p {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   margin: 0;
 }
@@ -311,42 +304,42 @@
 /* ---------- Secciones ---------- */
 .charts-section,
 .table-section {
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .section-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .section-description {
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0;
 }
 
 /* ---------- Gráficos ---------- */
 .estadisticas-charts-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .estadisticas-chart-block {
   background: var(--bg-primary);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
   border: 1px solid var(--border-light);
-  min-height: 400px;
+  min-height: 350px;
   display: flex;
   flex-direction: column;
 }
@@ -356,12 +349,12 @@
 }
 
 .chart-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   text-align: center;
 }
 
 .chart-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 0.5rem 0;
@@ -369,7 +362,7 @@
 
 .chart-subtitle {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   margin: 0;
 }
 
@@ -381,10 +374,32 @@
 /* ---------- Tabla de balnearios ---------- */
 .table-container {
   background: var(--bg-primary);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border-light);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--bg-secondary);
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
 }
 
 .tabla-balnearios {
@@ -401,10 +416,10 @@
 }
 
 .tabla-balnearios th {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: var(--primary-color);
   color: white;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -450,7 +465,7 @@
 
 /* ---------- Botón Ver ---------- */
 .ver-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -467,7 +482,7 @@
 }
 
 .ver-button:hover {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  background: var(--primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -525,9 +540,9 @@
 
 /* ---------- Header del detalle ---------- */
 .detalle-header {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: var(--primary-color);
   color: white;
-  padding: 2rem;
+  padding: 1.5rem;
   position: relative;
 }
 
@@ -624,12 +639,12 @@
 }
 
 .detalle-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: var(--primary-color);
   border-radius: 4px;
 }
 
 .detalle-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  background: var(--primary-dark);
 }
 
 .detalle-section {
@@ -822,7 +837,7 @@
 }
 
 .ver-mas-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -836,16 +851,27 @@
   align-items: center;
   gap: 0.5rem;
   box-shadow: var(--shadow-sm);
+  min-width: 180px;
+  justify-content: center;
 }
 
 .ver-mas-button:hover {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  background: var(--primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
+.ver-mas-button:active {
+  transform: translateY(0);
+}
+
 .ver-mas-button svg {
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.ver-mas-button:hover svg {
+  transform: scale(1.1);
 }
 
 /* ---------- Contenedor de reservas ---------- */
@@ -919,7 +945,7 @@
   }
   
   .stats-summary {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 }
 
@@ -929,48 +955,63 @@
   }
   
   .dashboard-title {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
   
   .dashboard-subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .section-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
   
   .estadisticas-chart-block {
-    min-height: 350px;
-    padding: 1.5rem;
+    min-height: 300px;
+    padding: 1.25rem;
   }
   
-  .detalle-stats {
-    grid-template-columns: 1fr;
-    margin: 1.5rem;
-    padding: 1.5rem;
+  .stats-summary {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.25rem;
+  }
+  
+  .stat-content h3 {
+    font-size: 1.75rem;
   }
   
   .balneario-detalle-card {
     margin: 1rem;
     max-height: 95vh;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
   }
 
   .balneario-detalle-overlay {
     padding: 1rem;
   }
   
-  .tabla-balnearios th,
-  .tabla-balnearios td {
-    padding: 1rem 0.75rem;
-    font-size: 0.9rem;
+  .table-container {
+    margin: 0 -0.5rem;
+    border-radius: var(--radius-md);
   }
   
-  .reserva-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+  .tabla-balnearios {
+    min-width: 700px;
+  }
+  
+  .tabla-balnearios th,
+  .tabla-balnearios td {
+    padding: 0.875rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .ver-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
   }
 
   .cerrar-button {
@@ -981,18 +1022,15 @@
   }
 
   .detalle-header {
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 1.5rem 1.25rem 1.25rem;
   }
 
   .detalle-header h3 {
     font-size: 1.5rem;
   }
-
-  .chart-bar,
-  .reseñas-section,
-  .reservas-section {
+  
+  .detalle-content {
     padding: 1.5rem;
-    margin: 1.5rem;
   }
 }
 
@@ -1002,35 +1040,69 @@
   }
   
   .dashboard-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.9rem;
   }
   
   .stats-summary {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.875rem;
   }
   
   .stat-card {
-    padding: 1.5rem;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
   }
   
   .stat-content h3 {
-    font-size: 2rem;
+    font-size: 1.5rem;
+  }
+  
+  .stat-content p {
+    font-size: 0.8rem;
+  }
+  
+  .estadisticas-chart-block {
+    padding: 1rem;
+    min-height: 280px;
+  }
+  
+  .chart-title {
+    font-size: 1rem;
+  }
+  
+  .chart-subtitle {
+    font-size: 0.8rem;
   }
   
   .balneario-detalle-card {
-    padding: 1rem;
+    margin: 0.5rem;
     max-height: 98vh;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
   }
 
   .balneario-detalle-overlay {
     padding: 0.5rem;
   }
   
-  .detalle-stats {
+  .detalle-header {
+    padding: 1.25rem 1rem 1rem;
+  }
+  
+  .detalle-header h3 {
+    font-size: 1.25rem;
+  }
+  
+  .detalle-content {
     padding: 1rem;
-    gap: 0.75rem;
   }
 
   .cerrar-button {
@@ -1040,32 +1112,155 @@
     height: 36px;
   }
 
-  .detalle-header h3 {
-    font-size: 1.25rem;
+  .header-stats {
+    gap: 1rem;
   }
-
-  .chart-bar,
-  .reseñas-section,
-  .reservas-section {
-    padding: 1rem;
-    margin: 1rem;
-  }
-
-  .detalle-stat {
+  
+  .header-stat {
     padding: 0.75rem;
   }
-
+  
+  .stat-number {
+    font-size: 1.25rem;
+  }
+  
   .stat-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
-
-  .stat-value {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.75rem;
+  
+  .table-container {
+    margin: 0 -0.5rem;
+    border-radius: var(--radius-md);
   }
+  
+  .tabla-balnearios {
+    font-size: 0.8rem;
+    min-width: 650px;
+  }
+  
+  .tabla-balnearios th,
+  .tabla-balnearios td {
+    padding: 0.75rem 0.5rem;
+    white-space: nowrap;
+  }
+  
+  .ver-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .ver-mas-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    min-width: 160px;
+  }
+}
 
-  .reseña-item,
-  .reserva-item {
-    padding: 1rem;
+@media (max-width: 360px) {
+  .estadisticas-container {
+    padding: 0.25rem;
+  }
+  
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .stat-card {
+    padding: 0.875rem;
+  }
+  
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .stat-content h3 {
+    font-size: 1.25rem;
+  }
+  
+  .estadisticas-chart-block {
+    padding: 0.875rem;
+    min-height: 250px;
+  }
+  
+  .balneario-detalle-card {
+    margin: 0.25rem;
+  }
+  
+  .detalle-header {
+    padding: 1rem 0.875rem 0.875rem;
+  }
+  
+  .detalle-content {
+    padding: 0.875rem;
+  }
+  
+  .table-container {
+    margin: 0 -0.25rem;
+    border-radius: var(--radius-sm);
+  }
+  
+  .tabla-balnearios {
+    min-width: 600px;
+    font-size: 0.75rem;
+  }
+  
+  .tabla-balnearios th,
+  .tabla-balnearios td {
+    padding: 0.625rem 0.375rem;
+  }
+  
+  .ver-button {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.75rem;
+  }
+  
+  .ver-mas-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 320px) {
+  .estadisticas-container {
+    padding: 0.125rem;
+  }
+  
+  .dashboard-title {
+    font-size: 1.25rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .table-container {
+    margin: 0 -0.125rem;
+  }
+  
+  .tabla-balnearios {
+    min-width: 550px;
+    font-size: 0.7rem;
+  }
+  
+  .tabla-balnearios th,
+  .tabla-balnearios td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .ver-button {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+  }
+  
+  .ver-mas-button {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.75rem;
+    min-width: 120px;
   }
 }

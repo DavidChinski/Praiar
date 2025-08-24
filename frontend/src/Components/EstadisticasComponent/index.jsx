@@ -362,7 +362,7 @@ export default function EstadisticasComponent() {
             <p>Balnearios Activos</p>
           </div>
         </div>
-        <div className="stat-card success">
+        <div className="stat-card secondary">
           <div className="stat-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -374,7 +374,7 @@ export default function EstadisticasComponent() {
             <p>Reservas Totales</p>
           </div>
         </div>
-        <div className="stat-card info">
+        <div className="stat-card accent">
           <div className="stat-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -385,7 +385,7 @@ export default function EstadisticasComponent() {
             <p>Reseñas Recibidas</p>
           </div>
         </div>
-        <div className="stat-card warning">
+        <div className="stat-card light">
           <div className="stat-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 9V5A3 3 0 0 0 8 5V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -398,7 +398,7 @@ export default function EstadisticasComponent() {
             <p>Likes Totales</p>
           </div>
         </div>
-        <div className="stat-card secondary">
+        <div className="stat-card dark">
           <div className="stat-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -691,6 +691,8 @@ export default function EstadisticasComponent() {
 }
 
 function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) {
+  const [mostrarTodasReseñas, setMostrarTodasReseñas] = useState(false);
+  
   // Estadísticas por balneario
   const estrellasCount = {};
   reseñas.forEach((r) => {
@@ -842,7 +844,7 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
             </div>
           ) : (
             <div className="reseñas-container">
-              {reseñas.slice(0, 3).map((r) => (
+              {(mostrarTodasReseñas ? reseñas : reseñas.slice(0, 3)).map((r) => (
                 <div key={r.id_reseña} className="reseña-card">
                   <div className="reseña-header">
                     <div className="reseña-user">
@@ -875,11 +877,14 @@ function BalnearioDetalle({ balneario, ciudades, reseñas, reservas, onClose }) 
               ))}
               {reseñas.length > 3 && (
                 <div className="ver-mas-reseñas">
-                  <button className="ver-mas-button">
+                  <button 
+                    className="ver-mas-button"
+                    onClick={() => setMostrarTodasReseñas(!mostrarTodasReseñas)}
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7 13L12 8L17 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d={mostrarTodasReseñas ? "M7 17L12 12L17 17" : "M7 13L12 8L17 13"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Ver {reseñas.length - 3} reseñas más
+                    {mostrarTodasReseñas ? "Ver menos" : `Ver ${reseñas.length - 3} reseñas más`}
                   </button>
                 </div>
               )}
