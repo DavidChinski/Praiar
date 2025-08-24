@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
-import { supabase } from './supabaseClient.js';
+import { supabase, supabaseAdmin } from './supabaseClient.js';
 import nodemailer from 'nodemailer';
+import { transporter, sendEmail, createReservaNotificationEmail, createApprovalEmail, createRejectionEmail } from './emailConfig.js';
 import morgan from 'morgan';
 import { elAgente } from './Agente/src/agent.js';
 import 'dotenv/config';
@@ -10,7 +11,7 @@ import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 
 const app = express();
-app.use(cors());
+app.use(cors({ methods: ['GET','POST','PUT','DELETE','OPTIONS'], origin: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -29,6 +30,17 @@ const mpPayment = new Payment(mpClient);
 // URLs base configurables
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
+
+// Verificar SMTP al inicio (log informativo)
+try {
+  transporter.verify().then(() => {
+    console.log('[EMAIL] Transporter SMTP listo para enviar (Brevo).');
+  }).catch((e) => {
+    console.warn('[EMAIL] No se pudo verificar SMTP:', e?.message || e);
+  });
+} catch (e) {
+  console.warn('[EMAIL] Error inicializando verificación SMTP');
+}
 
 app.post('/api/chat', async (req, res) => {
   const { message, session } = req.body;
@@ -1217,7 +1229,8 @@ app.post('/api/reserva', async (req, res) => {
         ciudad,
         codigo_postal,
         pais_region: pais,
-        precio_total: precioTotalFinal
+  precio_total: precioTotalFinal,
+  estado: 'pendiente'
       })
       .select()
       .single();
@@ -1276,37 +1289,30 @@ app.post('/api/reserva', async (req, res) => {
       .eq("auth_id", id_usuario)
       .single();
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'praiar.info@gmail.com',
-        pass: 'hbtt hyzt ktwp team'
-      }
-    });
-
-    const mailOptions = {
-      from: '"Reservas" <praiar.info@gmail.com>',
-      to: duenio.email,
-      subject: `Nueva reserva en ${balneario.nombre}`,
-      text: `
-¡Nueva reserva recibida!
-
-Cliente: ${usuario ? usuario.nombre + ' ' + usuario.apellido : 'ID usuario: ' + id_usuario}
-Email cliente: ${usuario?.email || 'No disponible'}
-
-Ubicaciones: ${id_ubicaciones.join(", ")}
-Fecha inicio: ${fecha_inicio}
-Fecha salida: ${fecha_salida}
-Método de pago: ${metodo_pago}
-Precio total: ${precioTotalFinal}
-      `
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error enviando mail:", error);
-      }
-    });
+    // Enviar email con Brevo SMTP usando plantilla completa
+    try {
+      const emailData = createReservaNotificationEmail({
+        id_reserva: reservaInsertada.id_reserva,
+        clienteNombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : 'Cliente',
+        clienteEmail: usuario?.email || email,
+        clienteTelefono: telefono,
+        balnearioNombre: balneario.nombre,
+        ubicaciones: id_ubicaciones.map((id) => ({ id_ubicacion: id })),
+        fechaInicio: fecha_inicio,
+        fechaSalida: fecha_salida,
+        precioTotal: precioTotalFinal,
+        metodoPago: metodo_pago,
+        direccion,
+        ciudad,
+        codigoPostal: codigo_postal,
+        pais,
+      });
+  console.log('[EMAIL] Enviando notificación de reserva a dueño:', duenio.email, 'reserva:', reservaInsertada.id_reserva);
+  const info = await sendEmail({ to: duenio.email, ...emailData });
+  console.log('[EMAIL] Resultado envío (owner):', { messageId: info?.messageId, accepted: info?.accepted, rejected: info?.rejected });
+    } catch (e) {
+      console.error('Error enviando email de notificación:', e?.message || e);
+    }
 
     res.status(200).json({ mensaje: "Reserva realizada con éxito. Se notificó al dueño del balneario por mail." });
 
@@ -1580,4 +1586,287 @@ app.post('/api/pago/mercadopago', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
+
+// Endpoints para aprobar / rechazar reserva
+app.get('/api/reserva/approve/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  const idNum = Number(id_reserva);
+  console.log('[RESERVA][APPROVE][GET] id:', id_reserva, 'num:', idNum);
+  try {
+    // Traer datos de reserva y usuario
+    const { data: reserva, error: rErr } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+      .single();
+    if (rErr || !reserva) return res.status(404).send('Reserva no encontrada');
+
+    // Marcar reserva como 'aprobado' y registrar fecha_aprobacion
+    const { error: updErr } = await supabaseAdmin
+      .from('reservas')
+      .update({ estado: 'aprobado', fecha_aprobacion: new Date().toISOString() })
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+    if (updErr) {
+      console.error('[RESERVA][APPROVE][GET] Error update:', updErr);
+      return res.status(500).send('No se pudo actualizar la reserva');
+    }
+    console.log('[RESERVA][APPROVE][GET] Update OK');
+
+    // Obtener balneario, dueño y cliente
+    const { data: balneario } = await supabase
+      .from('balnearios')
+      .select('nombre, id_usuario')
+      .eq('id_balneario', reserva.id_balneario)
+      .single();
+    const { data: duenio } = await supabase
+      .from('usuarios')
+      .select('email')
+      .eq('auth_id', balneario?.id_usuario)
+      .single();
+    const { data: cliente } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido, email, telefono')
+      .eq('auth_id', reserva.id_usuario)
+      .single();
+
+    // Email a cliente confirmando
+    try {
+      const emailData = createApprovalEmail({
+        clienteNombre: cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Cliente',
+        balnearioNombre: balneario?.nombre || 'Balneario',
+        fechaInicio: reserva.fecha_inicio,
+        fechaSalida: reserva.fecha_salida,
+        precioTotal: reserva.precio_total,
+      });
+      const destinatario = reserva.email; // usar el email provisto en la reserva
+      console.log('[EMAIL] Enviando confirmación de aprobación al cliente (GET):', destinatario, 'reserva:', id_reserva);
+      const info = await sendEmail({ to: destinatario, ...emailData });
+      console.log('[EMAIL] Resultado envío (cliente approve):', { messageId: info?.messageId, accepted: info?.accepted, rejected: info?.rejected });
+    } catch (e) {
+      console.error('Error enviando email de aprobación:', e?.message || e);
+    }
+
+    // Respuesta simple en navegador
+  res.send('La reserva fue aprobada. Se notificó al cliente por email.');
+  } catch (e) {
+    res.status(500).send('Error procesando aprobación.');
+  }
+});
+
+app.get('/api/reserva/reject/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  const idNum = Number(id_reserva);
+  console.log('[RESERVA][REJECT][GET] id:', id_reserva, 'num:', idNum);
+  try {
+    const { data: reserva, error: rErr } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+      .single();
+    if (rErr || !reserva) return res.status(404).send('Reserva no encontrada');
+
+    // Marcar estado como 'rechazado' y registrar fecha_rechazo
+    const { error: updErr } = await supabaseAdmin
+      .from('reservas')
+      .update({ estado: 'rechazado', fecha_rechazo: new Date().toISOString() })
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+    if (updErr) {
+      console.error('[RESERVA][REJECT][GET] Error update:', updErr);
+      return res.status(500).send('No se pudo actualizar la reserva');
+    }
+    console.log('[RESERVA][REJECT][GET] Update OK');
+
+    // Marcar reserva como no activa en vínculos y liberar ubicaciones
+    try {
+      const { data: vinculos } = await supabaseAdmin
+        .from('Reservas_Ubicaciones')
+        .select('id_ubicacion')
+  .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+        .eq('reserva_activa', true);
+      await supabaseAdmin
+        .from('Reservas_Ubicaciones')
+        .update({ reserva_activa: false })
+  .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+      if (vinculos?.length) {
+        const ids = vinculos.map((v) => v.id_ubicacion);
+        await supabaseAdmin
+          .from('ubicaciones')
+          .update({ reservado: false })
+          .in('id_carpa', ids);
+      }
+    } catch {}
+
+    // Obtener balneario y cliente
+    const { data: balneario } = await supabase
+      .from('balnearios')
+      .select('nombre')
+      .eq('id_balneario', reserva.id_balneario)
+      .single();
+    const { data: cliente } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido, email')
+      .eq('auth_id', reserva.id_usuario)
+      .single();
+
+    // Email a cliente informando rechazo
+    try {
+      const emailData = createRejectionEmail({
+        clienteNombre: cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Cliente',
+        balnearioNombre: balneario?.nombre || 'Balneario',
+      });
+      const destinatario = reserva.email; // usar el email provisto en la reserva
+      console.log('[EMAIL] Enviando notificación de rechazo al cliente (GET):', destinatario, 'reserva:', id_reserva);
+      const info = await sendEmail({ to: destinatario, ...emailData });
+      console.log('[EMAIL] Resultado envío (cliente reject):', { messageId: info?.messageId, accepted: info?.accepted, rejected: info?.rejected });
+    } catch (e) {
+      console.error('Error enviando email de rechazo:', e?.message || e);
+    }
+
+    res.send('La reserva fue rechazada. Se informó al cliente y se liberaron las ubicaciones.');
+  } catch (e) {
+    res.status(500).send('Error procesando rechazo.');
+  }
+});
+
+// Debug: obtener una reserva y su estado
+app.get('/api/reserva/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  try {
+    const idNum = Number(id_reserva);
+    console.log('[DEBUG] GET /api/reserva/:id_reserva ->', id_reserva, 'as number:', idNum);
+
+    let query = supabase.from('reservas').select('*');
+    let resp = await query.eq('id_reserva', isNaN(idNum) ? id_reserva : idNum).maybeSingle();
+    if ((!resp.data || resp.error) && !isNaN(idNum)) {
+      // Fallback: intentar con string si antes fue número
+      resp = await query.eq('id_reserva', String(id_reserva)).maybeSingle();
+    }
+    if (!resp.data) {
+      return res.status(404).json({ error: 'Reserva no encontrada' });
+    }
+    res.json(resp.data);
+  } catch (e) {
+    res.status(500).json({ error: 'Error obteniendo reserva' });
+  }
+});
+
+// Variantes RESTful con PUT para aprobación/rechazo (mismo comportamiento)
+app.put('/api/reserva/approve/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  const idNum = Number(id_reserva);
+  console.log('[RESERVA][APPROVE][PUT] id:', id_reserva, 'num:', idNum);
+  try {
+    const { data: reserva, error: rErr } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+      .single();
+    if (rErr || !reserva) return res.status(404).json({ error: 'Reserva no encontrada' });
+
+    const { error: updErr } = await supabaseAdmin
+      .from('reservas')
+      .update({ estado: 'aprobado', fecha_aprobacion: new Date().toISOString() })
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+    if (updErr) return res.status(500).json({ error: 'No se pudo actualizar la reserva' });
+    console.log('[RESERVA][APPROVE][PUT] Update OK');
+
+    const { data: balneario } = await supabase
+      .from('balnearios')
+      .select('nombre, id_usuario')
+      .eq('id_balneario', reserva.id_balneario)
+      .single();
+    const { data: cliente } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido, email, telefono')
+      .eq('auth_id', reserva.id_usuario)
+      .single();
+
+    try {
+      const emailData = createApprovalEmail({
+        clienteNombre: cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Cliente',
+        balnearioNombre: balneario?.nombre || 'Balneario',
+        fechaInicio: reserva.fecha_inicio,
+        fechaSalida: reserva.fecha_salida,
+        precioTotal: reserva.precio_total,
+      });
+      const destinatario = reserva.email; // usar el email provisto en la reserva
+      console.log('[EMAIL] Enviando confirmación de aprobación al cliente (PUT):', destinatario, 'reserva:', id_reserva);
+      await sendEmail({ to: destinatario, ...emailData });
+    } catch (e) {
+      console.error('Error enviando email de aprobación (PUT):', e?.message || e);
+    }
+
+    res.json({ ok: true, id_reserva, estado: 'aprobado' });
+  } catch (e) {
+    res.status(500).json({ error: 'Error procesando aprobación' });
+  }
+});
+
+app.put('/api/reserva/reject/:id_reserva', async (req, res) => {
+  const { id_reserva } = req.params;
+  const idNum = Number(id_reserva);
+  console.log('[RESERVA][REJECT][PUT] id:', id_reserva, 'num:', idNum);
+  try {
+    const { data: reserva, error: rErr } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+      .single();
+    if (rErr || !reserva) return res.status(404).json({ error: 'Reserva no encontrada' });
+
+    const { error: updErr } = await supabaseAdmin
+      .from('reservas')
+      .update({ estado: 'rechazado', fecha_rechazo: new Date().toISOString() })
+      .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+    if (updErr) return res.status(500).json({ error: 'No se pudo actualizar la reserva' });
+    console.log('[RESERVA][REJECT][PUT] Update OK');
+
+    // Desactivar vínculos + liberar ubicaciones
+    try {
+      const { data: vinculos } = await supabaseAdmin
+        .from('Reservas_Ubicaciones')
+        .select('id_ubicacion')
+  .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum)
+        .eq('reserva_activa', true);
+      await supabaseAdmin
+        .from('Reservas_Ubicaciones')
+        .update({ reserva_activa: false })
+  .eq('id_reserva', isNaN(idNum) ? id_reserva : idNum);
+      if (vinculos?.length) {
+        const ids = vinculos.map((v) => v.id_ubicacion);
+        await supabaseAdmin
+          .from('ubicaciones')
+          .update({ reservado: false })
+          .in('id_carpa', ids);
+      }
+    } catch {}
+
+    const { data: balneario } = await supabase
+      .from('balnearios')
+      .select('nombre')
+      .eq('id_balneario', reserva.id_balneario)
+      .single();
+    const { data: cliente } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido, email')
+      .eq('auth_id', reserva.id_usuario)
+      .single();
+
+    try {
+      const emailData = createRejectionEmail({
+        clienteNombre: cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Cliente',
+        balnearioNombre: balneario?.nombre || 'Balneario',
+      });
+      const destinatario = reserva.email; // usar el email provisto en la reserva
+      console.log('[EMAIL] Enviando notificación de rechazo al cliente (PUT):', destinatario, 'reserva:', id_reserva);
+      await sendEmail({ to: destinatario, ...emailData });
+    } catch (e) {
+      console.error('Error enviando email de rechazo (PUT):', e?.message || e);
+    }
+
+    res.json({ ok: true, id_reserva, estado: 'rechazado' });
+  } catch (e) {
+    res.status(500).json({ error: 'Error procesando rechazo' });
+  }
 });
