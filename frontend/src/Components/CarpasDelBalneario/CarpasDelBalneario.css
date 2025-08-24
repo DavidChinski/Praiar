@@ -7,8 +7,8 @@
 
 /* Header moderno */
 .balneario-header {
-  background: linear-gradient(135deg, #ffffff, #f8faff);
-  border: 1px solid rgba(0, 63, 94, 0.08);
+  background: #ffffff;
+  border: 1px solid #005984;
   border-radius: 20px;
   padding: 1.3rem 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 63, 94, 0.06);
@@ -21,22 +21,23 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* eliminado del header; ahora se usa en el panel */
 
 .balneario-nombre {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.5rem !important;
   font-weight: 800;
-  color: #003F5E;
+  color: #003F5E !important;
   letter-spacing: 0.2px;
 }
 
 /* chip eliminado del header */
 
 .cambiar-fecha-btn {
-  background: linear-gradient(135deg, #ffffff, #f0f7fa);
+  background: #ffffff;
   color: #005984;
   border: 2px solid #005984;
   box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
@@ -47,7 +48,7 @@
   transition: all 0.2s ease;
 }
 .cambiar-fecha-btn:hover {
-  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  background: #f0f7fa;
   transform: translateY(-1px);
 }
 .cambiar-fecha-btn:disabled {
@@ -62,7 +63,7 @@
   position: relative;
   margin-top: 10px;
   background: #fff;
-  border: 1px solid rgba(0, 63, 94, 0.08);
+  border: 1px solid #005984;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   padding: 8px;
@@ -95,7 +96,7 @@
   position: relative;
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid rgba(0, 63, 94, 0.08);
+  border: 1px solid #005984;
   box-shadow: 0 16px 48px rgba(0,0,0,0.18);
   padding: 1rem 1.2rem 1rem 1.2rem;
   width: min(820px, 96vw);
@@ -126,12 +127,14 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #ffdddd, #ffc2c2);
-  color: #8b1a1a;
+  background: #005984;
+  color: #ffffff;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(139, 26, 26, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 89, 132, 0.2);
 }
-.modal-fechas-close:hover { filter: brightness(0.95); }
+.modal-fechas-close:hover { 
+  background: #003f5e; 
+}
 
 .balneario-meta {
   display: grid;
@@ -411,11 +414,10 @@
 .map-container-wrapper {
   flex: 1;
   min-height: 500px;
-  background: linear-gradient(135deg, #f8faff, #f0f7fa);
+  background: #ffffff;
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 63, 94, 0.08);
-  border: 1px solid rgba(0, 63, 94, 0.05);
   position: relative;
 }
 
@@ -427,14 +429,15 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.9);
   z-index: 1200;
   border-radius: 20px;
+  border: 1px solid #005984;
 }
 .map-loading-overlay .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid #cfe7f2;
+  border: 3px solid #e0f0f7;
   border-top-color: #005984;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -451,11 +454,12 @@
   display: flex;
   gap: 0.8rem;
   z-index: 101;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid rgba(0, 63, 94, 0.08);
+  background: #ffffff;
+  border: 1px solid #005984;
   border-radius: 12px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.1);
 }
 .legend-item {
   display: flex;
@@ -503,7 +507,7 @@
   height: 40px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
+  background: #ffffff;
   color: #005984;
   cursor: pointer;
   display: flex;
@@ -511,13 +515,13 @@
   justify-content: center;
   font-size: 14px;
   box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
-  border: 1px solid rgba(0, 63, 94, 0.1);
+  border: 1px solid #005984;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
 }
 
 .zoom-btn:hover {
-  background: linear-gradient(135deg, #f0f7fa, #e8f4f8);
+  background: #f0f7fa;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 63, 94, 0.2);
 }
@@ -528,42 +532,42 @@
 }
 
 .zoom-btn.zoom-in {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: #005984;
   color: white;
 }
 
 .zoom-btn.zoom-in:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
+  background: #003f5e;
 }
 
 .zoom-btn.zoom-out {
-  background: linear-gradient(135deg, #FF9800, #f57c00);
+  background: #005984;
   color: white;
 }
 
 .zoom-btn.zoom-out:hover {
-  background: linear-gradient(135deg, #f57c00, #ef6c00);
+  background: #003f5e;
 }
 
 .zoom-btn.zoom-reset {
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: #005984;
   color: white;
 }
 
 .zoom-btn.zoom-reset:hover {
-  background: linear-gradient(135deg, #1976D2, #1565C0);
+  background: #003f5e;
 }
 
 /* Indicador de nivel de zoom */
 .zoom-level-indicator {
-  background: linear-gradient(135deg, #ffffff, #f8faff);
+  background: #ffffff;
   color: #005984;
   padding: 0.5rem;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  border: 1px solid rgba(0, 63, 94, 0.1);
+  border: 1px solid #005984;
   box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
   backdrop-filter: blur(10px);
   min-width: 50px;
@@ -571,14 +575,14 @@
 
 /* Sugerencia de zoom */
 .zoom-hint {
-  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-  color: #856404;
+  background: #f0f7fa;
+  color: #003f5e;
   padding: 0.5rem;
   border-radius: 6px;
   font-size: 10px;
   text-align: center;
-  border: 1px solid #ffeaa7;
-  box-shadow: 0 2px 8px rgba(133, 100, 4, 0.15);
+  border: 1px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
   backdrop-filter: blur(10px);
   min-width: 120px;
   line-height: 1.2;
@@ -591,9 +595,9 @@
   height: 500px;
   margin: 0;
   border-radius: 12px;
-  border: 1px solid #c8d8e0;
+  border: 1px solid #005984;
   overflow: hidden;
-  background: #f0f7fa;
+  background: #ffffff;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
   transition: cursor 0.1s ease;
   will-change: transform;
@@ -604,9 +608,9 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
-    linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/40px 40px,
-    transparent;
+    linear-gradient(90deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
+    linear-gradient(0deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
+    #ffffff;
 }
 
 /* Carpas orden y disposición */
@@ -808,7 +812,7 @@
   border: none;
   border-radius: 7px;
   cursor: pointer;
-  background-color: #004A68;
+  background-color: #005984;
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -819,7 +823,7 @@
 }
 
 .modal-buttons button:last-child {
-  background-color: #b00020;
+  background-color: #003F5E;
 }
 
 .tabla-precios-reserva {
@@ -840,8 +844,9 @@
 }
 
 .tabla-precios-reserva th {
-  background: #8AC9DC;
+  background: #005984;
   font-weight: bold;
+  color: #ffffff;
 }
 
 .tabla-precios-reserva tr:last-child td {
@@ -918,8 +923,8 @@
 
 .resenias-carrusel-btn {
   background: #fff;
-  border: 1.4px solid #d2dbe8;
-  color: #444;
+  border: 1.4px solid #005984;
+  color: #005984;
   border-radius: 50%;
   width: 38px;
   height: 38px;
@@ -936,7 +941,7 @@
 .resenias-carrusel-btn:active,
 .resenias-carrusel-btn:focus {
   background: #f0f7fa;
-  border-color: #339dff;
+  border-color: #003f5e;
 }
 
 
@@ -944,7 +949,7 @@
   flex: 0 0 320px;
   max-width: 320px;
   background: #fff;
-  border: 1.5px solid #005278;
+  border: 1.5px solid #005984;
   border-radius: 10px;
   box-shadow: 0 1px 8px 0 rgba(0,0,0,0.04);
   padding: 1.15rem 1.2rem 1.2rem 1.2rem;
@@ -958,8 +963,8 @@
   background: #fff;
 }
 .resenia-card:hover {
-  box-shadow: 0 4px 20px 0 #339dff22;
-  border-color: #00182e;
+  box-shadow: 0 4px 20px 0 #00598422;
+  border-color: #003f5e;
 }
 
 .resenia-header {
@@ -977,7 +982,7 @@
   background: #eaeaea;
   display: inline-block;
   margin-right: 8px;
-  border: 2px solid #d2dbe8;
+  border: 2px solid #005984;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
@@ -985,7 +990,7 @@
 .resenia-avatar:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #339dff;
+  border-color: #003f5e;
 }
 
 .resenia-usuario {
@@ -1206,11 +1211,11 @@ button {
 /* Panel de gestión izquierdo */
 .management-panel {
   flex: 0 0 320px;
-  background: linear-gradient(135deg, #ffffff, #f8faff);
+  background: #ffffff;
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 63, 94, 0.1);
-  border: 1px solid rgba(0, 63, 94, 0.08);
+  border: 1px solid #005984;
   position: sticky;
   top: 2rem;
   max-height: calc(100vh - 4rem);
@@ -1240,7 +1245,7 @@ button {
 .panel-section {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(0, 63, 94, 0.1);
+  border-bottom: 1px solid #005984;
 }
 
 .panel-section:last-child {
@@ -1252,11 +1257,13 @@ button {
 .panel-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #005984;
+  color: #003f5e;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border-bottom: 2px solid #005984;
+  padding-bottom: 0.5rem;
 }
 
 /* Contenedor del filtro de fechas */
@@ -1331,29 +1338,29 @@ button {
 }
 
 .panel-button.primary {
-  background: linear-gradient(135deg, #005984, #0077b6);
+  background: #005984;
   color: white;
   box-shadow: 0 4px 16px rgba(0, 89, 132, 0.2);
 }
 
 .panel-button.primary:hover {
-  background: linear-gradient(135deg, #004a68, #005984);
+  background: #003f5e;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 89, 132, 0.3);
 }
 
 .panel-button.secondary {
-  background: linear-gradient(135deg, #ffffff, #f0f7fa);
+  background: #ffffff;
   color: #005984;
   border: 2px solid #005984;
   box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
 }
 
 .panel-button.secondary:hover {
-  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  background: #f0f7fa;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 89, 132, 0.15);
-  border-color: #0077b6;
+  border-color: #003f5e;
 }
 
 /* Acciones rápidas */
@@ -1365,10 +1372,10 @@ button {
 
 /* Información de disponibilidad para usuarios no propietarios */
 .availability-info {
-  background: linear-gradient(135deg, #f0f7fa, #e0f0f7);
+  background: #f0f7fa;
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(0, 89, 132, 0.1);
+  border: 1px solid #005984;
 }
 
 .availability-info p {
@@ -1385,10 +1392,10 @@ button {
   top: 100%;
   left: 0;
   z-index: 1000;
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 63, 94, 0.1);
+  border: 1px solid #005984;
   margin-top: 0.5rem;
 }
 
@@ -1414,8 +1421,8 @@ button {
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid rgba(0, 89, 132, 0.2);
+  background: #ffffff;
+  border: 1px solid #005984;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -1427,7 +1434,7 @@ button {
 .autocomplete-option {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #e0f0f7;
   transition: background-color 0.2s ease;
 }
 
@@ -1436,7 +1443,7 @@ button {
 }
 
 .autocomplete-option:hover {
-  background-color: #f8faff;
+  background-color: #f0f7fa;
 }
 
 .autocomplete-option .suggestion-text {
@@ -1574,5 +1581,911 @@ button {
   
   .panel-title {
     font-size: 0.95rem;
+  }
+}
+
+/* Mejoras adicionales para la experiencia del usuario */
+.management-panel .panel-section:first-child {
+  border-top: 2px solid #005984;
+  padding-top: 1rem;
+}
+
+.management-panel .panel-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Mejoras en la información de disponibilidad */
+.availability-info {
+  background: #f0f7fa;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #005984;
+  position: relative;
+}
+
+.availability-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Mejoras en los botones de acción */
+.quick-actions .panel-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-actions .panel-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.quick-actions .panel-button:hover::before {
+  left: 100%;
+}
+
+/* Mejoras en el mapa */
+.map-container-wrapper {
+  position: relative;
+}
+
+.map-container-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 20px 20px 0 0;
+  z-index: 1;
+}
+
+/* Mejoras en la leyenda */
+.map-legend {
+  position: absolute;
+  left: 1.5rem;
+  top: 1.5rem;
+  display: flex;
+  gap: 0.8rem;
+  z-index: 101;
+  background: #ffffff;
+  border: 1px solid #005984;
+  border-radius: 12px;
+  padding: 8px 12px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.1);
+  transition: all 0.2s ease;
+}
+
+.map-legend:hover {
+  box-shadow: 0 4px 16px rgba(0, 63, 94, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Mejoras en los controles de zoom */
+.zoom-controls {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+  animation: slideInRight 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid #005984;
+  backdrop-filter: blur(10px);
+}
+
+/* Mejoras en el indicador de zoom */
+.zoom-level-indicator {
+  background: #ffffff;
+  color: #005984;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
+  backdrop-filter: blur(10px);
+  min-width: 50px;
+  position: relative;
+}
+
+.zoom-level-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #005984;
+}
+
+/* Mejoras en la sugerencia de zoom */
+.zoom-hint {
+  background: #f0f7fa;
+  color: #003f5e;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 10px;
+  text-align: center;
+  border: 1px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
+  backdrop-filter: blur(10px);
+  min-width: 120px;
+  line-height: 1.2;
+  position: relative;
+}
+
+.zoom-hint::before {
+  content: '💡';
+  margin-right: 4px;
+  font-size: 8px;
+}
+
+/* Mejoras en el canvas del mapa */
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
+    linear-gradient(0deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
+    #ffffff;
+  transition: all 0.3s ease;
+}
+
+/* Mejoras en las carpas */
+.carpa {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: all 0.2s ease;
+  z-index: 5;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 8px;
+}
+
+.carpa.libre {
+  background-color: #dff7ea;
+  border: 2px solid #2bae66;
+  box-shadow: 0 2px 8px rgba(43, 174, 102, 0.15);
+}
+
+.carpa.reservada {
+  background-color: #ffe1e1;
+  border: 2px solid #c62828;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.15);
+}
+
+.carpa:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 89, 132, 0.2);
+}
+
+/* Mejoras en el header */
+.balneario-header {
+  background: #ffffff;
+  border: 1px solid #005984;
+  border-radius: 20px;
+  padding: 1.3rem 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 63, 94, 0.06);
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.balneario-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #005984;
+}
+
+.balneario-nombre {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #003F5E;
+  letter-spacing: 0.2px;
+  position: relative;
+}
+
+.balneario-nombre::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: #005984;
+  border-radius: 2px;
+}
+
+/* Mejoras en la meta información */
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem;
+  background: #f0f7fa;
+  border-radius: 8px;
+  border: 1px solid #e0f0f7;
+  transition: all 0.2s ease;
+}
+
+.meta-item:hover {
+  background: #e0f0f7;
+  border-color: #005984;
+  transform: translateY(-1px);
+}
+
+.meta-label {
+  font-size: 0.8rem;
+  color: #5c7b8a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meta-value {
+  font-size: 1.05rem;
+  color: #0e2b3d;
+  font-weight: 500;
+}
+
+/* Mejoras en el botón de cambiar fecha */
+.cambiar-fecha-btn {
+  background: #ffffff;
+  color: #005984;
+  border: 2px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cambiar-fecha-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 89, 132, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.cambiar-fecha-btn:hover::before {
+  left: 100%;
+}
+
+.cambiar-fecha-btn:hover {
+  background: #f0f7fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.2);
+}
+
+/* Mejoras en el modal de fechas */
+.modal-fechas-content {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 2px solid #005984;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  padding: 1rem 1.2rem 1rem 1.2rem;
+  width: min(820px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-fechas-title {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.25rem;
+  color: #003F5E;
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #005984;
+}
+
+.modal-fechas-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: #005984;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(0, 89, 132, 0.2);
+  transition: all 0.2s ease;
+}
+
+.modal-fechas-close:hover { 
+  background: #003f5e;
+  transform: scale(1.1);
+}
+
+/* Mejoras en los botones del modal */
+.modal-fechas-actions .panel-button {
+  min-width: 100px;
+  font-weight: 600;
+}
+
+/* Mejoras en la tabla de precios */
+.tabla-precios-reserva {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.04);
+  border: 1px solid #005984;
+}
+
+.tabla-precios-reserva th,
+.tabla-precios-reserva td {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid #e0f0f7;
+}
+
+.tabla-precios-reserva th {
+  background: #005984;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabla-precios-reserva tr:hover {
+  background: #f0f7fa;
+}
+
+/* Mejoras en las reseñas */
+.resenias-section {
+  border-radius: 14px;
+  padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+  margin: 0 auto 3rem auto;
+  font-family: 'arial', sans-serif;
+  background: #ffffff;
+  border: 1px solid #005984;
+  box-shadow: 0 4px 20px rgba(0, 63, 94, 0.08);
+}
+
+.resenias-section h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  text-align: left;
+  font-family: 'El Messiri', sans-serif;
+  color: #003f5e;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #005984;
+}
+
+/* Mejoras en el carrusel de reseñas */
+.resenias-carrusel-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 240px;
+  justify-content: center;
+  position: relative;
+  padding: 1rem 0;
+}
+
+.resenias-carrusel-btn {
+  background: #fff;
+  border: 2px solid #005984;
+  color: #005984;
+  border-radius: 50%;
+  width: 46px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin: 0 7px;
+  box-shadow: 0 2px 8px rgba(0, 89, 132, 0.15);
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.resenias-carrusel-btn:hover {
+  background: #005984;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.resenias-carrusel-btn:active,
+.resenias-carrusel-btn:focus {
+  background: #003f5e;
+  border-color: #003f5e;
+  color: #ffffff;
+}
+
+/* Mejoras en las tarjetas de reseñas */
+.resenia-card {
+  flex: 0 0 320px;
+  max-width: 320px;
+  background: #fff;
+  border: 2px solid #005984;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  padding: 1.15rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  position: relative;
+  min-height: 160px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.resenia-card:hover {
+  box-shadow: 0 8px 24px 0 #00598422;
+  border-color: #003f5e;
+  transform: translateY(-2px);
+}
+
+.resenia-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Mejoras en el avatar de las reseñas */
+.resenia-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eaeaea;
+  display: inline-block;
+  margin-right: 8px;
+  border: 2px solid #005984;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.resenia-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #003f5e;
+}
+
+/* Mejoras en la información del usuario de la reseña */
+.resenia-usuario {
+  font-weight: 600;
+  font-size: 1.07rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.resenia-usuario-nombre {
+  color: #003f5e;
+  font-weight: 700;
+}
+
+/* Responsive improvements */
+@media (max-width: 1200px) {
+  .management-panel {
+    flex: none;
+    width: 100%;
+    position: static;
+    max-height: none;
+    order: 1;
+    margin-bottom: 1rem;
+  }
+  
+  .map-container-wrapper {
+    width: 100%;
+    order: 2;
+  }
+  
+  .zoom-controls {
+    position: relative;
+    top: auto;
+    right: auto;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-layout {
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .management-panel {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .map-container-wrapper {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .zoom-controls {
+    flex-direction: row;
+    justify-content: center;
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .zoom-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+  
+  .zoom-level-indicator {
+    font-size: 11px;
+    padding: 0.4rem;
+    min-width: 45px;
+  }
+  
+  .zoom-hint {
+    font-size: 9px;
+    padding: 0.4rem;
+    min-width: 110px;
+  }
+  
+  .panel-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .panel-title {
+    font-size: 1rem;
+  }
+  
+  .panel-button {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .balneario-header {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .balneario-nombre {
+    font-size: 1.5rem;
+  }
+  
+  .balneario-meta {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-layout {
+    gap: 0.8rem;
+    margin: 0.8rem 0;
+  }
+  
+  .management-panel {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .map-container-wrapper {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .zoom-controls {
+    flex-direction: row;
+    justify-content: center;
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .zoom-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+  
+  .zoom-level-indicator {
+    font-size: 10px;
+    padding: 0.3rem;
+    min-width: 40px;
+  }
+  
+  .zoom-hint {
+    font-size: 8px;
+    padding: 0.3rem;
+    min-width: 100px;
+  }
+  
+  .panel-button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+    min-height: 40px;
+  }
+  
+  .panel-title {
+    font-size: 0.95rem;
+  }
+  
+  .balneario-header {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .balneario-nombre {
+    font-size: 1.3rem;
+  }
+  
+  .carpas-del-balneario {
+    padding: 1rem;
+  }
+}
+
+/* Mejoras finales para la experiencia del usuario */
+.management-panel .panel-section:first-child {
+  border-top: 2px solid #005984;
+  padding-top: 1rem;
+}
+
+.availability-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 12px 12px 0 0;
+}
+
+.map-container-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 20px 20px 0 0;
+  z-index: 1;
+}
+
+.balneario-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #005984;
+}
+
+.balneario-nombre::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: #005984;
+  border-radius: 2px;
+}
+
+.meta-item {
+  padding: 0.5rem;
+  background: #f0f7fa;
+  border-radius: 8px;
+  border: 1px solid #e0f0f7;
+  transition: all 0.2s ease;
+}
+
+.meta-item:hover {
+  background: #e0f0f7;
+  border-color: #005984;
+  transform: translateY(-1px);
+}
+
+.meta-label {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-fechas-title {
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #005984;
+}
+
+.modal-fechas-close:hover { 
+  transform: scale(1.1);
+}
+
+.tabla-precios-reserva {
+  border: 1px solid #005984;
+}
+
+.tabla-precios-reserva th {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabla-precios-reserva tr:hover {
+  background: #f0f7fa;
+}
+
+.resenias-section {
+  background: #ffffff;
+  border: 1px solid #005984;
+  box-shadow: 0 4px 20px rgba(0, 63, 94, 0.08);
+}
+
+.resenias-section h3 {
+  color: #003f5e;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #005984;
+}
+
+.resenias-carrusel-btn:hover {
+  background: #005984;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.resenia-card {
+  border: 2px solid #005984;
+  border-radius: 12px;
+}
+
+.resenia-card:hover {
+  transform: translateY(-2px);
+}
+
+.resenia-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #005984;
+  border-radius: 12px 12px 0 0;
+}
+
+.resenia-usuario-nombre {
+  color: #003f5e;
+  font-weight: 700;
+}
+
+/* Badge de vista principal */
+.header-badge {
+  background: #005984;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 89, 132, 0.2);
+  border: 2px solid #003f5e;
+  transition: all 0.2s ease;
+}
+
+.header-badge:hover {
+  background: #003f5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.3);
+}
+
+.header-badge span {
+  display: block;
+  text-align: center;
+}
+
+/* Indicador de estado del sistema */
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f0f7fa;
+  border-radius: 8px;
+  border: 1px solid #005984;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2bae66;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.active {
+  background: #2bae66;
+}
+
+.status-text {
+  color: #003f5e;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(43, 174, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(43, 174, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(43, 174, 102, 0);
   }
 }

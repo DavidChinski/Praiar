@@ -139,101 +139,373 @@ function CrearBalneario() {
   };
 
   return (
-    <div className="form-consultas">
-      <div className="form-layout">
-        <div className="form-container-consultas">
-          <h1 className="titulo">Agregar nuevo Balneario</h1>
-          <form onSubmit={handleFinalizar} className="formulario">
-            <div className="form-section">
-              <h3>Configuración del balneario</h3>
-              <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-              <label htmlFor="direccion">Dirección</label>
-              <input id="direccion" type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} required />
-              <label htmlFor="telefono">Teléfono</label>
-              <input id="telefono" type="number" value={telefono} onChange={(e) => setTelefono(e.target.value)} required />
-              <label htmlFor="imagenUrl">Imagen URL</label>
-              <input id="imagenUrl" type="text" value={imagenUrl} onChange={(e) => setImagenUrl(e.target.value)} />
-              <label htmlFor="ciudad">Ciudad</label>
-              <select id="ciudad" value={ciudadSeleccionada} onChange={(e) => setCiudadSeleccionada(e.target.value)} required>
-                <option value="">Seleccione una ciudad</option>
-                {ciudades.map((ciudad) => (
-                  <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>{ciudad.nombre}</option>
-                ))}
-              </select>
+    <div className="crear-balneario-container">
+      <div className="crear-balneario-layout">
+        <div className="crear-balneario-header">
+          <h1 className="crear-balneario-title">Crear Nuevo Balneario</h1>
+          <p className="crear-balneario-subtitle">Complete la información para registrar su establecimiento</p>
+        </div>
+
+        <form onSubmit={handleFinalizar} className="crear-balneario-form">
+          {/* Información del Balneario */}
+          <div className="form-section-card">
+            <div className="section-header">
+              <div className="section-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3>Información del Balneario</h3>
+              <p>Datos básicos del establecimiento</p>
             </div>
-
-            {/* Formulario de carpa (tanda) + precios */}
-            <div className="form-section">
-              <h3>Agregar tanda de carpas/sombrillas</h3>
-              <label htmlFor="tipoUbicacion">Tipo</label>
-              <select id="tipoUbicacion" value={tipoUbicacion} onChange={(e) => setTipoUbicacion(e.target.value)}>
-                <option value="">Seleccione tipo</option>
-                {tiposUbicacion
-                  .filter(tipo => !tandasCarpas.some(tc => tc.id_tipo_ubicacion == tipo.id_tipo_ubicaciones))
-                  .map(tipo => (
-                    <option key={tipo.id_tipo_ubicaciones} value={tipo.id_tipo_ubicaciones}>{tipo.nombre}</option>
-                ))}
-              </select>
-              <label htmlFor="cantidadCarpas">Cantidad</label>
-              <input id="cantidadCarpas" type="number" value={cantidadCarpas} onChange={e => setCantidadCarpas(parseInt(e.target.value) || 0)} />
-              <label htmlFor="sillas">Sillas</label>
-              <input id="sillas" type="number" value={cantSillas} onChange={e => setCantSillas(parseInt(e.target.value) || 0)} />
-              <label htmlFor="mesas">Mesas</label>
-              <input id="mesas" type="number" value={cantMesas} onChange={e => setCantMesas(parseInt(e.target.value) || 0)} />
-              <label htmlFor="reposeras">Reposeras</label>
-              <input id="reposeras" type="number" value={cantReposeras} onChange={e => setCantReposeras(parseInt(e.target.value) || 0)} />
-              <label htmlFor="capacidad">Capacidad</label>
-              <input id="capacidad" type="number" value={capacidad} onChange={e => setCapacidad(parseInt(e.target.value) || 0)} />
-
-              {/* Precios para este tipo */}
-              {tipoUbicacion && (
-                <>
-                  <div style={{marginTop:8, marginBottom:8, fontWeight:"bold"}}>
-                    Precios para <span>
-                      {tiposUbicacion.find(t => t.id_tipo_ubicaciones == tipoUbicacion)?.nombre || ""}
-                    </span>
-                  </div>
-                  <label>Día
-                    <input type="number" value={precioDia} min={0} onChange={e => setPrecioDia(e.target.value)} />
-                  </label>
-                  <label>Semana
-                    <input type="number" value={precioSemana} min={0} onChange={e => setPrecioSemana(e.target.value)} />
-                  </label>
-                  <label>Quincena
-                    <input type="number" value={precioQuincena} min={0} onChange={e => setPrecioQuincena(e.target.value)} />
-                  </label>
-                  <label>Mes
-                    <input type="number" value={precioMes} min={0} onChange={e => setPrecioMes(e.target.value)} />
-                  </label>
-                </>
-              )}
-              <button type="button" onClick={handleAgregarTanda}>Agregar tanda + precios</button>
-            </div>
-
-            {/* Mostrar las tandas cargadas */}
-            {tandasCarpas.length > 0 && (
-              <div>
-                <h4>Tandas agregadas</h4>
-                <ul>
-                  {tandasCarpas.map((t, idx) => (
-                    <li key={idx}>
-                      {tiposUbicacion.find(x => x.id_tipo_ubicaciones == t.id_tipo_ubicacion)?.nombre || "Tipo"}: {t.cantidadCarpas} carpas
-                      <button type="button" style={{marginLeft:8}} onClick={() => handleEliminarTanda(t.id_tipo_ubicacion)}>Eliminar</button>
-                      <div style={{fontSize:14, color:"#444", marginLeft:12}}>
-                        Precios: Día ${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.dia || "-"} | Semana ${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.semana || "-"} | Quincena ${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.quincena || "-"} | Mes ${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.mes || "-"}
-                      </div>
-                    </li>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="nombre">Nombre del Balneario *</label>
+                <input 
+                  id="nombre" 
+                  type="text" 
+                  value={nombre} 
+                  onChange={(e) => setNombre(e.target.value)} 
+                  required 
+                  placeholder="Ingrese el nombre del balneario"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="direccion">Dirección *</label>
+                <input 
+                  id="direccion" 
+                  type="text" 
+                  value={direccion} 
+                  onChange={(e) => setDireccion(e.target.value)} 
+                  required 
+                  placeholder="Ingrese la dirección completa"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="telefono">Teléfono *</label>
+                <input 
+                  id="telefono" 
+                  type="tel" 
+                  value={telefono} 
+                  onChange={(e) => setTelefono(e.target.value)} 
+                  required 
+                  placeholder="Ingrese el número de teléfono"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="ciudad">Ciudad *</label>
+                <select 
+                  id="ciudad" 
+                  value={ciudadSeleccionada} 
+                  onChange={(e) => setCiudadSeleccionada(e.target.value)} 
+                  required
+                >
+                  <option value="">Seleccione una ciudad</option>
+                  {ciudades.map((ciudad) => (
+                    <option key={ciudad.id_ciudad} value={ciudad.id_ciudad}>{ciudad.nombre}</option>
                   ))}
-                </ul>
+                </select>
+              </div>
+              
+              <div className="form-group full-width">
+                <label htmlFor="imagenUrl">URL de Imagen</label>
+                <input 
+                  id="imagenUrl" 
+                  type="url" 
+                  value={imagenUrl} 
+                  onChange={(e) => setImagenUrl(e.target.value)} 
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Configuración de Carpas */}
+          <div className="form-section-card">
+            <div className="section-header">
+              <div className="section-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 7L20 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M4 11L20 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M4 15L20 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M4 19L20 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3>Configuración de Carpas</h3>
+              <p>Defina los tipos y cantidades de ubicaciones disponibles</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="tipoUbicacion">Tipo de Ubicación *</label>
+                <select 
+                  id="tipoUbicacion" 
+                  value={tipoUbicacion} 
+                  onChange={(e) => setTipoUbicacion(e.target.value)}
+                >
+                  <option value="">Seleccione tipo</option>
+                  {tiposUbicacion
+                    .filter(tipo => !tandasCarpas.some(tc => tc.id_tipo_ubicacion == tipo.id_tipo_ubicaciones))
+                    .map(tipo => (
+                      <option key={tipo.id_tipo_ubicaciones} value={tipo.id_tipo_ubicaciones}>{tipo.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="cantidadCarpas">Cantidad de Carpas *</label>
+                <input 
+                  id="cantidadCarpas" 
+                  type="number" 
+                  value={cantidadCarpas} 
+                  onChange={e => setCantidadCarpas(parseInt(e.target.value) || 0)} 
+                  min="1"
+                  placeholder="0"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="sillas">Cantidad de Sillas</label>
+                <input 
+                  id="sillas" 
+                  type="number" 
+                  value={cantSillas} 
+                  onChange={e => setCantSillas(parseInt(e.target.value) || 0)} 
+                  min="0"
+                  placeholder="2"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="mesas">Cantidad de Mesas</label>
+                <input 
+                  id="mesas" 
+                  type="number" 
+                  value={cantMesas} 
+                  onChange={e => setCantMesas(parseInt(e.target.value) || 0)} 
+                  min="0"
+                  placeholder="1"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="reposeras">Cantidad de Reposeras</label>
+                <input 
+                  id="reposeras" 
+                  type="number" 
+                  value={cantReposeras} 
+                  onChange={e => setCantReposeras(parseInt(e.target.value) || 0)} 
+                  min="0"
+                  placeholder="2"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="capacidad">Capacidad por Carpa</label>
+                <input 
+                  id="capacidad" 
+                  type="number" 
+                  value={capacidad} 
+                  onChange={e => setCapacidad(parseInt(e.target.value) || 0)} 
+                  min="1"
+                  placeholder="4"
+                />
+              </div>
+            </div>
+
+            {/* Precios */}
+            {tipoUbicacion && (
+              <div className="precios-section">
+                <div className="precios-header">
+                  <h4>Precios para {tiposUbicacion.find(t => t.id_tipo_ubicaciones == tipoUbicacion)?.nombre || ""}</h4>
+                  <p>Configure los precios para diferentes períodos</p>
+                </div>
+                
+                <div className="precios-grid">
+                  <div className="form-group">
+                    <label htmlFor="precioDia">Precio por Día *</label>
+                    <div className="input-with-prefix">
+                      <span className="currency-prefix">$</span>
+                      <input 
+                        id="precioDia"
+                        type="number" 
+                        value={precioDia} 
+                        min="0" 
+                        onChange={e => setPrecioDia(e.target.value)} 
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="precioSemana">Precio por Semana *</label>
+                    <div className="input-with-prefix">
+                      <span className="currency-prefix">$</span>
+                      <input 
+                        id="precioSemana"
+                        type="number" 
+                        value={precioSemana} 
+                        min="0" 
+                        onChange={e => setPrecioSemana(e.target.value)} 
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="precioQuincena">Precio por Quincena *</label>
+                    <div className="input-with-prefix">
+                      <span className="currency-prefix">$</span>
+                      <input 
+                        id="precioQuincena"
+                        type="number" 
+                        value={precioQuincena} 
+                        min="0" 
+                        onChange={e => setPrecioQuincena(e.target.value)} 
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="precioMes">Precio por Mes *</label>
+                    <div className="input-with-prefix">
+                      <span className="currency-prefix">$</span>
+                      <input 
+                        id="precioMes"
+                        type="number" 
+                        value={precioMes} 
+                        min="0" 
+                        onChange={e => setPrecioMes(e.target.value)} 
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <button type="button" onClick={handleAgregarTanda} className="add-tanda-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Agregar Tanda y Precios
+                </button>
               </div>
             )}
-            <div className="boton-contenedor">
-              <button className="enviar" type="submit">Finalizar y crear balneario</button>
+          </div>
+
+          {/* Tandas Agregadas */}
+          {tandasCarpas.length > 0 && (
+            <div className="form-section-card">
+              <div className="section-header">
+                <div className="section-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h3>Tandas Configuradas</h3>
+                <p>Resumen de las ubicaciones agregadas</p>
+              </div>
+              
+              <div className="tandas-grid">
+                {tandasCarpas.map((t, idx) => (
+                  <div key={idx} className="tanda-card">
+                    <div className="tanda-header">
+                      <h4>{tiposUbicacion.find(x => x.id_tipo_ubicaciones == t.id_tipo_ubicacion)?.nombre || "Tipo"}</h4>
+                      <button 
+                        type="button" 
+                        onClick={() => handleEliminarTanda(t.id_tipo_ubicacion)}
+                        className="remove-tanda-btn"
+                        title="Eliminar tanda"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <div className="tanda-details">
+                      <div className="detail-item">
+                        <span className="detail-label">Carpas:</span>
+                        <span className="detail-value">{t.cantidadCarpas}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Sillas:</span>
+                        <span className="detail-value">{t.cantSillas}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Mesas:</span>
+                        <span className="detail-value">{t.cantMesas}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Reposeras:</span>
+                        <span className="detail-value">{t.cantReposeras}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Capacidad:</span>
+                        <span className="detail-value">{t.capacidad} personas</span>
+                      </div>
+                    </div>
+                    
+                    <div className="tanda-precios">
+                      <h5>Precios</h5>
+                      <div className="precios-list">
+                        <div className="precio-item">
+                          <span className="precio-label">Día:</span>
+                          <span className="precio-value">${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.dia || "-"}</span>
+                        </div>
+                        <div className="precio-item">
+                          <span className="precio-label">Semana:</span>
+                          <span className="precio-value">${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.semana || "-"}</span>
+                        </div>
+                        <div className="precio-item">
+                          <span className="precio-label">Quincena:</span>
+                          <span className="precio-value">${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.quincena || "-"}</span>
+                        </div>
+                        <div className="precio-item">
+                          <span className="precio-label">Mes:</span>
+                          <span className="precio-value">${preciosPorTipo.find(p=>p.id_tipo_ubicacion==t.id_tipo_ubicacion)?.mes || "-"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </form>
-          {mensaje && <p className="mensaje">{mensaje}</p>}
-        </div>
+          )}
+
+          {/* Botón Finalizar */}
+          <div className="form-actions">
+            <button className="submit-btn" type="submit">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+              Crear Balneario
+            </button>
+          </div>
+        </form>
+
+        {mensaje && (
+          <div className="mensaje-container">
+            <div className="mensaje-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <p className="mensaje-text">{mensaje}</p>
+          </div>
+        )}
       </div>
     </div>
   );

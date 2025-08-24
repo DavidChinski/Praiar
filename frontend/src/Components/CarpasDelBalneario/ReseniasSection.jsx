@@ -137,6 +137,7 @@ function ReseniasSection({
                   </span>
                 ))}
               </label>
+              <br />
               <label>
                 Comentario:{" "}
                 <textarea

@@ -743,6 +743,9 @@ function CarpasDelBalneario(props) {
       <div className="balneario-header">
         <div className="balneario-header-main">
           <h1 className="balneario-nombre">{balnearioInfo?.nombre || 'Balneario'}</h1>
+          <div className="header-badge">
+            <span>Vista Principal del Sistema</span>
+          </div>
         </div>
         {balnearioInfo && (
           <div className="balneario-meta">
@@ -765,11 +768,17 @@ function CarpasDelBalneario(props) {
       <div className="main-content-layout">
         {/* Panel izquierdo con elementos de gestión */}
         <div className="management-panel">
+          {/* Indicador de estado del sistema */}
+          <div className="system-status">
+            <div className="status-indicator active"></div>
+            <span className="status-text">Sistema Operativo</span>
+          </div>
+          
           {esDuenio ? (
             <>
-              {/* Disponibilidad + cambiar fecha (dueño) */}
+              {/* Sección de Gestión de Fechas */}
               <div className="panel-section">
-                <h3 className="panel-title">📅 Disponibilidad</h3>
+                <h3 className="panel-title">Gestión de Fechas</h3>
                 <div className="availability-row">
                   <div className="availability-info">
                     <p>
@@ -785,15 +794,15 @@ function CarpasDelBalneario(props) {
                       }}
                       disabled={actualizandoDisponibilidad}
                     >
-                      <span className="emoji">📅</span> Cambiar fecha
+                      Cambiar Fecha
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Agregar elementos */}
+              {/* Sección de Gestión de Elementos */}
               <div className="panel-section">
-                <h3 className="panel-title">➕ Agregar Elementos</h3>
+                <h3 className="panel-title">Gestión de Elementos</h3>
                 <div className="add-elements-container">
                   <div className="element-input-group">
                     <label className="subtitulo">Tipo de elemento</label>
@@ -813,9 +822,9 @@ function CarpasDelBalneario(props) {
                 </div>
               </div>
 
-              {/* Acciones rápidas */}
+              {/* Sección de Acciones del Sistema */}
               <div className="panel-section">
-                <h3 className="panel-title">🚀 Acciones Rápidas</h3>
+                <h3 className="panel-title">Acciones del Sistema</h3>
                 <div className="quick-actions">
                   <Link className="panel-button secondary" to={`/tusreservas/${balnearioInfo?.id_balneario}`}>
                     <FontAwesomeIcon icon={faList} /> Ver Reservas
@@ -828,7 +837,7 @@ function CarpasDelBalneario(props) {
             </>
           ) : (
             <div className="panel-section">
-              <h3 className="panel-title">📅 Disponibilidad</h3>
+              <h3 className="panel-title">Información de Disponibilidad</h3>
               <div className="availability-row">
                 <div className="availability-info">
                   <p>
@@ -844,7 +853,7 @@ function CarpasDelBalneario(props) {
                     }}
                     disabled={actualizandoDisponibilidad}
                   >
-                    <span className="emoji">📅</span> Cambiar fecha
+                    Cambiar Fecha
                   </button>
                 </div>
               </div>
@@ -862,39 +871,11 @@ function CarpasDelBalneario(props) {
           )}
           {/* Leyenda del mapa */}
           <div className="map-legend">
-            <div className="legend-item"><span className="legend-dot libre" /> Libre</div>
-            <div className="legend-item"><span className="legend-dot reservada" /> Reservada</div>
+            <div className="legend-item"><span className="legend-dot libre" /> Disponible</div>
+            <div className="legend-item"><span className="legend-dot reservada" /> Reservado</div>
           </div>
           {/* Controles de zoom */}
-          <div className="zoom-controls">
-            <button 
-              className="zoom-btn zoom-in" 
-              onClick={handleZoomIn}
-              title="Acercar (o usar rueda del mouse)"
-            >
-              <FontAwesomeIcon icon={faSearchPlus} />
-            </button>
-            <button 
-              className="zoom-btn zoom-out" 
-              onClick={handleZoomOut}
-              title="Alejar (o usar rueda del mouse)"
-            >
-              <FontAwesomeIcon icon={faSearchMinus} />
-            </button>
-            <button 
-              className="zoom-btn zoom-reset" 
-              onClick={handleResetZoom}
-              title="Restablecer vista"
-            >
-              <FontAwesomeIcon icon={faExpandArrowsAlt} />
-            </button>
-            <div className="zoom-level-indicator">
-              {Math.round(zoom * 100)}%
-            </div>
-            <div className="zoom-hint">
-              💡 Usa la rueda del mouse para hacer zoom
-            </div>
-          </div>
+          
           
           <div
             className="carpa-container"
@@ -982,7 +963,7 @@ function CarpasDelBalneario(props) {
             >
               ✕
             </button>
-            <h3 className="modal-fechas-title">Elegí tu rango de fechas</h3>
+            <h3 className="modal-fechas-title">Selecciona tu rango de fechas</h3>
             <DateRange
               editableDateInputs={true}
               onChange={(item) => setRangoFechasDraft([item.selection])}
