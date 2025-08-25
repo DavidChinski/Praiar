@@ -183,7 +183,7 @@ function PerfilComponent() {
               </>
             ) : (
               <>
-                <a className="quick-link" href="/tusreservas">Tus reservas</a>
+                <a className="quick-link" href="/tusreservas/null">Tus reservas</a>
                 <a className="quick-link" href="/ciudades">Explorar balnearios</a>
               </>
             )}

@@ -201,6 +201,7 @@ function CrearBalneario() {
               <div className="form-group">
                 <label htmlFor="ciudad">Ciudad *</label>
                 <select 
+                  style={{maxWidth: '295.33px'}}
                   id="ciudad" 
                   value={ciudadSeleccionada} 
                   onChange={(e) => setCiudadSeleccionada(e.target.value)} 
@@ -245,6 +246,7 @@ function CrearBalneario() {
               <div className="form-group">
                 <label htmlFor="tipoUbicacion">Tipo de Ubicación *</label>
                 <select 
+                  style={{maxWidth: '295.33px'}}
                   id="tipoUbicacion" 
                   value={tipoUbicacion} 
                   onChange={(e) => setTipoUbicacion(e.target.value)}
