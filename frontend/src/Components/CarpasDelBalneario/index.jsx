@@ -743,8 +743,13 @@ function CarpasDelBalneario(props) {
       <div className="balneario-header">
         <div className="balneario-header-main">
           <h1 className="balneario-nombre">{balnearioInfo?.nombre || 'Balneario'}</h1>
+
           <div className="header-badge">
-            <span>Vista Principal del Sistema</span>
+            {esDuenio ? (
+              <span>TU BALNEARIO!</span>
+            ) : (
+              <span>RESERVA YA!</span>
+            )}
           </div>
         </div>
         {balnearioInfo && (
@@ -771,7 +776,11 @@ function CarpasDelBalneario(props) {
           {/* Indicador de estado del sistema */}
           <div className="system-status">
             <div className="status-indicator active"></div>
-            <span className="status-text">Sistema Operativo</span>
+            {esDuenio ? (
+              <span className="status-text">Tu panel de control</span>
+            ) : (
+              <span className="status-text">Edita la fecha!</span>
+            )}
           </div>
           
           {esDuenio ? (
