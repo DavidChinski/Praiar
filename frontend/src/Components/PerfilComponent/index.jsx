@@ -18,9 +18,26 @@ function PerfilComponent() {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('usuario'));
     if (userData && userData.auth_id) {
+      // Optimistic set to avoid flicker and unnecessary redirects on transient errors
+      setUsuario(userData);
+      setFormData({
+        nombre: userData.nombre || '',
+        apellido: userData.apellido || '',
+        email: userData.email || '',
+        dni: userData.dni || '',
+        telefono: userData.telefono || '',
+      });
+
       fetch(`http://localhost:3000/api/perfil/${userData.auth_id}`)
-        .then(res => res.json())
-        .then(data => {
+        .then(async (res) => {
+          if (!res.ok) {
+            // Si no está autorizado o hay error del servidor, mantenemos los datos locales
+            return null;
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (!data || !data.usuario) return;
           setUsuario(data.usuario);
           setFormData({
             nombre: data.usuario.nombre || '',
@@ -30,7 +47,9 @@ function PerfilComponent() {
             telefono: data.usuario.telefono || '',
           });
         })
-        .catch(() => navigate('/login'));
+        .catch(() => {
+          // No redirigimos si hay fallo de red; permanecemos en Perfil con datos locales
+        });
     } else {
       navigate('/login');
     }

@@ -48,21 +48,21 @@ function CarpaItem({
           icon="fa-solid fa-tents"
           alt={`Carpa doble ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       ) : tipo === "sombrilla" ? (
         <FontAwesomeIcon
           icon="fa-solid fa-umbrella-beach"
           alt={`Sombrilla ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       ) : (
         <FontAwesomeIcon
           icon="fa-solid fa-tent"
           alt={`Carpa ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       )}
       <div className="acciones">

@@ -289,14 +289,25 @@ function CarpasDelBalneario(props) {
   useEffect(() => {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (usuario && usuario.auth_id) {
+    if (usuario && (usuario.auth_id || usuario.id_usuario)) {
       setUsuarioLogueado(true);
       fetch(`http://localhost:3000/api/balneario/${balnearioId}/info`)
         .then(res => res.json())
         .then(info => {
           setBalnearioInfo(info);
           setCiudad(info.ciudad || "");
-          if (info.id_usuario === usuario.auth_id) setEsDuenio(true);
+          const userAuthId = usuario.auth_id;
+          const userNumericId = usuario.id_usuario;
+          // Considerar múltiples formas de identificar al dueño
+          if (
+            usuario.esPropietario === true ||
+            info.id_usuario === userAuthId ||
+            info.id_usuario === userNumericId
+          ) {
+            setEsDuenio(true);
+          } else {
+            setEsDuenio(false);
+          }
         });
     } else {
       setUsuarioLogueado(false);
