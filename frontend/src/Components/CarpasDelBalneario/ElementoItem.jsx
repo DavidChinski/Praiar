@@ -1,4 +1,5 @@
 import React from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ElementoItem({ el, esDuenio, setDragging, rotarElemento }) {
   return (
@@ -20,7 +21,9 @@ function ElementoItem({ el, esDuenio, setDragging, rotarElemento }) {
       {el.tipo}
       {esDuenio && (
         <div className="acciones">
-          <button className="boton-agregar-servicio" onClick={() => rotarElemento(el.id_elemento)}>🔄</button>
+          <button className="boton-agregar-servicio" onClick={() => rotarElemento(el.id_elemento)}>
+            <FontAwesomeIcon icon="fa-solid fa-rotate-right" />
+          </button>
         </div>
       )}
     </div>

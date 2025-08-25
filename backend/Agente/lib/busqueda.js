@@ -56,6 +56,76 @@ class Busqueda {
     }));
   }
 
+  // Busca balnearios por nombre (búsqueda parcial) y devuelve con datos de ciudad
+  async buscarBalneariosPorNombre(nombreParcial) {
+    const termino = (nombreParcial || '').trim();
+    if (!termino) return [];
+
+    const { data, error } = await supabase
+      .from('balnearios')
+      .select(`
+        id_balneario,
+        nombre,
+        direccion,
+        telefono,
+        imagen,
+        id_ciudad,
+        ciudades (
+          id_ciudad,
+          nombre,
+          img
+        )
+      `)
+      .ilike('nombre', `%${termino}%`);
+
+    if (error) throw error;
+
+    return (data || []).map(balneario => ({
+      id_balneario: balneario.id_balneario,
+      nombre: balneario.nombre,
+      direccion: balneario.direccion,
+      telefono: balneario.telefono,
+      imagen: balneario.imagen,
+      ciudad: balneario.ciudades ? balneario.ciudades.nombre : null,
+      ciudad_img: balneario.ciudades ? balneario.ciudades.img : null,
+    }));
+  }
+
+  // Lista balnearios pertenecientes a un usuario (dueño) por auth_id
+  async listarBalneariosDelDueno(authId) {
+    const id = (authId || '').trim();
+    if (!id) return [];
+
+    const { data, error } = await supabase
+      .from('balnearios')
+      .select(`
+        id_balneario,
+        nombre,
+        direccion,
+        telefono,
+        imagen,
+        id_ciudad,
+        ciudades (
+          id_ciudad,
+          nombre,
+          img
+        )
+      `)
+      .eq('id_usuario', id);
+
+    if (error) throw error;
+
+    return (data || []).map(balneario => ({
+      id_balneario: balneario.id_balneario,
+      nombre: balneario.nombre,
+      direccion: balneario.direccion,
+      telefono: balneario.telefono,
+      imagen: balneario.imagen,
+      ciudad: balneario.ciudades ? balneario.ciudades.nombre : null,
+      ciudad_img: balneario.ciudades ? balneario.ciudades.img : null,
+    }));
+  }
+
   // Lista todas las ciudades
   async listarCiudades() {
     const { data, error } = await supabase

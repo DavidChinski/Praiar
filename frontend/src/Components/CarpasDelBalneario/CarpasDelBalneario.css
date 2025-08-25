@@ -489,6 +489,7 @@
   gap: 0.5rem;
   z-index: 100;
   animation: slideInRight 0.3s ease-out;
+  align-items: end;
 }
 
 @keyframes slideInRight {
@@ -631,6 +632,13 @@
   gap: 2px;
 }
 
+/* Sombrillas: circulares y un poco más chicas */
+.carpa.tipo-sombrilla {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
 .carpa.libre {
   background-color: #dff7ea;
   border: 2px solid #2bae66;
@@ -652,6 +660,10 @@
   height: auto;
   color:#005A84;
   pointer-events: none;
+}
+
+.carpa.tipo-sombrilla .carpa-imagen {
+  width: 60%;
 }
 
 /* Mejor feedback en hover y selección */
@@ -704,12 +716,12 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 7px 16px;
+  padding: 4px 8px; /* más chico */
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.8rem; /* más chico */
   font-weight: 500;
   transition: background 0.2s;
-  margin-bottom: 7px;
+  margin-bottom: 4px; /* menos espacio */
   display: inline-block;
   text-align: center;
 }

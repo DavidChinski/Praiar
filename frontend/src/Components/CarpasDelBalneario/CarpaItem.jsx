@@ -78,21 +78,27 @@ function CarpaItem({
                   onReservarManual(carpa);
                 }
               }}
-            >📅</button>
+            >
+              <FontAwesomeIcon icon="fa-solid fa-calendar-days" />
+            </button>
             <button
               className="boton-agregar-servicio"
               onClick={e => {
                 e.stopPropagation();
                 eliminarCarpa(carpa.id_carpa);
               }}
-            >🗑</button>
+            >
+              <FontAwesomeIcon icon="fa-solid fa-trash" />
+            </button>
             <button
               className="boton-agregar-servicio"
               onClick={e => {
                 e.stopPropagation();
                 handleEditarCarpa(carpa);
               }}
-            >✏️</button>
+            >
+              <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
+            </button>
           </>
         )}
       </div>

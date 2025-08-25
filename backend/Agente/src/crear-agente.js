@@ -6,37 +6,35 @@ import { Busqueda } from "../lib/busqueda.js";
 const busqueda = new Busqueda();
 
 const systemPrompt = `
-Sos el asistente de Praiar. Ayudás a usuarios a encontrar y gestionar balnearios.
+Sos el asistente de Praiar. Tu objetivo es dar respuestas accionables con enlaces internos clicables.
 
-Contexto de sesión (si llega): session = { isLoggedIn, esPropietario, auth_id, nombre, email }.
-- Si session.isLoggedIn es false o no existe, asumí usuario invitado.
-- Si esPropietario es true, es dueño. Caso contrario, es cliente.
+Identificación de rol del usuario (por el bloque Contexto de sesión al inicio del mensaje):
+- Si session.isLoggedIn es false o no existe => Rol: Invitado.
+- Si session.esPropietario es true => Rol: Dueño.
+- En otro caso, Rol: Cliente.
 
-Capacidades:
-- Buscar balnearios por ciudad
-- Listar balnearios con su ciudad
-- Listar ciudades
-- Filtrar balnearios por ciudad y servicios, o solo por servicios
-- Buscar disponibilidad por fechas (opcionalmente combinando ciudad y/o servicios)
+Guía por rol:
+- Invitado: invitar a registrarse/iniciar sesión. Sugerir explorar ciudades en "/ciudades".
+- Cliente: ayudar a encontrar balnearios rápidamente. Siempre que devuelvas balnearios, incluí un link a "/balneario/{id}". Ofrecer atajos: "/ciudades" para el mapa.
+- Dueño: asistir en gestión. Atajos: "/tusbalnearios" para ver/crear. Si no tiene balnearios, guiar: Tus Balnearios → Crear Balneario → completar datos, tandas y precios → guardar.
 
-Guía contextual:
-- Invitado: sugerí registrarse/iniciar sesión y compartí el mapa: "/ciudades".
-- Cliente: ofrecé links rápidos: "/ciudades" (mapa).
-- Dueño: guiá cómo crear su balneario y linkeá: "/tusbalnearios". El flujo para crear balneario es: Tus Balnearios -> sección "Crear Balneario" -> completar datos, tandas y precios -> guardar.
+Sugerencias rápidas por rol (al inicio de la respuesta):
+- Invitado: "Ver ciudades /ciudades", "Cómo reservo", "Balnearios populares".
+- Cliente: "Disponibilidad este fin de semana", "Filtrar por servicios", "Ver ciudades /ciudades".
+- Dueño: "Mis balnearios /tusbalnearios", "Crear balneario", "Ver reservas recientes".
+
+Herramientas disponibles:
+- Buscar por ciudad, listar todas, filtrar por ciudad y servicios, filtrar por servicios, buscar disponibilidad por fechas, buscar por nombre, listar balnearios del dueño.
 
 Formato de respuesta:
-- Sé claro y breve. Usá listas con "- ".
-- Incluí rutas absolutas de la app (por ejemplo "/ciudades", "/tusbalnearios") para que el frontend pueda hacerlas clic.
+- Siempre usa secciones con títulos cortos seguidos de dos puntos (ej: "Opciones:"), y debajo listas con "- " o listas numeradas. Máximo 5 ítems por lista.
+- Evitá párrafos largos; dividí en puntos. Cada ítem debe caber en una sola línea si es posible.
+- Incluí rutas absolutas: "/ciudades", "/tusbalnearios", "/balneario/{id}" para navegación.
+- Si el usuario pide disponibilidad con fechas, priorizá la herramienta buscarDisponibilidad.
 
-Notas sobre filtros:
-- El frontend puede enviar un bloque opcional de filtros al comienzo del mensaje con el formato:
-  [Filtros]\n
-  - fechaInicio=YYYY-MM-DD\n
-  - fechaFin=YYYY-MM-DD\n
-  - ciudad=NombreCiudad (opcional)\n
-  - servicios=Wi-Fi,Pileta (opcional, separados por coma)
-- Si hay fechaInicio y fechaFin, priorizá usar la herramienta "buscarDisponibilidad" combinándola con ciudad/servicios si también están presentes.
-- Si no hay fechas, usá las herramientas de búsqueda y filtrado existentes según corresponda.
+Interpretación de intención y fechas:
+- Extraé de forma robusta ciudad, servicios y rango de fechas desde lenguaje natural (ej: "del 5 al 10 de enero en Miramar").
+- Confirmá brevemente lo entendido antes de listar resultados ("Entendido: Miramar, 5–10 ene").
 `.trim();
 
 const ollamaLLM = new Ollama({
@@ -170,6 +168,42 @@ const buscarDisponibilidadTool = tool({
     },
 });
 
+// Nuevo: buscar balnearios por nombre (parcial)
+const buscarBalnearioPorNombreTool = tool({
+    name: "buscarBalnearioPorNombre",
+    description: "Busca balnearios por nombre (parcial) y devuelve enlaces /balneario/{id}",
+    parameters: z.object({
+        nombre: z.string().describe("Nombre o parte del nombre del balneario"),
+    }),
+    execute: async ({ nombre }) => {
+        try {
+            const lista = await busqueda.buscarBalneariosPorNombre(nombre);
+            if (!lista || lista.length === 0) return "No se encontraron balnearios con ese nombre.";
+            return lista.map(bal => `- ${bal.nombre} — ${bal.ciudad || "Ciudad"} — ${bal.direccion} — /balneario/${bal.id_balneario}`).join('\n');
+        } catch (error) {
+            return `Error al buscar por nombre: ${error.message}`;
+        }
+    },
+});
+
+// Nuevo: listar balnearios del dueño autenticado
+const listarMisBalneariosTool = tool({
+    name: "listarMisBalnearios",
+    description: "Lista los balnearios del dueño autenticado (usa session.auth_id)",
+    parameters: z.object({
+        auth_id: z.string().describe("auth_id del usuario dueño"),
+    }),
+    execute: async ({ auth_id }) => {
+        try {
+            const lista = await busqueda.listarBalneariosDelDueno(auth_id);
+            if (!lista || lista.length === 0) return "No tenés balnearios aún. Andá a /tusbalnearios para crear el primero.";
+            return lista.map(bal => `- ${bal.nombre} — ${bal.ciudad || "Ciudad"} — ${bal.direccion} — /balneario/${bal.id_balneario}`).join('\n');
+        } catch (error) {
+            return `Error al listar tus balnearios: ${error.message}`;
+        }
+    },
+});
+
 export function crearAgenteBalnearios({ verbose = true } = {}) {
     return agent({
         tools: [
@@ -178,7 +212,9 @@ export function crearAgenteBalnearios({ verbose = true } = {}) {
             listarCiudadesTool,
             filtrarBalneariosPorCiudadYServiciosTool,
             filtrarBalneariosPorServiciosTool, // Nuevo tool agregado
-            buscarDisponibilidadTool
+            buscarDisponibilidadTool,
+            buscarBalnearioPorNombreTool,
+            listarMisBalneariosTool
         ],
         llm: ollamaLLM,
         verbose,

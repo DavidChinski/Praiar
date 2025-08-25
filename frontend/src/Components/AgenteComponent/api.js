@@ -38,3 +38,6 @@ export async function enviarMensajeAlBackend(mensaje) {
   // Si no es ninguno, devuelve el objeto en string (debug)
   return JSON.stringify(data.response);
 }
+
+// Export util para que el frontend pueda mostrar sugerencias según rol
+export { getSesionContext };

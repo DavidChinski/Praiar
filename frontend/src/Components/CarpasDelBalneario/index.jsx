@@ -972,7 +972,9 @@ function CarpasDelBalneario(props) {
             <div className="zoom-level-indicator">{Math.round(zoom * 100)}%</div>
             <button className="zoom-btn zoom-in" onClick={handleZoomIn}>+</button>
             <button className="zoom-btn zoom-out" onClick={handleZoomOut}>-</button>
-            <button className="zoom-btn zoom-reset" onClick={handleResetZoom}>⟲</button>
+            <button className="zoom-btn zoom-reset" onClick={handleResetZoom}>
+              <FontAwesomeIcon icon="fa-solid fa-rotate-left" />
+            </button>
           </div>
 
           <div

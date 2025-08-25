@@ -21,22 +21,85 @@ function renderInlineWithLinks(texto) {
   });
 }
 
-function formatearMensajeComoLista(texto) {
-  // Detectar listas válidas SOLO si cada línea empieza con "- "
-  const lineas = texto.split(/\r?\n/);
-  const esLista = lineas.length >= 2 && lineas.every(l => l.trim().startsWith('- '));
-  if (esLista) {
+function isBulletList(lines) {
+  return lines.length >= 2 && lines.every(l => l.trim().startsWith('- '));
+}
+
+function isNumberedList(lines) {
+  const regex = /^\d+\.\s+/;
+  if (lines.length < 2) return false;
+  // Deben empezar con 1., 2., ... de forma consistente
+  for (let i = 0; i < lines.length; i++) {
+    if (!regex.test(lines[i].trim())) return false;
+  }
+  return true;
+}
+
+function renderParagraph(text) {
+  return text.split('\n').map((line, i) => (
+    <span key={i}>{renderInlineWithLinks(line)}<br /></span>
+  ));
+}
+
+function renderBlock(block, index) {
+  const lines = block.split(/\r?\n/).filter(l => l.length > 0);
+  if (lines.length === 0) return null;
+
+  // Título estilo "Sección:" en la primera línea
+  const first = lines[0].trim();
+  const isHeading = /:$/g.test(first) && !first.startsWith('- ') && !/^\d+\.\s+/.test(first);
+
+  if (isHeading && lines.length === 1) {
+    return <div key={index}><strong>{first}</strong></div>;
+  }
+
+  if (isHeading) {
+    const rest = lines.slice(1);
     return (
-      <ul>
-        {lineas.map((linea, i) => {
-          const contenido = linea.trim().replace(/^-\s+/, '');
-          return <li key={i}>{renderInlineWithLinks(contenido)}</li>;
-        })}
+      <div key={index}>
+        <div><strong>{first}</strong></div>
+        {isBulletList(rest) ? (
+          <ul>
+            {rest.map((l, i) => <li key={i}>{renderInlineWithLinks(l.trim().replace(/^-\s+/, ''))}</li>)}
+          </ul>
+        ) : isNumberedList(rest) ? (
+          <ol>
+            {rest.map((l, i) => <li key={i}>{renderInlineWithLinks(l.trim().replace(/^\d+\.\s+/, ''))}</li>)}
+          </ol>
+        ) : (
+          renderParagraph(rest.join('\n'))
+        )}
+      </div>
+    );
+  }
+
+  if (isBulletList(lines)) {
+    return (
+      <ul key={index}>
+        {lines.map((l, i) => <li key={i}>{renderInlineWithLinks(l.trim().replace(/^-\s+/, ''))}</li>)}
       </ul>
     );
   }
-  // Si no es lista, muestra como texto normal (con saltos de línea)
-  return texto.split('\n').map((line, i) => <span key={i}>{renderInlineWithLinks(line)}<br /></span>);
+
+  if (isNumberedList(lines)) {
+    return (
+      <ol key={index}>
+        {lines.map((l, i) => <li key={i}>{renderInlineWithLinks(l.trim().replace(/^\d+\.\s+/, ''))}</li>)}
+      </ol>
+    );
+  }
+
+  return <div key={index}>{renderParagraph(block)}</div>;
+}
+
+function renderRichText(texto) {
+  // Separar por bloques (doble salto de línea) para títulos/paragraphs
+  const blocks = texto.split(/\n\s*\n/);
+  return (
+    <div>
+      {blocks.map((b, idx) => renderBlock(b, idx))}
+    </div>
+  );
 }
 
 export default function Chat({ mensajes = [], loading }) {
@@ -53,7 +116,7 @@ export default function Chat({ mensajes = [], loading }) {
     <div className="chat-mensajes" ref={containerRef}>
       {mensajes.map((msg, idx) => {
         const rol = msg.rol === 'user' ? 'usuario' : 'asistente';
-        let contenido = formatearMensajeComoLista(msg.texto);
+        let contenido = renderRichText(msg.texto);
 
         return (
           <div key={idx} className={`mensaje ${rol}`}>
