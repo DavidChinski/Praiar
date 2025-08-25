@@ -447,18 +447,22 @@ function ReservaComponent() {
         <form className="reserva-form" onSubmit={handleSubmit}>
           <h2>Introduce tus datos</h2>
           <div className="form-group">
-            <label>Nombre/s<span className="required-asterisk">*</span>
+            <label htmlFor="nombre">
+              <span>Nombre/s<span className="required-asterisk">*</span></span>
               <input
                 type="text"
+                id="nombre"
                 name="nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 required
               />
             </label>
-            <label>Apellido/s<span className="required-asterisk">*</span>
+            <label htmlFor="apellido">
+              <span>Apellido/s<span className="required-asterisk">*</span></span>
               <input
                 type="text"
+                id="apellido"
                 name="apellido"
                 value={apellido}
                 onChange={(e) => setApellido(e.target.value)}
@@ -467,9 +471,11 @@ function ReservaComponent() {
             </label>
           </div>
 
-          <label>Email<span className="required-asterisk">*</span>
+          <label htmlFor="email">
+            <span>Email<span className="required-asterisk">*</span></span>
             <input
               type="email"
+              id="email"
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -478,13 +484,15 @@ function ReservaComponent() {
           </label>
 
           <div className="form-group telefono-group">
-            <label>Teléfono<span className="required-asterisk">*</span>
+            <label htmlFor="telefono">
+              <span>Teléfono<span className="required-asterisk">*</span></span>
               <div className="telefono-wrapper">
                 <select value={codigoPais} onChange={(e) => setCodigoPais(e.target.value)}>
                   <option value="+54">🇦🇷 +54</option>
                 </select>
                 <input
                   type="tel"
+                  id="telefono"
                   name="telefono"
                   value={telefono}
                   onChange={(e) => setTelefono(e.target.value)}
@@ -494,9 +502,11 @@ function ReservaComponent() {
             </label>
           </div>
 
-          <label>Dirección<span className="required-asterisk">*</span>
+          <label htmlFor="direccion">
+            <span>Dirección<span className="required-asterisk">*</span></span>
             <input
               type="text"
+              id="direccion"
               name="direccion"
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
@@ -504,9 +514,11 @@ function ReservaComponent() {
             />
           </label>
 
-          <label>Ciudad<span className="required-asterisk">*</span>
+          <label htmlFor="ciudad">
+            <span>Ciudad<span className="required-asterisk">*</span></span>
             <input
               type="text"
+              id="ciudad"
               name="ciudad"
               value={ciudad}
               onChange={(e) => setCiudad(e.target.value)}
@@ -514,17 +526,21 @@ function ReservaComponent() {
             />
           </label>
 
-          <label>Código Postal
+          <label htmlFor="codigo-postal">
+            <span>Código Postal</span>
             <input
               type="text"
+              id="codigo-postal"
               name="codigo_postal"
               value={codigoPostal}
               onChange={(e) => setCodigoPostal(e.target.value)}
             />
           </label>
 
-          <label>País/región<span className="required-asterisk">*</span>
+          <label htmlFor="pais">
+            <span>País/región<span className="required-asterisk">*</span></span>
             <select
+              id="pais"
               name="pais"
               value={pais}
               onChange={(e) => setPais(e.target.value)}
@@ -544,8 +560,10 @@ function ReservaComponent() {
             </select>
           </label>
 
-          <label>Método de pago<span className="required-asterisk">*</span>
+          <label htmlFor="metodo-pago">
+            <span>Método de pago<span className="required-asterisk">*</span></span>
             <select
+              id="metodo-pago"
               value={metodoPago}
               onChange={(e) => setMetodoPago(e.target.value)}
               required
