@@ -32,14 +32,18 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
 
 // Verificar SMTP al inicio (log informativo)
-try {
-  transporter.verify().then(() => {
-    console.log('[EMAIL] Transporter SMTP listo para enviar (Brevo).');
-  }).catch((e) => {
-    console.warn('[EMAIL] No se pudo verificar SMTP:', e?.message || e);
-  });
-} catch (e) {
-  console.warn('[EMAIL] Error inicializando verificación SMTP');
+if (!process.env.BREVO_API_KEY) {
+  try {
+    transporter.verify().then(() => {
+      console.log('[EMAIL] Transporter SMTP listo para enviar (Brevo).');
+    }).catch((e) => {
+      console.warn('[EMAIL] No se pudo verificar SMTP:', e?.message || e);
+    });
+  } catch (e) {
+    console.warn('[EMAIL] Error inicializando verificación SMTP');
+  }
+} else {
+  console.log('[EMAIL] Usando Brevo API (no se verifica SMTP)');
 }
 
 app.post('/api/chat', async (req, res) => {
