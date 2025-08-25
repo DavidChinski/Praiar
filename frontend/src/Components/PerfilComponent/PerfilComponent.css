@@ -1,17 +1,17 @@
 /* Variables CSS para colores del proyecto */
 :root {
-  --primary-color: #1a365d;
-  --secondary-color: #2d3748;
-  --accent-color: #4a5568;
-  --background-color: #f7fafc;
+  --primary-color: var(--primary-600, #005178);
+  --secondary-color: var(--primary-800, #001349);
+  --accent-color: var(--primary-700, #003f5e);
+  --background-color: var(--secondary2-200, #fffff4);
   --white: #ffffff;
   --black: #000000;
-  --text-primary: #1a202c;
-  --text-secondary: #4a5568;
+  --text-primary: var(--primary-800, #001349);
+  --text-secondary: var(--primary-700, #003f5e);
   --border-radius: 8px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 89, 132, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 89, 132, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 89, 132, 0.1);
 }
 
 .perfil-wrapper {

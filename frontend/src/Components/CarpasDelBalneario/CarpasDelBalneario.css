@@ -7,11 +7,11 @@
 
 /* Header moderno */
 .balneario-header {
-  background: #ffffff;
-  border: 1px solid #005984;
+  background: var(--secondary2-50);
+  border: 1px solid var(--primary-500);
   border-radius: 20px;
   padding: 1.3rem 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 63, 94, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 89, 132, 0.08);
   margin-bottom: 1.5rem;
   position: relative;
 }
@@ -30,7 +30,7 @@
   margin: 0;
   font-size: 1.5rem !important;
   font-weight: 800;
-  color: #003F5E !important;
+  color: var(--primary-700) !important;
   letter-spacing: 0.2px;
 }
 

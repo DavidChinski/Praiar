@@ -1,12 +1,12 @@
 /* --------- Header principal --------- */
 .header {
-  background-color: #fef8e8;
+  background-color: var(--secondary2-500);
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 500;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  box-shadow: 0 3px 10px rgba(0,89,132,0.15);
 }
 
 
@@ -49,7 +49,7 @@
 .brand {
   font-size: 2.4rem;
   font-weight: bold;
-  color: #004b75;
+  color: var(--primary-500);
   font-family: "El Messiri", sans-serif;
 }
 
@@ -74,7 +74,7 @@
 
 .nav a {
   text-decoration: none;
-  color: black;
+  color: var(--primary-800);
   font-size: 1.3rem;
   transition: color 0.3s ease;
   text-decoration: none;
@@ -87,7 +87,7 @@
 }
 
 .nav a:hover {
-  color: #008ab2;
+  color: var(--secondary-500);
 }
 
 .nav a::after {
@@ -97,7 +97,7 @@
   left: 50%;
   width: 0;
   height: 2px;
-  background-color: #008ab2;
+  background-color: var(--secondary-500);
   transition: width 0.3s ease, left 0.3s ease;
 }
 
@@ -118,18 +118,19 @@
 
 
 .auth-buttons button {
-  border: 2px solid #B0DBE7;
-  background-color: #fef8e8;
+  border: 2px solid var(--secondary-200);
+  background-color: var(--secondary2-500);
   border-radius: 8px;
   padding: 0.4rem 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   font-size: 1.2rem;
+  color: var(--primary-700);
 }
 
 .auth-buttons button:hover {
-  background-color: #ddf2f8;
-  border: 2px solid #a1c3d6
+  background-color: var(--secondary-50);
+  border: 2px solid var(--secondary-300);
 }
 .perfil-img {
   background-color: transparent !important;
@@ -155,7 +156,7 @@
 
 .auth-buttons button a {
   text-decoration: none;
-  color: black;
+  color: var(--primary-700);
   font-weight: 500;
 }
 
@@ -167,7 +168,7 @@
   border: none;
   outline: none;
   cursor: pointer;
-  color: #004b75;
+  color: var(--primary-500);
 }
 
 .hamburger:focus {
@@ -220,9 +221,9 @@
     align-items: center; /* Centra el contenido horizontalmente */
     justify-content: center;
     width: 100%;
-    background: #fef8e8;
+    background: var(--secondary2-500);
     border-radius: 0 0 18px 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    box-shadow: 0 8px 24px rgba(0,89,132,0.15);
     padding-top: 0;
     max-height: 0;
     overflow: hidden;
@@ -250,7 +251,7 @@
   }
   .nav-mobile a {
     font-size: 1.4rem;
-    color: #004b75;
+    color: var(--primary-500);
     text-decoration: none;
     font-weight: 600;
     padding: 0.5rem 1.5rem;
@@ -258,19 +259,19 @@
     transition: background 0.2s, color 0.2s;
   }
   .nav-mobile a:hover {
-    background: #e6f6fa;
-    color: #008ab2;
+    background: var(--secondary-50);
+    color: var(--secondary-500);
   }
   .auth-buttons-mobile button {
     width: 80%;
     max-width: 320px;
     margin: 0 auto;
-    border: 2px solid #B0DBE7;
-    background-color: #fef8e8;
+    border: 2px solid var(--secondary-200);
+    background-color: var(--secondary2-500);
     border-radius: 8px;
     padding: 0.6rem 1rem;
     cursor: pointer;
-    transition: background-color 0.3s, border 0.3s;
+    transition: all 0.3s;
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     font-weight: 500;
@@ -278,14 +279,14 @@
     justify-content: center;
   }
   .auth-buttons-mobile button a {
-    color: black;
+    color: var(--primary-700);
     text-decoration: none;
     width: 100%;
     display: block;
   }
   .auth-buttons-mobile button:hover {
-    background-color: #fcfaf4;
-    border: 2px solid #b9d4e4;
+    background-color: var(--secondary2-300);
+    border: 2px solid var(--secondary-300);
   }
 }
 

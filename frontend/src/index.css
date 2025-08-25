@@ -3,9 +3,45 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /* Primary Colors */
+  --primary-50: #e6eef3;
+  --primary-100: #b0ccd9;
+  --primary-200: #8ab3c6;
+  --primary-300: #5490ad;
+  --primary-400: #337a9d;
+  --primary-500: #005984;
+  --primary-600: #005178;
+  --primary-700: #003f5e;
+  --primary-800: #001349;
+  --primary-900: #002537;
+
+  /* Secondary Colors */
+  --secondary-50: #e6f3f7;
+  --secondary-100: #b0d0e7;
+  --secondary-200: #8ac9dc;
+  --secondary-300: #54b1cb;
+  --secondary-400: #33a1c1;
+  --secondary-500: #008ab2;
+  --secondary-600: #007ea2;
+  --secondary-700: #00627e;
+  --secondary-800: #004c62;
+  --secondary-900: #00304b;
+
+  /* Secondary 2 Colors */
+  --secondary2-50: #fffffd;
+  --secondary2-100: #fffffb;
+  --secondary2-200: #fffff4;
+  --secondary2-300: #fefaf0;
+  --secondary2-400: #fef9ed;
+  --secondary2-500: #fef8e8;
+  --secondary2-600: #e7e2d3;
+  --secondary2-700: #b4b0a5;
+  --secondary2-800: #8c8880;
+  --secondary2-900: #6b6861;
+
   color-scheme: light dark;
-  color: #000;
-  background-color: #fff;
+  color: var(--primary-900);
+  background-color: var(--secondary2-50);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,11 +51,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--secondary-500);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--secondary-600);
 }
 
 body {
@@ -39,27 +75,31 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  background-color: #1a1a1a;
+  background-color: var(--primary-500);
+  color: var(--secondary2-50);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s ease;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: var(--primary-600);
+  border-color: var(--secondary-300);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid var(--secondary-500);
+  outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    background-color: #ffffff;
+    background-color: var(--secondary2-50);
   }
   a:hover {
-    color: #747bff;
+    color: var(--secondary-400);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--primary-500);
+    color: var(--secondary2-50);
   }
 }
 html {

@@ -10,13 +10,13 @@
 }
 
 .login-container {
-  background-color: white;
+  background-color: var(--secondary2-50);
   padding: 40px;
   border-radius: 20px;
   max-width: 480px; /* MÁS ANCHO */
   width: 100%;
   text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  box-shadow: 0 0 30px rgba(0,89,132,0.15);
   font-family: 'Arial', sans-serif;
 }
 
@@ -31,21 +31,27 @@
 .subtitulo {
   font-weight: bold;
   font-size: 20px;
-  color: #003F5E;
+  color: var(--primary-700);
 }
 
 .login-form input {
   padding: 12px;
-  border: 2px solid #003F5E;
+  border: 2px solid var(--primary-700);
   border-radius: 10px;
   font-size: 14px;
-  color: #333;
+  color: var(--primary-800);
   max-width: none;
-  background-color: white;
+  background-color: var(--secondary2-50);
+  transition: border-color 0.3s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--secondary-500);
 }
 
 .login-form input::placeholder {
-  color: #aaa;
+  color: var(--secondary2-800);
 }
 
 .login-buttons {
@@ -58,36 +64,41 @@ button {
   padding: 10px 16px;
   border-radius: 10px;
   border: none;
-  background-color: #B0DBE7;
+  background-color: var(--secondary-100);
   cursor: pointer;
   font-weight: bold;
-  color: #003F5E;
-  transition: background-color 0.3s;
-  
+  color: var(--primary-700);
+  transition: all 0.3s ease;
 }
+
 button:focus {
   outline: none;
-  box-shadow: none;
+  box-shadow: 0 0 0 2px var(--secondary-500);
 }
+
 .secondary:hover {
-  background-color: #B0DBE7;
-  
+  background-color: var(--secondary-200);
 }
 
 .link-btn {
   background-color: transparent;
   border: none;
-  color: #008ab2;
+  color: var(--secondary-500);
   text-decoration: underline;
   cursor: pointer;
   font-size: 14px;
   margin-top: 10px;
   padding: 0;
+  transition: color 0.3s ease;
+}
+
+.link-btn:hover {
+  color: var(--secondary-600);
 }
 
 .linea {
   height: 1.5px;
-  background-color: #ccc;
+  background-color: var(--secondary2-700);
   width: 360px;           /* Ajustás el largo que querés */
   align-self: center;    /* La centra verticalmente */
   border: none;
@@ -107,11 +118,17 @@ button:focus {
   cursor: pointer;
   border-radius: 50%;
   padding: 4px;
-  background-color: white;
+  background-color: var(--secondary2-50);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   display: inline-block;
+  transition: background-color 0.3s ease;
+  border: 1px solid var(--secondary2-600);
+}
+
+.login-icons div:hover {
+  background-color: var(--secondary2-100);
 }
 
 #icon-google {
@@ -162,8 +179,13 @@ button:focus {
   margin-bottom: 20px;
 }
 .login-container>p>a{
-  color: #005984;
+  color: var(--primary-500);
   text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.login-container>p>a:hover {
+  color: var(--primary-600);
 }
 
 .login-container .password-container{

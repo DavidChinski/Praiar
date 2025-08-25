@@ -9,7 +9,7 @@
   font-size: 40px;
   margin-bottom: 2rem;
   font-family: "El Messiri";
-  color: #000000 !important
+  color: var(--primary-800) !important;
 }
 
 .contenido {
@@ -30,7 +30,7 @@
 .linea-vertical {
   width: 1px;
   height: 200px;
-  background-color: #555555;
+  background-color: var(--secondary2-700);
 }
 
 .texto {
@@ -41,13 +41,14 @@
 
 /* Link */
 .link-registrar {
-  color: #005984;
+  color: var(--primary-500);
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .link-registrar:hover {
-  color: #002537;
+  color: var(--primary-700);
 }
 
 /* Responsive */
@@ -60,7 +61,7 @@
   .linea-vertical {
     width: 60%;
     height: 1px;
-    background-color: #555555;
+    background-color: var(--secondary2-700);
   }
 
   .texto {

@@ -9,7 +9,7 @@
 /* TÍTULO */
 .titulo {
   font-size: 1.8rem;
-  color: #000;
+  color: var(--primary-800);
   text-align: left; /* Cambiado de center a left */
   margin-bottom: 2rem;
 }
@@ -41,7 +41,7 @@ form.formularioConsulta {
 /* ETIQUETAS */
 .labelConsulta {
   font-weight: bold;
-  color: #004080;
+  color: var(--primary-600);
   font-size: 1.3rem;
 }
 
@@ -49,15 +49,16 @@ form.formularioConsulta {
 .inputConsultas,
 textarea {
   padding: 12px;
-  border: 2px solid #005984;
+  border: 2px solid var(--primary-500);
   border-radius: 10px;
   font-size: 1rem;
   width: 100%;
   box-sizing: border-box;
   outline: none;
-  background-color: white;
-  color: #333;
+  background-color: var(--secondary2-50);
+  color: var(--primary-800);
   font-family: Arial, sans-serif;
+  transition: border-color 0.3s ease;
 }
 
 textarea {
@@ -66,27 +67,28 @@ textarea {
 }
 
 input:focus {
-  border-color: #005984;
-  box-shadow: 0 0 5px #005984;
+  border-color: var(--secondary-500);
+  box-shadow: 0 0 8px rgba(0, 138, 178, 0.3);
 }
 
 
 /* BOTÓN MÁS CHICO Y CENTRADO */
 .enviarConsulta {
-  background-color: #b2dfe8;
-  color: #000;
+  background-color: var(--secondary-100);
+  color: var(--primary-700);
   border: none;
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: bold;
   padding: 8px 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   align-self: center;
 }
 
 .enviarConsulta:hover {
-  background-color: #9ad0dd;
+  background-color: var(--secondary-200);
+  transform: translateY(-1px);
 }
 
 /* MENSAJE */
@@ -125,6 +127,6 @@ form.formularioConsulta {
 .form-container-consultas hr {
   width: 40%;
   margin: 2rem auto 0 auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--secondary2-700);
 }
 

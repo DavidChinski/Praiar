@@ -3,15 +3,15 @@
 
 /* Variables CSS para la paleta azul */
 :root {
-  --primary-blue: #1e3a8a;
-  --primary-light: #3b82f6;
-  --primary-dark: #1e40af;
-  --secondary-blue: #2563eb;
-  --accent-blue: #0ea5e9;
-  --light-blue: #60a5fa;
-  --very-light-blue: #93c5fd;
-  --dark-blue: #1e40af;
-  --deep-blue: #1e3a8a;
+  --primary-blue: var(--primary-500, #005984);
+  --primary-light: var(--primary-400, #337a9d);
+  --primary-dark: var(--primary-700, #003f5e);
+  --secondary-blue: var(--secondary-500, #008ab2);
+  --accent-blue: var(--secondary-400, #33a1c1);
+  --light-blue: var(--secondary-200, #8ac9dc);
+  --very-light-blue: var(--secondary-100, #b0d0e7);
+  --dark-blue: var(--primary-700, #003f5e);
+  --deep-blue: var(--primary-800, #001349);
   
   --text-primary: #1f2937;
   --text-secondary: #6b7280;

@@ -28,9 +28,15 @@
   height: 80px;
   font-size: 3rem;
   margin-bottom: 0.5rem;
-  background-color: #008AB2;
+  background-color: var(--secondary-500);
   border-radius: 50%;
-  color: white;
+  color: var(--secondary2-50);
+  transition: all 0.3s ease;
+}
+
+.feature:hover .ElegirPraiarIcon {
+  background-color: var(--secondary-400);
+  transform: scale(1.05);
 }
 
 .feature .ElegirPraiarIcon svg {
@@ -43,10 +49,12 @@
   line-height: 1.2;
   margin: 0;
   word-wrap: break-word;
+  color: var(--primary-700);
 }
 
 h2 {
   font-family: "El Messiri", sans-serif;
   margin-bottom: 0.5rem; /* Reduce espacio entre título y contenido */
   font-size: 40px;
+  color: var(--primary-800);
 }

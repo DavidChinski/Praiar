@@ -21,29 +21,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e9ecef;
-  border: 2px solid #dee2e6;
+  background-color: var(--secondary2-700);
+  border: 2px solid var(--secondary2-600);
   transition: all 0.3s ease;
   margin-bottom: 8px;
 }
 
 .fase-circulo.completada {
-  background-color: #005A84;
-  border-color: #005A84;
+  background-color: var(--primary-500);
+  border-color: var(--primary-500);
   color: white;
 }
 
 .fase-circulo.activa {
-  background-color: #005A84;
-  border-color: #005A84;
+  background-color: var(--primary-500);
+  border-color: var(--primary-500);
   color: white;
-  box-shadow: 0 0 0 4px rgba(0, 90, 132, 0.2);
+  box-shadow: 0 0 0 4px rgba(0, 89, 132, 0.25);
 }
 
 .fase-numero {
   font-weight: bold;
   font-size: 1.2rem;
-  color: #6c757d;
+  color: var(--primary-800);
 }
 
 .fase-circulo.completada .fase-numero,
@@ -54,23 +54,23 @@
 .fase-texto {
   font-weight: 500;
   font-size: 1.1rem;
-  color: #6c757d;
+  color: var(--primary-700);
 }
 
 .fase-texto.completada {
-  color: #005A84;
+  color: var(--primary-500);
   font-weight: 600;
 }
 
 .fase-texto.activa {
-  color: #005A84;
+  color: var(--primary-500);
   font-weight: 600;
 }
 
 .fase-linea {
   width: 30%;
   height: 2px;
-  background-color: #dee2e6;
+  background-color: var(--secondary2-600);
   margin: 0 1rem;
   transition: background-color 0.3s ease;
   align-self: center;
@@ -78,7 +78,7 @@
 }
 
 .fase-linea.activa {
-  background-color: #005A84;
+  background-color: var(--primary-500);
 }
 
 /* Responsive */

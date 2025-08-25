@@ -1,9 +1,9 @@
 footer {
-  background-color: #00405E;
-  color: white;
+  background-color: var(--primary-700);
+  color: var(--secondary2-50);
   font-family: sans-serif;
   padding: 30px 20px 10px; /* más corto */
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--secondary-200);
   margin-top: auto; /* Esto empuja el footer hacia abajo */
 }
 
@@ -71,7 +71,7 @@ ul li {
 
 ul li a {
   text-decoration: none;
-  color: white;
+  color: var(--secondary2-50);
   transition: color 0.2s ease;
 }
 
@@ -79,7 +79,7 @@ ul li a:hover,
 ul li a:focus,
 ul li a:active {
   text-decoration: none;
-  color: #8AC9DC;
+  color: var(--secondary-200);
 }
 
 
@@ -87,7 +87,7 @@ ul li a:active {
   width: auto;
   height: 20px;
   margin-right: 8px;
-  color: white;
+  color: var(--secondary2-50);
   font-size: 16px;
   vertical-align: middle;
 }
@@ -104,7 +104,7 @@ ul li a:active {
 }
 
 .footer_bottom {
-  border-top: 1px solid #aaa;
+  border-top: 1px solid var(--secondary-200);
   margin-top: 25px;
   padding-top: 10px;
   text-align: center;
@@ -112,13 +112,13 @@ ul li a:active {
 }
 
 .footer_bottom a {
-  color: #8AC9DC;
+  color: var(--secondary-200);
   margin: 0 5px;
   text-decoration: none;
 }
 
 .footer_bottom a:hover {
   text-decoration: none;
-  color: #002537;
+  color: var(--secondary-100);
 }
 

@@ -27,14 +27,14 @@
 .formulario-reserva select {
   width: 350px;
   padding: 12px 14px;
-  border: 2px solid #cbd5e0;
-  background-color: #ffffff;
-  color: #2d3748;
+  border: 2px solid var(--secondary2-700);
+  background-color: var(--secondary2-50);
+  color: var(--primary-800);
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 400;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 4px rgba(0, 89, 132, 0.06);
   display: block;
   box-sizing: border-box;
 }
@@ -42,9 +42,9 @@
 .formulario-reserva input:focus,
 .formulario-reserva select:focus {
   outline: none;
-  border-color: #005A84;
-  box-shadow: 0 0 0 3px rgba(0, 90, 132, 0.1), 0 2px 8px rgba(0, 90, 132, 0.15);
-  background-color: #ffffff;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(0, 89, 132, 0.1), 0 2px 8px rgba(0, 89, 132, 0.15);
+  background-color: var(--secondary2-50);
 }
 
 .formulario-reserva input:hover,
@@ -78,7 +78,7 @@
 .formulario-reserva button {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #005A84 0%, #0077B6 50%, #00B4D8 100%);
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 50%, var(--secondary-400) 100%);
   color: white;
   font-weight: 600;
   font-size: 1.1rem;
@@ -104,7 +104,7 @@
 }
 
 .formulario-reserva button:hover {
-  background: linear-gradient(135deg, #004a73 0%, #0066a3 50%, #009ec7 100%);
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 50%, var(--secondary-600) 100%);
   box-shadow: 0 6px 16px rgba(0, 90, 132, 0.4);
   transform: translateY(-2px);
 }

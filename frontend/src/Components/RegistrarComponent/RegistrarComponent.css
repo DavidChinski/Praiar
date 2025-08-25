@@ -11,13 +11,13 @@
 }
 
 .registrar-container {
-  background-color: white;
+  background-color: var(--secondary2-50);
   padding: 40px;
   border-radius: 20px;
   max-width: 600px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  box-shadow: 0 0 30px rgba(0,89,132,0.15);
   font-family: 'Arial', sans-serif;
 }
 
@@ -32,46 +32,52 @@
 .subtitulo {
   font-weight: bold;
   font-size: 20px;
-  color: #003F5E;
+  color: var(--primary-700);
 }
 
 .registrar-form input {
   padding: 12px;
-  border: 2px solid #003F5E;
+  border: 2px solid var(--primary-700);
   border-radius: 10px;
   font-size: 14px;
-  color: #333;
+  color: var(--primary-800);
   max-width: none;
-  background-color: white;
+  background-color: var(--secondary2-50);
+  transition: border-color 0.3s ease;
+}
+
+.registrar-form input:focus {
+  outline: none;
+  border-color: var(--secondary-500);
 }
 
 .registrar-form input::placeholder {
-  color: #aaa;
+  color: var(--secondary2-800);
 }
 
 button {
   padding: 10px 16px;
   border-radius: 10px;
   border: none;
-  background-color: #B0DBE7;
+  background-color: var(--secondary-100);
   cursor: pointer;
   font-weight: bold;
-  color: #003F5E;
-  transition: background-color 0.3s;
+  color: var(--primary-700);
+  transition: all 0.3s ease;
 }
 
 button:focus {
   outline: none;
-  box-shadow: none;
+  box-shadow: 0 0 0 2px var(--secondary-500);
 }
 
 .secondary:hover {
-  background-color: #B0DBE7;
+  background-color: var(--secondary-200);
 }
 
 .linea {
   height: 1.5px;
-  background-color: #ccc;
+  background-color: var(--secondary2-700);
   width: 360px;
   align-self: center;
   border: none;
@@ -89,11 +95,17 @@ button:focus {
   cursor: pointer;
   border-radius: 50%;
   padding: 4px;
-  background-color: white;
+  background-color: var(--secondary2-50);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   display: inline-block;
+  transition: background-color 0.3s ease;
+  border: 1px solid var(--secondary2-600);
+}
+
+.registrar-icons div:hover {
+  background-color: var(--secondary2-100);
 }
 
 #icon-google {
@@ -149,8 +161,13 @@ button:focus {
 }
 
 .registrar-container > p > a {
-  color: #005984;
+  color: var(--primary-500);
   text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.registrar-container > p > a:hover {
+  color: var(--primary-600);
 }
 
 button[type="submit"] {
@@ -182,12 +199,18 @@ button[type="submit"] {
 
 .telefono-wrapper select {
   padding: 12px;
-  border: 2px solid #003F5E;
+  border: 2px solid var(--primary-700);
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--secondary2-50);
   font-size: 14px;
-  color: black;
+  color: var(--primary-800);
   height: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.telefono-wrapper select:focus {
+  outline: none;
+  border-color: var(--secondary-500);
 }
 
 
@@ -202,7 +225,7 @@ button[type="submit"] {
 .checkbox-group input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #003F5E;
+  accent-color: var(--primary-700);
   cursor: pointer;
   margin: 0;
 }
@@ -211,7 +234,7 @@ button[type="submit"] {
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  color: #003F5E;
+  color: var(--primary-700);
   user-select: none;
 }
 
@@ -219,22 +242,22 @@ button[type="submit"] {
   display: inline-block;
   padding: 10px 16px;
   border-radius: 10px;
-  border: 2px solid #003F5E;
-  background-color: #B0DBE7;
-  color: #003F5E;
+  border: 2px solid var(--primary-700);
+  background-color: var(--secondary-100);
+  color: var(--primary-700);
   font-weight: bold;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .custom-file-upload:hover {
-  background-color: #A0CAD8;
+  background-color: var(--secondary-200);
 }
 
 .archivo-nombre {
   font-size: 14px;
-  color: #003F5E;
+  color: var(--primary-700);
   margin-top: 6px;
 }
 
@@ -246,7 +269,7 @@ button[type="submit"] {
 }
 
 .success {
-  color: #388e3c;
+  color: #2e7d32;
   font-size: 14px;
   margin-top: 10px;
   text-align: center;

@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   font-family: 'El Messiri', sans-serif;
-  background-color: #fffdf7;
+  background-color: var(--secondary2-200);
 }
 
 .main-content {
@@ -15,24 +15,25 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background-color: #008ab2;
-  color: white;
+  background-color: var(--secondary-500);
+  color: var(--secondary2-50);
   font-size: 1.8rem;
   border: none;
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0,89,132,0.25);
   cursor: pointer;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .boton-flotante-chat:hover {
-  background-color: #006a8e;
+  background-color: var(--secondary-600);
+  transform: scale(1.05);
 }
 
 /* Chat flotante en esquina */

@@ -8,7 +8,7 @@
 }
 
 .hero-title {
-  color: #003f5e !important;
+  color: var(--primary-700) !important;
   font-size: 2.5rem;
   font-weight: 600;
   text-align: center;
@@ -18,10 +18,10 @@
 /* ---------- Formulario de búsqueda ---------- */
 .busqueda-form {
   display: flex;
-  background-color: white;
+  background-color: var(--secondary2-50);
   border-radius: 2rem;
   padding: 1.5rem 2rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 89, 132, 0.15);
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
@@ -51,31 +51,31 @@
   flex-direction: column;
   justify-content: center;
   font-size: 0.95rem;
-  color: #005984;
+  color: var(--primary-500);
   height: 100%;
   width: 100%;
 }
 
 .input-estandar,
 .date-summary {
-  border: 1px solid #005984;
+  border: 1px solid var(--primary-500);
   border-radius: 15px;
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
-  color: #005a84;
-  background-color: white;
+  color: var(--primary-500);
+  background-color: var(--secondary2-50);
   height: 38px;
   display: flex;
   align-items: center;
   justify-content: center; /* Centrado horizontal */
   width: 100%;
-  transition: box-shadow 0.3s, border 0.3s;
+  transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .date-summary:hover {
-  box-shadow: 0 0 10px rgba(0, 89, 132, 0.3);
-  border: 1.5px solid #0077b6;
+  box-shadow: 0 0 15px rgba(0, 89, 132, 0.25);
+  border: 2px solid var(--secondary-500);
   transform: scale(1.02);
 }
 
@@ -92,7 +92,7 @@
 
 /* ---------- Botón de búsqueda ---------- */
 .search-button {
-  background-color: #006699;
+  background-color: var(--secondary-500);
   border: none;
   border-radius: 1rem;
   padding: 0.5rem 0.75rem; /* Más chico */
@@ -100,14 +100,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
   height: 46px;
   color: white;
   font-weight: bold;
 }
 
 .search-button:hover {
-  background-color: #00527c;
+  background-color: var(--secondary-600);
   transform: scale(1.05);
 }
 
@@ -128,18 +128,18 @@
   background-color: white;
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 89, 132, 0.1);
 }
 
 .tabla-reservas th,
 .tabla-reservas td {
   padding: 1rem;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--secondary2-600);
 }
 
 .tabla-reservas th {
-  background-color: #005984;
+  background-color: var(--primary-500);
   color: white;
   font-weight: 600;
 }

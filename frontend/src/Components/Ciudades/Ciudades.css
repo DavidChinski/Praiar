@@ -19,15 +19,15 @@
   height: 220px;
   border-radius: 18px; /* más redondeado */
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 89, 132, 0.12);
   background-color: white;
   font-family: Arial, sans-serif;
-  transition: transform 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s;
+  transition: all 0.22s cubic-bezier(.4,2,.6,1);
 }
 
 .ciudad-card:hover {
   transform: translateY(-8px) scale(1.035);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 89, 132, 0.18);
   z-index: 2;
 }
 
@@ -113,7 +113,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #007b99 60%, #00b4d8 100%);
+  background: linear-gradient(90deg, var(--secondary-500) 60%, var(--secondary-400) 100%);
   z-index: -1;
   transition: filter 0.3s ease;
   border-radius: 12px;
@@ -127,9 +127,8 @@
 
 h2 {
     font-family: "El Messiri", sans-serif;
-    color: #000;
+    color: var(--primary-800);
     font-size: 50px;
-    
 }
 @media (max-width: 1005px) {
   .titulo-ciudades {
@@ -149,21 +148,21 @@ h2 {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: #007b99;
+  background-color: var(--secondary-500);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   font-size: 2rem;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .ver-mas-circular:hover,
 .ver-mas-circular:focus,
 .ver-mas-circular:active {
-  background-color: #20536d; /* entorno */
-  color: #3b708a; /* flecha */
+  background-color: var(--primary-700);
+  color: var(--secondary-300);
   transform: scale(1.05);
 }
 
@@ -176,10 +175,10 @@ h2 {
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 89, 132, 0.1);
   height: auto;
   border-radius: 5px;
-  border: 3px solid #005A84;
+  border: 3px solid var(--primary-500);
   padding: 1.5%;  /* <--- espacio entre contenido y borde */
 }
 
@@ -205,7 +204,7 @@ h2 {
   font-family: "El Messiri", sans-serif;
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
-  color: #000;
+  color: var(--primary-800);
 }
 
 .info-izquierda p {
@@ -214,7 +213,7 @@ h2 {
   display: flex;
   align-items: center;
   margin: 4px 0;
-  color: #000;
+  color: var(--primary-800);
 }
 
 .iconoCard {
@@ -227,8 +226,8 @@ h2 {
   position: absolute; /* 🔸 NUEVO */
   bottom: 20px;        /* 🔸 distancia del borde inferior */
   right: 12px;         /* 🔸 distancia del borde derecho */
-  background-color: #c9ebf2;
-  color: #000;
+  background-color: var(--secondary-100);
+  color: var(--primary-700);
   font-family: Arial, sans-serif;
   font-size: 1rem;
   font-weight: bold;
@@ -240,9 +239,8 @@ h2 {
   white-space: nowrap;
 }
 
-
 .mirar-btn:hover {
-  background-color: #b3dbe4;
+  background-color: var(--secondary-200);
 }
 
 .modal-mapa-overlay {
@@ -268,7 +266,7 @@ h2 {
   position: relative;
 }
 .modal-mapa-contenido h3 {
-  color: #002537;
+  color: var(--primary-900);
   margin-bottom: 12px;
 }
 
@@ -280,7 +278,7 @@ h2 {
   background: none;
   border: none;
   cursor: pointer;
-  color: #002537;
+  color: var(--primary-900);
 }
 
 
