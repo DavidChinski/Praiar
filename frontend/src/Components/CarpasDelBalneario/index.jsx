@@ -134,12 +134,37 @@ function CarpasDelBalneario(props) {
         y: e.clientY - dragStart.y
       });
     }
+    if (dragging) {
+      // Delegar en la lógica de DnD si hay un elemento en drag
+      onMouseMove(e);
+    }
   };
 
   // Función para manejar el fin del arrastre
   const handleMouseUp = () => {
     setIsDragging(false);
+    // Si se estaba moviendo una carpa/elemento, persistir
+    if (dragging) {
+      onMouseUp();
+    }
   };
+
+  // Listeners globales para no quedar "pegado" fuera del contenedor
+  useEffect(() => {
+    const handleWindowMouseUp = () => {
+      if (isDragging) setIsDragging(false);
+      if (dragging) onMouseUp();
+    };
+    const handleWindowMouseMove = (e) => {
+      if (isDragging || dragging) handleMouseMove(e);
+    };
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    return () => {
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+    };
+  }, [isDragging, dragging, dragStart, pan, zoom]);
 
   // Función para manejar el scroll del mouse para zoom
   const handleWheel = (e) => {
@@ -511,8 +536,11 @@ function CarpasDelBalneario(props) {
   function onMouseMove(e) {
     if (!dragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - 40;
-    const y = e.clientY - rect.top - 40;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    // Convertir a coordenadas del canvas (antes de transform: translate/scale)
+    const x = (mouseX - pan.x) / zoom - 40;
+    const y = (mouseY - pan.y) / zoom - 40;
 
     if (dragging.tipo === "carpa") {
       setCarpas((prev) =>
@@ -532,27 +560,83 @@ function CarpasDelBalneario(props) {
   async function onMouseUp() {
     if (!dragging) return;
 
-    if (dragging.tipo === "carpa") {
-      const carpa = carpas.find((c) => c.id_carpa === dragging.id);
-      if (carpa) {
-        await fetch(`http://localhost:3000/api/balneario/carpas/${carpa.id_carpa}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ x: carpa.x, y: carpa.y }),
-        });
-      }
-    } else if (dragging.tipo === "elemento") {
-      const el = elementos.find((el) => el.id_elemento === dragging.id);
-      if (el) {
-        await fetch(`http://localhost:3000/api/balneario/elementos/${el.id_elemento}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ x: el.x, y: el.y }),
-        });
-      }
-    }
+    try {
+      // Validación de colisión simple por bounding-box 80x80
+      const collides = (x, y, selfId, selfTipo) => {
+        const size = 80;
+        const ax1 = x, ay1 = y, ax2 = x + size, ay2 = y + size;
+        // contra carpas
+        for (const c of carpas) {
+          if (selfTipo === 'carpa' && c.id_carpa === selfId) continue;
+          const bx1 = c.x, by1 = c.y, bx2 = c.x + size, by2 = c.y + size;
+          const overlap = ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+          if (overlap) return true;
+        }
+        // contra elementos
+        for (const el of elementos) {
+          if (selfTipo === 'elemento' && el.id_elemento === selfId) continue;
+          const bx1 = el.x, by1 = el.y, bx2 = el.x + size, by2 = el.y + size;
+          const overlap = ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+          if (overlap) return true;
+        }
+        return false;
+      };
 
-    setDragging(null);
+      if (dragging.tipo === "carpa") {
+        const carpa = carpas.find((c) => c.id_carpa === dragging.id);
+        if (carpa) {
+          const finalX = Math.round(carpa.x);
+          const finalY = Math.round(carpa.y);
+          if (collides(finalX, finalY, carpa.id_carpa, 'carpa')) {
+            // revertir si colisiona
+            setCarpas(prev => prev.map(c => c.id_carpa === carpa.id_carpa ? { ...c, x: dragging.origX, y: dragging.origY } : c));
+          } else {
+          // Persistir primero, luego refrescar con un leve retardo para evitar carreras
+          const res = await fetch(`http://localhost:3000/api/balneario/carpas/${carpa.id_carpa}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ x: finalX, y: finalY }),
+          });
+          if (!res.ok) {
+            console.warn('No se pudo guardar posición de carpa', carpa.id_carpa);
+          } else {
+            // Refrescar desde backend para asegurar persistencia
+            setTimeout(() => {
+              fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
+                .then(r => r.json())
+                .then(data => setCarpas(data.map(c => ({ ...c }))));
+            }, 150);
+          }
+          }
+        }
+      } else if (dragging.tipo === "elemento") {
+        const el = elementos.find((el) => el.id_elemento === dragging.id);
+        if (el) {
+          const finalX = Math.round(el.x);
+          const finalY = Math.round(el.y);
+          if (collides(finalX, finalY, el.id_elemento, 'elemento')) {
+            setElementos(prev => prev.map(e => e.id_elemento === el.id_elemento ? { ...e, x: dragging.origX, y: dragging.origY } : e));
+          } else {
+          const res = await fetch(`http://localhost:3000/api/balneario/elementos/${el.id_elemento}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ x: finalX, y: finalY }),
+          });
+          if (!res.ok) {
+            console.warn('No se pudo guardar posición de elemento', el.id_elemento);
+          } else {
+            setTimeout(() => {
+              fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
+                .then(r => r.json())
+                .then(setElementos);
+            }, 150);
+          }
+          }
+        }
+      }
+    } finally {
+      setDragging(null);
+    }
   }
 
   async function eliminarCarpa(id_carpa) {
@@ -883,9 +967,14 @@ function CarpasDelBalneario(props) {
             <div className="legend-item"><span className="legend-dot libre" /> Disponible</div>
             <div className="legend-item"><span className="legend-dot reservada" /> Reservado</div>
           </div>
-          {/* Controles de zoom */}
-          
-          
+          {/* Controles de zoom (arriba a la derecha) */}
+          <div className="zoom-controls">
+            <div className="zoom-level-indicator">{Math.round(zoom * 100)}%</div>
+            <button className="zoom-btn zoom-in" onClick={handleZoomIn}>+</button>
+            <button className="zoom-btn zoom-out" onClick={handleZoomOut}>-</button>
+            <button className="zoom-btn zoom-reset" onClick={handleResetZoom}>⟲</button>
+          </div>
+
           <div
             className="carpa-container"
             ref={containerRef}
@@ -893,7 +982,7 @@ function CarpasDelBalneario(props) {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onWheel={handleWheel}
-            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+            style={{ cursor: (isDragging || dragging) ? 'grabbing' : 'grab' }}
           >
             <div
               className="map-canvas"

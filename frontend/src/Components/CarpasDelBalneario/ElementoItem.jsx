@@ -13,7 +13,7 @@ function ElementoItem({ el, esDuenio, setDragging, rotarElemento }) {
         position: 'absolute'
       }}
       onMouseDown={() =>
-        esDuenio && setDragging({ tipo: "elemento", id: el.id_elemento })
+        esDuenio && setDragging({ tipo: "elemento", id: el.id_elemento, origX: el.x, origY: el.y })
       }
       title={el.tipo}
     >

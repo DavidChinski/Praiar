@@ -24,11 +24,17 @@ function CarpaItem({
       key={carpa.id_carpa}
       className={`carpa ${carpaReservada(carpa.id_carpa) ? "reservada" : "libre"} tipo-${tipo}`}
       style={{ left: `${left}px`, top: `${top}px` }}
+      onMouseDown={(e) => {
+        if (!esDuenio) return;
+        e.stopPropagation();
+        // Guardar posición original para poder revertir si hay colisión
+        setDragging({ tipo: "carpa", id: carpa.id_carpa, origX: carpa.x, origY: carpa.y });
+      }}
       onClick={() => {
-        // Dueño y usuario común: solo pueden reservar si está libre
-        if (esDuenio && onReservarManual && !carpaReservada(carpa.id_carpa)) {
-          onReservarManual(carpa);
-        } else if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
+        // Dueño: el click en la carpa no reserva; usar el botón pequeño
+        if (esDuenio) return;
+        // Usuario: puede navegar para reservar si está libre
+        if (!esDuenio && usuarioLogueado && !carpaReservada(carpa.id_carpa)) {
           navigate(`/reservaubicacion/${carpa.id_carpa}`, {
             state: { fechaInicio, fechaFin, id_balneario: idBalneario }
           });
@@ -62,15 +68,17 @@ function CarpaItem({
       <div className="acciones">
         {esDuenio && (
           <>
-            {/* Handler de drag exclusivo */}
-            <span
+            {/* Reserva manual desde botón pequeño */}
+            <button
               className="boton-agregar-servicio"
-              title="Mover carpa"
-              onMouseDown={e => {
+              title="Reserva manual"
+              onClick={e => {
                 e.stopPropagation();
-                setDragging({ tipo: "carpa", id: carpa.id_carpa });
+                if (onReservarManual && !carpaReservada(carpa.id_carpa)) {
+                  onReservarManual(carpa);
+                }
               }}
-            >🔄️</span>
+            >📅</button>
             <button
               className="boton-agregar-servicio"
               onClick={e => {
