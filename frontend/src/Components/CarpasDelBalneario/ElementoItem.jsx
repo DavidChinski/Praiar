@@ -13,9 +13,14 @@ function ElementoItem({ el, esDuenio, setDragging, rotarElemento }) {
         transformOrigin: 'center center',
         position: 'absolute'
       }}
-      onMouseDown={() =>
-        esDuenio && setDragging({ tipo: "elemento", id: el.id_elemento, origX: el.x, origY: el.y })
-      }
+      onMouseDown={(e) => {
+        if (!esDuenio) return;
+        e.stopPropagation();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickOffsetX = e.clientX - rect.left - rect.width / 2;
+        const clickOffsetY = e.clientY - rect.top - rect.height / 2;
+        setDragging({ tipo: "elemento", id: el.id_elemento, origX: el.x, origY: el.y, offsetX: clickOffsetX, offsetY: clickOffsetY });
+      }}
       title={el.tipo}
     >
       {el.tipo}

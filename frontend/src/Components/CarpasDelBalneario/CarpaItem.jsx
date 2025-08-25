@@ -27,8 +27,11 @@ function CarpaItem({
       onMouseDown={(e) => {
         if (!esDuenio) return;
         e.stopPropagation();
-        // Guardar posición original para poder revertir si hay colisión
-        setDragging({ tipo: "carpa", id: carpa.id_carpa, origX: carpa.x, origY: carpa.y });
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickOffsetX = e.clientX - rect.left - rect.width / 2;
+        const clickOffsetY = e.clientY - rect.top - rect.height / 2;
+        // Guardar posición original y offset de clic para arrastre más natural
+        setDragging({ tipo: "carpa", id: carpa.id_carpa, origX: carpa.x, origY: carpa.y, offsetX: clickOffsetX, offsetY: clickOffsetY });
       }}
       onClick={() => {
         // Dueño: el click en la carpa no reserva; usar el botón pequeño
@@ -48,21 +51,21 @@ function CarpaItem({
           icon="fa-solid fa-tents"
           alt={`Carpa doble ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       ) : tipo === "sombrilla" ? (
         <FontAwesomeIcon
           icon="fa-solid fa-umbrella-beach"
           alt={`Sombrilla ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       ) : (
         <FontAwesomeIcon
           icon="fa-solid fa-tent"
           alt={`Carpa ${carpa.posicion}`}
           className="carpa-imagen"
-          style={{ opacity: carpaReservada(carpa.id_ubicacion) ? 0.6 : 1 }}
+          style={{ opacity: carpaReservada(carpa.id_carpa) ? 0.6 : 1 }}
         />
       )}
       <div className="acciones">
