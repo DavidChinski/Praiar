@@ -550,8 +550,8 @@ function CarpasDelBalneario(props) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     // Convertir a coordenadas del canvas (antes de transform: translate/scale)
-    const x = (mouseX - pan.x) / zoom - 40;
-    const y = (mouseY - pan.y) / zoom - 40;
+    const x = (mouseX - pan.x) / zoom - 40 - (dragging.offsetX || 0);
+    const y = (mouseY - pan.y) / zoom - 40 - (dragging.offsetY || 0);
 
     if (dragging.tipo === "carpa") {
       setCarpas((prev) =>
@@ -572,36 +572,11 @@ function CarpasDelBalneario(props) {
     if (!dragging) return;
 
     try {
-      // Validación de colisión simple por bounding-box 80x80
-      const collides = (x, y, selfId, selfTipo) => {
-        const size = 80;
-        const ax1 = x, ay1 = y, ax2 = x + size, ay2 = y + size;
-        // contra carpas
-        for (const c of carpas) {
-          if (selfTipo === 'carpa' && c.id_carpa === selfId) continue;
-          const bx1 = c.x, by1 = c.y, bx2 = c.x + size, by2 = c.y + size;
-          const overlap = ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
-          if (overlap) return true;
-        }
-        // contra elementos
-        for (const el of elementos) {
-          if (selfTipo === 'elemento' && el.id_elemento === selfId) continue;
-          const bx1 = el.x, by1 = el.y, bx2 = el.x + size, by2 = el.y + size;
-          const overlap = ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
-          if (overlap) return true;
-        }
-        return false;
-      };
-
       if (dragging.tipo === "carpa") {
         const carpa = carpas.find((c) => c.id_carpa === dragging.id);
         if (carpa) {
           const finalX = Math.round(carpa.x);
           const finalY = Math.round(carpa.y);
-          if (collides(finalX, finalY, carpa.id_carpa, 'carpa')) {
-            // revertir si colisiona
-            setCarpas(prev => prev.map(c => c.id_carpa === carpa.id_carpa ? { ...c, x: dragging.origX, y: dragging.origY } : c));
-          } else {
           // Persistir primero, luego refrescar con un leve retardo para evitar carreras
           const res = await fetch(`http://localhost:3000/api/balneario/carpas/${carpa.id_carpa}`, {
             method: "PUT",
@@ -612,12 +587,9 @@ function CarpasDelBalneario(props) {
             console.warn('No se pudo guardar posición de carpa', carpa.id_carpa);
           } else {
             // Refrescar desde backend para asegurar persistencia
-            setTimeout(() => {
-              fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
-                .then(r => r.json())
-                .then(data => setCarpas(data.map(c => ({ ...c }))));
-            }, 150);
-          }
+            fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
+              .then(r => r.json())
+              .then(data => setCarpas(data.map(c => ({ ...c }))));
           }
         }
       } else if (dragging.tipo === "elemento") {
@@ -625,9 +597,6 @@ function CarpasDelBalneario(props) {
         if (el) {
           const finalX = Math.round(el.x);
           const finalY = Math.round(el.y);
-          if (collides(finalX, finalY, el.id_elemento, 'elemento')) {
-            setElementos(prev => prev.map(e => e.id_elemento === el.id_elemento ? { ...e, x: dragging.origX, y: dragging.origY } : e));
-          } else {
           const res = await fetch(`http://localhost:3000/api/balneario/elementos/${el.id_elemento}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -636,12 +605,9 @@ function CarpasDelBalneario(props) {
           if (!res.ok) {
             console.warn('No se pudo guardar posición de elemento', el.id_elemento);
           } else {
-            setTimeout(() => {
-              fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
-                .then(r => r.json())
-                .then(setElementos);
-            }, 150);
-          }
+            fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
+              .then(r => r.json())
+              .then(setElementos);
           }
         }
       }
