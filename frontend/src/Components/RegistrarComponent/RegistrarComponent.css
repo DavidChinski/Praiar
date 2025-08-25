@@ -2,56 +2,30 @@
   background-image: url('../../assets/fondoLogin.png');
   background-size: cover;
   background-position: center;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 110px !important;
   min-height: 100vh;
   padding-block-end: 70px;
-}
-
-p{
-  font-family: "El Messiri";
-}
-.split {
   display: flex;
-  flex-direction: row;
-  max-width: 900px;
-  width: 90%;
-  background-color: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-}
-
-.registrar-left {
-  flex: 1;
-  padding: 30px;
-  text-align: left;
-}
-
-.registrar-right {
-  flex: 0.8;
-  background-color: #fff;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding-top: 110px !important;
 }
 
-.divider {
-  width: 1.5px;
-  background-color: #ccc;
-  height: 360px;           /* Ajustás el largo que querés */
-  align-self: center;    /* La centra verticalmente */
+.registrar-container {
+  background-color: white;
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  font-family: 'Arial', sans-serif;
 }
 
 .registrar-form {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 20px;
   text-align: left;
 }
 
@@ -62,19 +36,17 @@ p{
 }
 
 .registrar-form input {
-  width: 100%;
   padding: 12px;
   border: 2px solid #003F5E;
   border-radius: 10px;
   font-size: 14px;
-  color: black;
+  color: #333;
+  max-width: none;
   background-color: white;
 }
 
-.registrar-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+.registrar-form input::placeholder {
+  color: #aaa;
 }
 
 button {
@@ -88,15 +60,27 @@ button {
   transition: background-color 0.3s;
 }
 
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .secondary:hover {
-  background-color: #A0CAD8;
+  background-color: #B0DBE7;
+}
+
+.linea {
+  height: 1.5px;
+  background-color: #ccc;
+  width: 360px;
+  align-self: center;
+  border: none;
 }
 
 .registrar-icons {
   display: flex;
   justify-content: space-around;
   margin: 20px 0;
-  width: 70%;
 }
 
 .registrar-icons div {
@@ -112,19 +96,68 @@ button {
   display: inline-block;
 }
 
-.extra-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+#icon-google {
+  background-image: url('../../assets/google.png');
 }
 
-.form-group {
+#icon-facebook {
+  background-image: url('../../assets/LogoFacebook.webp');
+}
+
+#icon-apple {
+  background-image: url('../../assets/apple.jpg');
+}
+
+.password-container {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
   width: 100%;
 }
 
+.password-wrapper input {
+  flex: 1;
+  padding-right: 40px;
+  margin: 0;
+}
+
+.eye-toggle {
+  background: none;
+  border: none;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ojo-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+
+.registrar-container > p {
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.registrar-container > p > a {
+  color: #005984;
+  text-decoration: underline;
+}
+
+button[type="submit"] {
+  margin-top: 20px;
+}
+
+/* Estilos específicos para el formulario de registro */
 .input-row {
   display: flex;
   gap: 16px;
@@ -135,94 +168,11 @@ button {
   flex: 1;
 }
 
-/* Responsive */
-@media (max-width: 1005px) {
-  .split {
-    flex-direction: column;
-  }
-
-  .divider {
-    height: 1.5px;
-    width: 360px;
-  }
-}
-
-.checkbox-group {
+.form-group {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  flex-direction: row;
-}
-
-/* Estilo checkbox más grande */
-.checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #003F5E; /* Color de check en navegadores modernos */
-  cursor: pointer;
-  margin: 0;
-}
-
-.checkbox-label {
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  color: #003F5E;
-  user-select: none;
-}
-
-.password-wrapper {
-  position: relative;
+  flex-direction: column;
   width: 100%;
 }
-
-.password-wrapper input {
-  padding-right: 40px; /* deja espacio para el ícono */
-}
-
-.eye-toggle {
-  position: absolute;
-  right: 10px;
-  top: 55%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: #003F5E;
-  padding: 0;
-}
-
-.eye-toggle:focus {
-  outline: none;
-}
-.ojo-icon {
-  font-size: 24px;
-  transition: transform 0.2s;
-}
-.custom-file-upload {
-  display: inline-block;
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: 2px solid #003F5E;
-  background-color: #B0DBE7;
-  color: #003F5E;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.custom-file-upload:hover {
-  background-color: #A0CAD8;
-}
-.archivo-nombre {
-  font-size: 14px;
-  color: #003F5E;
-  margin-top: 6px;
-}
-
 
 .telefono-wrapper {
   display: flex;
@@ -240,6 +190,64 @@ button {
   height: 100%;
 }
 
-.dni-reducido input {
-  max-width: 160px; /* achica el ancho del input DNI */
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-direction: row;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #003F5E;
+  cursor: pointer;
+  margin: 0;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #003F5E;
+  user-select: none;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 2px solid #003F5E;
+  background-color: #B0DBE7;
+  color: #003F5E;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #A0CAD8;
+}
+
+.archivo-nombre {
+  font-size: 14px;
+  color: #003F5E;
+  margin-top: 6px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.success {
+  color: #388e3c;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
 }
