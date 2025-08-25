@@ -176,26 +176,28 @@ function PerfilComponent() {
         <div className="modal-overlay-perfil">
           <div className="modal-perfil">
             <h3>Editar Perfil</h3>
-            <label>
-              Nombre:
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
-            </label>
-            <label>
-              Apellido:
-              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} />
-            </label>
-            <label>
-              Email:
-              <input type="email" name="email" value={formData.email} onChange={handleChange} />
-            </label>
-            <label>
-              DNI:
-              <input type="text" name="dni" value={formData.dni} onChange={handleChange} />
-            </label>
-            <label>
-              Teléfono:
-              <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} />
-            </label>
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+              <label>
+                Nombre:
+                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
+              </label>
+              <label>
+                Apellido:
+                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} />
+              </label>
+              <label>
+                Email:
+                <input type="email" name="email" value={formData.email} onChange={handleChange} />
+              </label>
+              <label>
+                DNI:
+                <input type="text" name="dni" value={formData.dni} onChange={handleChange} />
+              </label>
+              <label>
+                Teléfono:
+                <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} />
+              </label>
+            </form>
             <div className="modal-perfil-botones">
               <button className="btn-guardar" onClick={handleSave}>Guardar</button>
               <button className="btn-cancelar" onClick={() => setShowEditModal(false)}>Cancelar</button>

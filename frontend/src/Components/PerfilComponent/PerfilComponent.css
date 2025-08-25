@@ -1,51 +1,60 @@
 /* Variables CSS para colores del proyecto */
 :root {
-  --primary-color: #004b75;
-  --secondary-color: #008ab2;
-  --accent-color: #B0DBE7;
-  --background-color: #fef8e8;
+  --primary-color: #1a365d;
+  --secondary-color: #2d3748;
+  --accent-color: #4a5568;
+  --background-color: #f7fafc;
   --white: #ffffff;
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --border-radius: 12px;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --black: #000000;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --border-radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .perfil-wrapper {
-  max-width: 980px;
-  margin: 40px auto 80px auto;
-  padding: 0 24px;
-  font-family: 'Arial', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
   color: var(--text-primary);
-  /* Override local background tone to evitar tono piel */
-  --background-color: #F3F9FD;
-  background: #ffffff;
-  min-height: calc(100vh - 120px);
-  position: relative;
+  background: var(--background-color);
+  min-height: 100vh;
 }
 
 .perfil-banner {
-  height: 120px;
+  height: 200px;
   border-radius: var(--border-radius);
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  filter: saturate(0.85);
+  background: var(--primary-color);
   box-shadow: var(--shadow-lg);
-  margin-bottom: -70px;
+  margin-bottom: -100px;
+  position: relative;
+}
+
+.perfil-banner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--black);
 }
 
 .perfil-header {
   background: var(--white);
   border-radius: var(--border-radius);
-  padding: 28px 28px 28px 22px;
-  margin: 0 auto 30px auto;
+  padding: 40px;
+  margin: 0 auto 40px auto;
   box-shadow: var(--shadow-lg);
-  border: 2px solid var(--accent-color);
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 40px;
   position: relative;
+  max-width: 1000px;
   overflow: hidden;
 }
 
@@ -60,37 +69,39 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--primary-color);
+  background: var(--black);
+  margin: 0;
+  padding: 0;
 }
 
 .avatar-wrapper {
   position: relative;
+  flex-shrink: 0;
 }
 
 .perfil-avatar {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--accent-color);
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-  position: relative;
+  border: 4px solid var(--white);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s ease;
 }
 
 .perfil-avatar-fallback {
   display: grid;
   place-items: center;
-  font-weight: 800;
-  font-size: 42px;
-  color: var(--primary-color);
-  background: var(--background-color);
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--white);
+  background: var(--primary-color);
+  border: 4px solid var(--white);
 }
 
 .perfil-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--secondary-color);
+  transform: scale(1.02);
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
 }
 
 .perfil-info {
@@ -98,48 +109,53 @@
 }
 
 .perfil-nombre {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: var(--primary-color);
-  line-height: 1.2;
-  font-family: "El Messiri", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--black);
+  line-height: 1.1;
+  font-family: 'Inter', sans-serif;
 }
 
 .perfil-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .badge {
-  padding: 6px 10px;
-  border-radius: 999px;
+  padding: 8px 16px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .3px;
-  border: 2px solid var(--accent-color);
-  background: var(--background-color);
-  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 2px solid var(--primary-color);
+  background: var(--white);
+  color: var(--primary-color);
+  text-transform: uppercase;
 }
 
 .badge.owner {
-  border-color: var(--secondary-color);
+  border-color: var(--black);
+  color: var(--black);
 }
 
 .perfil-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .chip {
-  border: 1px solid var(--accent-color);
+  border: 1px solid #e2e8f0;
   background: var(--white);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .perfil-botones {
@@ -149,41 +165,40 @@
 }
 
 .btn-editar, .btn-logout {
-  padding: 12px 24px;
-  border: 2px solid var(--accent-color);
+  padding: 14px 28px;
+  border: 2px solid var(--primary-color);
   border-radius: var(--border-radius);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Inter', sans-serif;
+  min-width: 140px;
 }
 
 .btn-editar {
-  background: var(--background-color);
-  color: var(--text-primary);
-  border-color: var(--accent-color);
+  background: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
 }
 
 .btn-editar:hover {
-  background: var(--accent-color);
-  border-color: var(--secondary-color);
+  background: var(--black);
+  border-color: var(--black);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-logout {
-  background: var(--background-color);
-  color: var(--text-primary);
-  border-color: #b12e2e;
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--black);
 }
 
 .btn-logout:hover {
-  background: #b12e2e;
+  background: var(--black);
   color: var(--white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
@@ -192,28 +207,48 @@
 /* Nueva grilla y tarjetas */
 .perfil-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .perfil-card {
-  grid-column: span 12;
   background: var(--white);
-  border: 2px solid var(--accent-color);
+  border: 1px solid #e2e8f0;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
-  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  padding: 32px;
+  transition: all 0.2s ease;
+}
+
+.perfil-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .perfil-card h3 {
-  margin: 0 0 16px 0;
-  color: var(--primary-color);
-  font-family: "El Messiri", sans-serif;
+  margin: 0 0 24px 0;
+  color: var(--black);
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  position: relative;
+}
+
+.perfil-card h3::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--primary-color);
 }
 
 .info-list {
   display: grid;
-  gap: 10px;
+  gap: 16px;
 }
 
 .info-row {
@@ -221,30 +256,54 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   background: var(--background-color);
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
   border-left: 4px solid var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.info-row:hover {
+  background: #edf2f7;
+  transform: translateX(4px);
+}
+
+.info-row span {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.info-row strong {
+  color: var(--black);
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .acciones-rapidas {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .quick-link {
   display: inline-block;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 2px solid var(--accent-color);
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
+  border: 2px solid var(--primary-color);
   color: var(--primary-color);
   background: var(--white);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  text-align: center;
 }
 
 .quick-link:hover { 
-  background: #E3F2FA; 
+  background: var(--primary-color);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .modal-overlay-perfil {
@@ -253,12 +312,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
   animation: fadeIn 0.3s ease;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -268,15 +329,18 @@
 
 .modal-perfil {
   background: var(--white);
-  padding: 40px;
+  padding: 0;
   border-radius: var(--border-radius);
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
   box-shadow: var(--shadow-lg);
-  border: 2px solid var(--accent-color);
+  border: 1px solid #e2e8f0;
   position: relative;
-  overflow: hidden;
   animation: slideUp 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -301,12 +365,22 @@
 }
 
 .modal-perfil h3 {
-  margin: 0 0 30px 0;
+  margin: 0;
+  padding: 32px 32px 24px 32px;
   font-size: 24px;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-weight: 700;
+  color: var(--black);
   text-align: center;
-  font-family: "El Messiri", sans-serif;
+  font-family: 'Inter', sans-serif;
+  background: var(--background-color);
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.modal-perfil form {
+  padding: 32px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .modal-perfil label {
@@ -322,34 +396,41 @@
 .modal-perfil input {
   width: 100%;
   padding: 16px 20px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   border-radius: var(--border-radius);
-  border: 2px solid var(--accent-color);
+  border: 2px solid #e2e8f0;
   font-size: 16px;
   background: var(--white);
-  transition: all 0.3s ease;
-  font-family: 'Arial', sans-serif;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  box-sizing: border-box;
 }
 
 .modal-perfil input:focus {
   outline: none;
-  border-color: var(--secondary-color);
-  background: var(--background-color);
-  box-shadow: 0 0 0 3px rgba(0, 139, 178, 0.1);
-  transform: translateY(-2px);
+  border-color: var(--primary-color);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.modal-perfil input:hover {
+  border-color: var(--accent-color);
 }
 
 .modal-perfil-botones {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 30px;
+  margin-top: 32px;
+  padding: 0 32px 32px 32px;
+  flex-shrink: 0;
 }
 
 .btn-guardar {
   background: var(--primary-color);
   color: var(--white);
-  padding: 14px 32px;
+  padding: 16px 32px;
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -357,42 +438,43 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   box-shadow: var(--shadow-sm);
+  min-width: 120px;
 }
 
 .btn-guardar:hover {
-  background: var(--secondary-color);
+  background: var(--black);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-cancelar {
-  background: var(--background-color);
-  color: var(--text-primary);
-  padding: 14px 32px;
-  border: 2px solid var(--accent-color);
+  background: var(--white);
+  color: var(--black);
+  padding: 16px 32px;
+  border: 2px solid var(--black);
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  min-width: 120px;
 }
 
 .btn-cancelar:hover {
-  background: var(--accent-color);
-  border-color: var(--secondary-color);
+  background: var(--black);
+  color: var(--white);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .perfil-wrapper {
-    margin: 20px auto;
-    padding: 0 16px;
+    padding: 20px 16px;
   }
 
   .perfil-header {
@@ -423,31 +505,43 @@
     padding: 16px 24px;
   }
 
-  .perfil-datos {
-    padding: 30px 20px;
+  .perfil-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .perfil-datos p {
-    padding: 12px 16px;
-    font-size: 14px;
+  .perfil-card {
+    padding: 24px;
+  }
+
+  .modal-overlay-perfil {
+    padding: 10px;
   }
 
   .modal-perfil {
-    padding: 30px 20px;
-    margin: 20px;
+    margin: 0;
+    width: 100%;
+    max-height: 95vh;
+  }
+
+  .modal-perfil h3 {
+    padding: 24px 24px 20px 24px;
+    font-size: 20px;
+  }
+
+  .modal-perfil form {
+    padding: 24px;
   }
 
   .modal-perfil-botones {
     flex-direction: column;
     gap: 12px;
+    padding: 0 24px 24px 24px;
   }
 
   .btn-guardar, .btn-cancelar {
     width: 100%;
     padding: 16px 24px;
-  }
-  .perfil-grid {
-    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -461,13 +555,40 @@
     font-size: 1.75rem;
   }
 
-  .perfil-datos p {
-    font-size: 13px;
-    padding: 10px 14px;
+  .perfil-banner {
+    height: 150px;
+    margin-bottom: -75px;
+  }
+
+  .perfil-header.modern {
+    transform: translateY(-30px);
+  }
+
+  .modal-overlay-perfil {
+    padding: 5px;
+  }
+
+  .modal-perfil {
+    margin: 0;
+    width: 100%;
+    max-height: 98vh;
+  }
+
+  .modal-perfil h3 {
+    padding: 20px 20px 16px 20px;
+    font-size: 18px;
+  }
+
+  .modal-perfil form {
+    padding: 20px;
+  }
+
+  .modal-perfil-botones {
+    padding: 0 20px 20px 20px;
   }
 }
 
-/* Animaciones adicionales */
+/* Animaciones suaves */
 .perfil-wrapper {
   animation: fadeInUp 0.6s ease;
 }
@@ -496,24 +617,4 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-/* Efectos de hover mejorados */
-.perfil-card .info-row span {
-  position: relative;
-}
-
-.perfil-card .info-row span::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--primary-color);
-  transition: width 0.3s ease;
-}
-
-.perfil-card .info-row:hover span::after {
-  width: 100%;
 }
