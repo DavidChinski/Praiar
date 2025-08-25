@@ -310,7 +310,6 @@ input[type="text"]:focus,
 
 /* Estilos para el input */
 .input-autocomplete-wrapper input.input-estandar {
-  background: rgba(254, 248, 232, 0.95);
   position: relative;
   z-index: 2;
   transition: all 0.3s ease;

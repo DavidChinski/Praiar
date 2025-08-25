@@ -343,7 +343,7 @@ export default function EstadisticasComponent() {
   return (
     <div className="estadisticas-container">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard de Gestión</h1>
+        <h1 className="dashboard-title">Tus Estadísticas</h1>
         <p className="dashboard-subtitle">Análisis completo de tus balnearios</p>
       </div>
       
@@ -415,7 +415,6 @@ export default function EstadisticasComponent() {
       <div className="charts-section">
         <div className="section-header">
           <h2 className="section-title">Análisis de Rendimiento</h2>
-          <p className="section-description">Métricas clave para optimizar tu negocio</p>
         </div>
         
         <div className="estadisticas-charts-row">
@@ -607,7 +606,6 @@ export default function EstadisticasComponent() {
       <div className="table-section">
         <div className="section-header">
           <h2 className="section-title">Gestión de Balnearios</h2>
-          <p className="section-description">Vista detallada de todos tus establecimientos</p>
         </div>
         <div className="table-container">
           <table className="tabla-balnearios">
