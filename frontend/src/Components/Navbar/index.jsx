@@ -95,6 +95,30 @@ function Navbar() {
     return () => window.removeEventListener('resize', handleResize);
   }, [menuOpen]);
 
+  // Efecto para cerrar el menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpen && isMobile) {
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+        
+        if (menu && hamburger && 
+            !menu.contains(event.target) && 
+            !hamburger.contains(event.target)) {
+          setMenuOpen(false);
+        }
+      }
+    };
+
+    if (menuOpen && isMobile) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen, isMobile]);
+
   const toggleMenu = () => {
     if (isMobile) {
       setMenuOpen((open) => !open);
@@ -147,14 +171,22 @@ function Navbar() {
         </div>
 
         {isMobile && (
-          <div className={`menu${menuOpen ? ' open' : ''}`}>
-            <nav className="nav-mobile">
-              <NavLinks usuario={usuario} />
-            </nav>
-            <div className="auth-buttons-mobile">
-              <AuthButtons usuario={usuario} handleLogout={handleLogout} />
+          <>
+            {/* Overlay para cerrar el menú al hacer clic fuera */}
+            {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)} />}
+            
+            <div className={`menu${menuOpen ? ' open' : ''}`}>
+              <button className="close-menu" onClick={() => setMenuOpen(false)}>
+                ✕
+              </button>
+              <nav className="nav-mobile">
+                <NavLinks usuario={usuario} />
+              </nav>
+              <div className="auth-buttons-mobile">
+                <AuthButtons usuario={usuario} handleLogout={handleLogout} />
+              </div>
             </div>
-          </div>
+          </>
         )}
       </header>
 
