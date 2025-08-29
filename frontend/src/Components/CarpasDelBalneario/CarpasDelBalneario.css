@@ -5,6 +5,19 @@
   margin: 0 auto;
 }
 
+/* Responsive para el contenedor principal */
+@media (max-width: 768px) {
+  .carpas-del-balneario {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carpas-del-balneario {
+    padding: 0.5rem;
+  }
+}
+
 /* Header moderno */
 .balneario-header {
   background: var(--secondary2-50);
@@ -22,6 +35,35 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* Responsive para el header */
+@media (max-width: 768px) {
+  .balneario-header {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .balneario-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+  
+  .balneario-nombre {
+    font-size: 1.3rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .balneario-header {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .balneario-nombre {
+    font-size: 1.2rem !important;
+  }
 }
 
 /* eliminado del header; ahora se usa en el panel */
@@ -141,6 +183,21 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.8rem 1rem;
   margin-top: 1rem;
+}
+
+/* Responsive para meta información */
+@media (max-width: 768px) {
+  .balneario-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .balneario-meta {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 .meta-item {
@@ -421,6 +478,23 @@
   position: relative;
 }
 
+/* Responsive para contenedor del mapa */
+@media (max-width: 768px) {
+  .map-container-wrapper {
+    min-height: 400px;
+    padding: 1rem;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container-wrapper {
+    min-height: 350px;
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+}
+
 .map-loading-overlay {
   position: absolute;
   inset: 0;
@@ -461,6 +535,35 @@
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 8px rgba(0, 63, 94, 0.1);
 }
+
+/* Responsive para la leyenda del mapa */
+@media (max-width: 768px) {
+  .map-legend {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin-bottom: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-legend {
+    gap: 0.5rem;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .legend-item {
+    font-size: 0.8rem;
+  }
+  
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+  }
+}
 .legend-item {
   display: flex;
   align-items: center;
@@ -490,6 +593,41 @@
   z-index: 100;
   animation: slideInRight 0.3s ease-out;
   align-items: end;
+}
+
+/* Responsive para controles de zoom */
+@media (max-width: 768px) {
+  .zoom-controls {
+    position: relative;
+    top: auto;
+    right: auto;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 1rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 63, 94, 0.15);
+  }
+}
+
+@media (max-width: 480px) {
+  .zoom-controls {
+    gap: 0.3rem;
+    padding: 0.4rem;
+  }
+  
+  .zoom-btn {
+    min-width: 32px;
+    min-height: 32px;
+  }
+  
+  .zoom-level-indicator {
+    min-width: 40px;
+    text-align: center;
+  }
 }
 
 @keyframes slideInRight {
@@ -612,6 +750,25 @@
     linear-gradient(90deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
     linear-gradient(0deg, #f0f7fa 1px, transparent 1px) 0 0/50px 50px,
     #ffffff;
+}
+
+/* Responsive para el canvas del mapa */
+@media (max-width: 768px) {
+  .map-canvas {
+    background:
+      linear-gradient(90deg, #f0f7fa 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(0deg, #f0f7fa 1px, transparent 1px) 0 0/40px 40px,
+      #ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-canvas {
+    background:
+      linear-gradient(90deg, #f0f7fa 1px, transparent 1px) 0 0/30px 30px,
+      linear-gradient(0deg, #f0f7fa 1px, transparent 1px) 0 0/30px 30px,
+      #ffffff;
+  }
 }
 
 /* Carpas orden y disposición */
@@ -1122,14 +1279,18 @@
     padding: 0.5rem 0.5rem 1rem 0.5rem;
   }
 }
-/* Responsive */
+/* Responsive para carpas y contenedor */
 @media (max-width: 900px) {
   .carpa-container {
     height: 340px;
   }
   .carpa {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
+  }
+  .carpa.tipo-sombrilla {
+    width: 52px;
+    height: 52px;
   }
   .elemento {
     min-width: 48px;
@@ -1144,8 +1305,17 @@
 }
 
 @media (max-width: 600px) {
-  .carpas-del-balneario {
-    padding: 0.7rem 0.15rem;
+  .carpa-container {
+    width: 99%;
+    height: 280px;
+  }
+  .carpa {
+    width: 56px;
+    height: 56px;
+  }
+  .carpa.tipo-sombrilla {
+    width: 45px;
+    height: 45px;
   }
   .balneario-info {
     flex-direction: column;
@@ -1159,10 +1329,6 @@
     flex-direction: column;
     gap: 10px;
     padding: 10px;
-  }
-  .carpa-container {
-    width: 99%;
-    height: 220px;
   }
 }
 
@@ -1218,6 +1384,30 @@ button {
   margin: 2rem 0;
   align-items: flex-start;
   min-height: 600px;
+}
+
+/* Responsive para el layout principal */
+@media (max-width: 1200px) {
+  .main-content-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-layout {
+    gap: 1rem;
+    margin: 1rem 0;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-layout {
+    gap: 0.8rem;
+    margin: 0.5rem 0;
+  }
 }
 
 /* Panel de gestión izquierdo */
@@ -1501,16 +1691,15 @@ button {
   .management-panel {
     padding: 1rem;
     border-radius: 16px;
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
   }
   
   .map-container-wrapper {
     padding: 1rem;
     border-radius: 16px;
-  }
-  
-  .zoom-controls {
-    top: 1.5rem;
-    right: 1.5rem;
   }
   
   .zoom-btn {
@@ -1555,16 +1744,15 @@ button {
   .management-panel {
     padding: 0.8rem;
     border-radius: 12px;
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
   }
   
   .map-container-wrapper {
     padding: 0.8rem;
     border-radius: 12px;
-  }
-  
-  .zoom-controls {
-    top: 1rem;
-    right: 1rem;
   }
   
   .zoom-btn {
@@ -1593,6 +1781,31 @@ button {
   
   .panel-title {
     font-size: 0.95rem;
+  }
+}
+
+/* Mejoras para dispositivos táctiles */
+@media (max-width: 768px) {
+  .carpa {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .zoom-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .panel-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* Tamaño mínimo táctil recomendado */
+  }
+  
+  .cambiar-fecha-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px;
   }
 }
 
@@ -1801,6 +2014,31 @@ button {
 .carpa:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 16px rgba(0, 89, 132, 0.2);
+}
+
+/* Responsive para carpas */
+@media (max-width: 768px) {
+  .carpa {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .carpa.tipo-sombrilla {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carpa {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .carpa.tipo-sombrilla {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* Mejoras en el header */

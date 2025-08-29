@@ -33,6 +33,37 @@
   border-color: var(--secondary-400);
 }
 
+/* Mejoras responsive */
+@media (max-width: 768px) {
+  .balnearios-container {
+    padding: 0.5rem 4vw;
+  }
+  
+  .card-grid-balnearios {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .card-detalle {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .balnearios-container {
+    padding: 0.5rem 2vw;
+  }
+  
+  .card-grid-balnearios {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .card-detalle {
+    max-width: 100%;
+  }
+}
+
 .card-detalle img {
   width: 100%;
   height: 160px; /* fija la altura de la imagen */

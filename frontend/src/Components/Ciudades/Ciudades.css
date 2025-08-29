@@ -254,6 +254,7 @@ h2 {
   justify-content: center;
   align-items: center;
   z-index: 999;
+  padding: 1rem;
 }
 
 .modal-mapa-contenido {
@@ -264,6 +265,64 @@ h2 {
   max-width: 700px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   position: relative;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-mapa-contenido h3 {
+  color: var(--primary-900);
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}
+
+.modal-mapa-contenido iframe {
+  width: 100%;
+  height: 400px;
+  border: 0;
+  border-radius: 12px;
+}
+
+/* Responsive para modal de mapa */
+@media (max-width: 768px) {
+  .modal-mapa-overlay {
+    padding: 0.5rem;
+  }
+  
+  .modal-mapa-contenido {
+    width: 95%;
+    padding: 15px;
+    max-height: 85vh;
+  }
+  
+  .modal-mapa-contenido h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .modal-mapa-contenido iframe {
+    height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-mapa-overlay {
+    padding: 0.25rem;
+  }
+  
+  .modal-mapa-contenido {
+    width: 98%;
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .modal-mapa-contenido h3 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+  
+  .modal-mapa-contenido iframe {
+    height: 300px;
+  }
 }
 .modal-mapa-contenido h3 {
   color: var(--primary-900);
