@@ -118,6 +118,9 @@ function ReservasComponent() {
     },
   ]);
   const [showCalendario, setShowCalendario] = useState(false);
+  const [metodoReservaFiltro, setMetodoReservaFiltro] = useState("");
+  const [balnearioFiltro, setBalnearioFiltro] = useState("");
+  const [balnearios, setBalnearios] = useState([]);
   const [iconosBase64, setIconosBase64] = useState({});
   const { id } = useParams();
   const idBalneario = Number.isNaN(parseInt(id)) ? null : parseInt(id);
@@ -138,6 +141,31 @@ function ReservasComponent() {
   }, []);
 
   const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  // Función para obtener balnearios para el filtro
+  const fetchBalnearios = async () => {
+    try {
+      // Obtener todas las ciudades primero
+      const ciudadesResponse = await fetch("http://localhost:3000/api/ciudades");
+      if (ciudadesResponse.ok) {
+        const ciudades = await ciudadesResponse.json();
+        let todosLosBalnearios = [];
+        
+        // Obtener balnearios de cada ciudad
+        for (const ciudad of ciudades) {
+          const response = await fetch(`http://localhost:3000/api/balnearios?ciudad_id=${ciudad.id_ciudad}`);
+          if (response.ok) {
+            const balnearios = await response.json();
+            todosLosBalnearios = [...todosLosBalnearios, ...balnearios];
+          }
+        }
+        
+        setBalnearios(todosLosBalnearios);
+      }
+    } catch (error) {
+      console.error("Error obteniendo balnearios:", error);
+    }
+  };
 
   const fetchReservas = async (filtrarPorFechas = false) => {
     setLoading(true);
@@ -173,7 +201,23 @@ function ReservasComponent() {
         setError(result.error || "Error cargando reservas.");
         setReservas([]);
       } else {
-        setReservas(result.reservas || []);
+        let reservasFiltradas = result.reservas || [];
+        
+        // Aplicar filtro por método de reserva si está seleccionado
+        if (metodoReservaFiltro && metodoReservaFiltro !== "") {
+          reservasFiltradas = reservasFiltradas.filter(reserva => 
+            reserva.metodo_pago && reserva.metodo_pago.toLowerCase().includes(metodoReservaFiltro.toLowerCase())
+          );
+        }
+        
+        // Aplicar filtro por balneario si está seleccionado
+        if (balnearioFiltro && balnearioFiltro !== "") {
+          reservasFiltradas = reservasFiltradas.filter(reserva => 
+            reserva.balneario_nombre && reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
+          );
+        }
+        
+        setReservas(reservasFiltradas);
       }
     } catch (e) {
       setError("Error cargando reservas.");
@@ -184,24 +228,61 @@ function ReservasComponent() {
 
   useEffect(() => {
     fetchReservas();
+    // Solo cargar balnearios si no es vista de propietario
+    if (!idBalneario) {
+      fetchBalnearios();
+    }
     // eslint-disable-next-line
   }, []);
+
+  // Efecto para aplicar filtros cuando cambien
+  useEffect(() => {
+    if (metodoReservaFiltro !== "" || balnearioFiltro !== "") {
+      fetchReservas();
+    }
+  }, [metodoReservaFiltro, balnearioFiltro]);
 
   const handleBuscar = () => {
     fetchReservas(true);
   };
 
-  // NUEVO: helper para obtener todos los atributos de la reserva
+  // Helper para obtener todos los atributos de la reserva
   function getPDFReservaInfo(reserva) {
-    // Basado en la tabla reservas y usuarios de la imagen
+    // Extraer información del cliente - manejar diferentes casos
+    let clienteNombre = "";
+    let clienteApellido = "";
+    let clienteEmail = "";
+    let clienteTelefono = "";
+    
+    // Si es vista de propietario (tiene cliente_nombre)
+    if (reserva.cliente_nombre) {
+      const nombreCompleto = reserva.cliente_nombre.split(" ");
+      clienteNombre = nombreCompleto[0] || "";
+      clienteApellido = nombreCompleto.slice(1).join(" ") || "";
+      clienteEmail = reserva.email || "";
+      clienteTelefono = reserva.telefono || "";
+    } 
+    // Si es vista de usuario (necesitamos obtener datos del usuario logueado)
+    else if (usuario) {
+      clienteNombre = usuario.nombre || "";
+      clienteApellido = usuario.apellido || "";
+      clienteEmail = usuario.email || "";
+      clienteTelefono = usuario.telefono || "";
+    }
+    
+    // Extraer ubicaciones
+    const ubicaciones = reserva.ubicaciones && reserva.ubicaciones.length > 0 
+      ? reserva.ubicaciones.map(u => `Posición ${u.posicion || u.id_carpa}`).join(", ")
+      : "Sin ubicaciones especificadas";
+
     return [
       ["ID Reserva", reserva.id_reserva || ""],
-      ["Cliente", reserva.cliente_nombre || reserva.nombre || ""],
-      ["Apellido", reserva.apellido || ""],
-      ["Email", reserva.email || ""],
-      ["Teléfono", reserva.telefono || ""],
+      ["Cliente", clienteNombre],
+      ["Apellido", clienteApellido],
+      ["Email", clienteEmail],
+      ["Teléfono", clienteTelefono],
       ["Balneario", reserva.balneario_nombre || "Sin nombre"],
-      ["Ubicación", reserva.ubicacion_posicion || reserva.ubicacion_id_carpa || ""],
+      ["Ubicaciones", ubicaciones],
       ["Fecha Entrada", reserva.fecha_inicio ? format(new Date(reserva.fecha_inicio + "T00:00:00"), "dd/MM/yyyy") : ""],
       ["Fecha Salida", reserva.fecha_salida ? format(new Date(reserva.fecha_salida + "T00:00:00"), "dd/MM/yyyy") : ""],
       ["Dirección", reserva.direccion || ""],
@@ -220,38 +301,134 @@ function ReservasComponent() {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Header
-    doc.addImage(iconosBase64.logo, "PNG", 15, 10, 25, 25);
-    doc.setFontSize(18);
-    doc.setTextColor("#004b75");
-    doc.text("Detalle de Reserva", pageWidth / 2, 20, { align: "center" });
+    // Header con fondo azul
+    doc.setFillColor("#00405E");
+    doc.rect(0, 0, pageWidth, 45, "F");
+    
+    // Logo en el header
+    doc.addImage(iconosBase64.logo, "PNG", 20, 10, 25, 25);
+    
+    // Título principal
+    doc.setFontSize(20);
+    doc.setTextColor("#FFFFFF");
+    doc.setFont("helvetica", "bold");
+    doc.text("DETALLE DE RESERVA", pageWidth / 2, 25, { align: "center" });
 
-    // Info tabla
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    const left = 30;
-    let y = 50;
+    // Fecha de generación
+    doc.setFontSize(10);
+    doc.setTextColor("#B8D4E3");
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generado el ${format(new Date(), "dd/MM/yyyy HH:mm")}`, pageWidth - 20, 35, { align: "right" });
 
-    info.forEach(([label, value]) => {
+    // Contenido principal
+    let y = 65;
+    const leftMargin = 25;
+    const rightMargin = pageWidth - 25;
+    const contentWidth = rightMargin - leftMargin;
+    const footerHeight = 90; // Altura del footer
+    const maxContentHeight = pageHeight - footerHeight - 20; // Espacio disponible para contenido
+
+    // Sección de información del cliente
+    doc.setFillColor("#F0F8FF");
+    doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
+    doc.setFontSize(14);
+    doc.setTextColor("#00405E");
+    doc.setFont("helvetica", "bold");
+    doc.text("INFORMACIÓN DEL CLIENTE", leftMargin + 10, y + 2);
+
+    y += 20;
+    const clientInfo = info.slice(1, 5); // Cliente, Apellido, Email, Teléfono
+    clientInfo.forEach(([label, value]) => {
+      doc.setFontSize(11);
+      doc.setTextColor("#333333");
       doc.setFont("helvetica", "bold");
-      doc.text(label + ":", left, y);
+      doc.text(label + ":", leftMargin, y);
       doc.setFont("helvetica", "normal");
-      doc.text(String(value), left + 50, y);
-      y += 10;
+      doc.text(String(value || "No especificado"), leftMargin + 60, y);
+      y += 8;
     });
 
-    y += 5;
-    doc.setDrawColor("#008ab2");
-    doc.setLineWidth(0.5);
-    doc.line(left, y, pageWidth - left, y);
+    y += 10;
 
+    // Sección de información de la reserva
+    doc.setFillColor("#F0F8FF");
+    doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
+    doc.setFontSize(14);
+    doc.setTextColor("#00405E");
+    doc.setFont("helvetica", "bold");
+    doc.text("INFORMACIÓN DE LA RESERVA", leftMargin + 10, y + 2);
+
+    y += 20;
+    const reservaInfo = info.slice(0, 1).concat(info.slice(5, 9)); // ID, Balneario, Ubicaciones, Fecha Entrada, Fecha Salida
+    reservaInfo.forEach(([label, value]) => {
+      doc.setFontSize(11);
+      doc.setTextColor("#333333");
+      doc.setFont("helvetica", "bold");
+      doc.text(label + ":", leftMargin, y);
+      doc.setFont("helvetica", "normal");
+      const displayValue = String(value || "No especificado");
+      // Si el texto es muy largo, lo dividimos en múltiples líneas
+      if (displayValue.length > 50) {
+        const lines = doc.splitTextToSize(displayValue, contentWidth - 60);
+        doc.text(lines, leftMargin + 60, y);
+        y += (lines.length - 1) * 8;
+      } else {
+        doc.text(displayValue, leftMargin + 60, y);
+      }
+      y += 8;
+    });
+
+    y += 10;
+
+    // Verificar si necesitamos una nueva página
+    if (y > maxContentHeight - 50) {
+      doc.addPage();
+      y = 30;
+    }
+
+    // Sección de información de facturación
+    doc.setFillColor("#F0F8FF");
+    doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
+    doc.setFontSize(14);
+    doc.setTextColor("#00405E");
+    doc.setFont("helvetica", "bold");
+    doc.text("INFORMACIÓN DE FACTURACIÓN", leftMargin + 10, y + 2);
+
+    y += 20;
+    const facturacionInfo = info.slice(9, 15); // Dirección, Ciudad, etc.
+    facturacionInfo.forEach(([label, value]) => {
+      // Verificar si necesitamos una nueva página antes de cada línea
+      if (y > maxContentHeight - 10) {
+        doc.addPage();
+        y = 30;
+      }
+      
+      doc.setFontSize(11);
+      doc.setTextColor("#333333");
+      doc.setFont("helvetica", "bold");
+      doc.text(label + ":", leftMargin, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(value || "No especificado"), leftMargin + 60, y);
+      y += 8;
+    });
+
+    // Línea separadora antes del footer (solo si hay espacio)
+    if (y < maxContentHeight - 20) {
+      y += 15;
+      doc.setDrawColor("#00405E");
+      doc.setLineWidth(1);
+      doc.line(leftMargin, y, rightMargin, y);
+    }
+
+    // Agregar footer
     agregarFooterEstiloPraiar(doc, pageWidth, pageHeight, iconosBase64);
 
-    // El nombre del archivo incluye balneario y fecha de entrada/salida
+    // Nombre del archivo
     const balneario = info.find(([l]) => l === "Balneario")?.[1] || "Reserva";
     const entrada = info.find(([l]) => l === "Fecha Entrada")?.[1] || "";
     const salida = info.find(([l]) => l === "Fecha Salida")?.[1] || "";
-    doc.save(`Reserva_${balneario}_${entrada}_${salida}.pdf`);
+    const fileName = `Reserva_${balneario.replace(/[^a-zA-Z0-9]/g, '_')}_${entrada}_${salida}.pdf`;
+    doc.save(fileName);
   };
 
   return (
@@ -291,6 +468,57 @@ function ReservasComponent() {
             )}
           </div>
         </div>
+        
+        {/* Filtros adicionales - solo para usuarios (no propietarios) */}
+        {!idBalneario && (
+          <>
+            <div className="input-group">
+              <FontAwesomeIcon
+                icon="fa-solid fa-credit-card"
+                className="iconFecha"
+                alt="Icono de método de pago"
+              />
+              <div className="input-wrapper">
+                <label className="subtitulo">Método de Pago</label>
+                <select
+                  className="input-estandar"
+                  value={metodoReservaFiltro}
+                  onChange={(e) => setMetodoReservaFiltro(e.target.value)}
+                >
+                  <option value="">Todos los métodos</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="tarjeta">Tarjeta</option>
+                  <option value="transferencia">Transferencia</option>
+                  <option value="mercadopago">Mercado Pago</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="input-group">
+              <FontAwesomeIcon
+                icon="fa-solid fa-building"
+                className="iconFecha"
+                alt="Icono de balneario"
+              />
+              <div className="input-wrapper">
+                <label className="subtitulo">Balneario</label>
+                <select
+                  className="input-estandar"
+                  value={balnearioFiltro}
+                  onChange={(e) => setBalnearioFiltro(e.target.value)}
+                >
+                  <option value="">Todos los balnearios</option>
+                  {balnearios.map((balneario) => (
+                    <option key={balneario.id_balneario} value={balneario.nombre}>
+                      {balneario.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </>
+        )}
+        
         <button className="search-button" onClick={handleBuscar}>
           <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
         </button>
