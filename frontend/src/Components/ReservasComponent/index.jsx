@@ -467,19 +467,22 @@ function ReservasComponent() {
               {format(rangoFechas[0].endDate, "dd/MM/yyyy")}
             </div>
             {showCalendario && (
-              <div className="calendario-container">
-                <DateRange
-                  editableDateInputs={true}
-                  onChange={(item) => setRangoFechas([item.selection])}
-                  moveRangeOnFirstSelection={false}
-                  ranges={rangoFechas}
-                  months={2}
-                  direction="horizontal"
-                  rangeColors={["#005984"]}
-                  // El calendario ahora NO restringe fechas anteriores
-                  // minDate={new Date()}
-                />
-              </div>
+              <>
+                <div className="calendario-overlay" onClick={() => setShowCalendario(false)}></div>
+                <div className="calendario-container">
+                  <DateRange
+                    editableDateInputs={true}
+                    onChange={(item) => setRangoFechas([item.selection])}
+                    moveRangeOnFirstSelection={false}
+                    ranges={rangoFechas}
+                    months={2}
+                    direction="horizontal"
+                    rangeColors={["#005984"]}
+                    // El calendario ahora NO restringe fechas anteriores
+                    // minDate={new Date()}
+                  />
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -554,12 +557,12 @@ function ReservasComponent() {
               .sort((a, b) => new Date(b.fecha_inicio + 'T00:00:00') - new Date(a.fecha_inicio + 'T00:00:00'))
               .map((reserva) => (
                 <tr key={reserva.id_reserva}>
-                  <td>
+                  <td data-label={idBalneario ? "Cliente" : "Balneario"}>
                     {idBalneario
                       ? reserva.cliente_nombre
                       : reserva.balneario_nombre}
                   </td>
-                  <td>
+                  <td data-label="Ubicación">
                     {(reserva.ubicaciones && reserva.ubicaciones.length > 0)
                       ? reserva.ubicaciones
                         .map(u => u.posicion || u.id_carpa)
@@ -567,9 +570,9 @@ function ReservasComponent() {
                         .join(", ")
                       : "-"}
                   </td>
-                  <td>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                  <td>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                  <td>
+                  <td data-label="Entrada">{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td data-label="Salida">{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td data-label="Acción">
                     <button
                       className="ver-button"
                       disabled={!iconosBase64.logonombre}

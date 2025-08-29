@@ -82,6 +82,16 @@
 }
 
 /* ---------- Calendario ---------- */
+.calendario-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+
 .calendario-container {
   position: absolute;
   top: 60px;
@@ -89,7 +99,7 @@
   background-color: white;
   border-radius: 1rem;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  z-index: 10;
+  z-index: 1002;
 }
 
 /* ---------- Botón de búsqueda ---------- */
@@ -168,28 +178,188 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1005px) {
+  .tus-reservas {
+    padding: 1.5rem 4vw;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
   .busqueda-form {
     flex-direction: column;
     align-items: stretch;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .input-group {
+    min-width: 100%;
+    flex-grow: 1;
   }
 
   .input-estandar,
   .date-summary {
     width: 100%;
     max-width: 100%;
+    font-size: 0.9rem;
   }
 
   .search-button {
     width: 100%;
     height: 50px;
+    margin-top: 0.5rem;
   }
 
+  .calendario-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+  }
+
+  /* Tabla responsive con scroll horizontal */
   .tabla-reservas {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
 
+  .tabla-reservas thead,
+  .tabla-reservas tbody,
   .tabla-reservas th,
+  .tabla-reservas td,
+  .tabla-reservas tr {
+    display: block;
+  }
+
+  .tabla-reservas thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .tabla-reservas tr {
+    border: 1px solid var(--secondary2-600);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 89, 132, 0.1);
+  }
+
   .tabla-reservas td {
-    padding: 0.75rem;
+    border: none;
+    position: relative;
+    padding: 0.5rem 0 0.5rem 40%;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .tabla-reservas td:before {
+    content: attr(data-label) ": ";
+    position: absolute;
+    left: 6px;
+    width: 35%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--primary-500);
+  }
+
+  .ver-button {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tus-reservas {
+    padding: 1rem 3vw;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .busqueda-form {
+    padding: 0.8rem 1rem;
+  }
+
+  .input-group {
+    gap: 0.5rem;
+  }
+
+  .iconFecha {
+    width: 28px;
+    height: 28px;
+  }
+
+  .input-estandar,
+  .date-summary {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    height: 36px;
+  }
+
+  .tabla-reservas td {
+    padding: 0.4rem 0 0.4rem 45%;
+    font-size: 0.8rem;
+  }
+
+  .tabla-reservas td:before {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tus-reservas {
+    padding: 0.8rem 2vw;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+  }
+
+  .busqueda-form {
+    padding: 0.6rem 0.8rem;
+    border-radius: 1rem;
+  }
+
+  .input-group {
+    gap: 0.4rem;
+  }
+
+  .iconFecha {
+    width: 24px;
+    height: 24px;
+  }
+
+  .input-estandar,
+  .date-summary {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    height: 32px;
+  }
+
+  .search-button {
+    height: 44px;
+  }
+
+  .tabla-reservas td {
+    padding: 0.3rem 0 0.3rem 50%;
+    font-size: 0.75rem;
+  }
+
+  .tabla-reservas td:before {
+    font-size: 0.7rem;
+    left: 4px;
   }
 }

@@ -5,7 +5,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 500;
+  z-index: 1000;
   box-shadow: 0 3px 10px rgba(0,89,132,0.15);
 }
 
@@ -169,6 +169,8 @@
   outline: none;
   cursor: pointer;
   color: var(--primary-500);
+  z-index: 1003;
+  position: relative;
 }
 
 .hamburger:focus {
@@ -214,6 +216,11 @@
   .hamburger {
     display: block;
     justify-self: end;
+    z-index: 1003;
+    position: relative;
+    background-color: var(--secondary2-500);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
   }
   .menu {
     display: flex;
