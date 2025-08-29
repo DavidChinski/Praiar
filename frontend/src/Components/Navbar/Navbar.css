@@ -169,7 +169,7 @@
   outline: none;
   cursor: pointer;
   color: var(--primary-500);
-  z-index: 1003;
+  z-index: 999;
   position: relative;
 }
 
@@ -216,7 +216,7 @@
   .hamburger {
     display: block;
     justify-self: end;
-    z-index: 1003;
+    z-index: 999;
     position: relative;
     background-color: var(--secondary2-500);
     padding: 0.5rem;
