@@ -67,6 +67,11 @@ function Navbar() {
   useEffect(() => {
     const storedUser = localStorage.getItem('usuario');
     setUsuario(storedUser ? JSON.parse(storedUser) : null);
+    
+    // Cerrar el menú hamburguesa cuando cambie la página
+    if (menuOpen) {
+      setMenuOpen(false);
+    }
   }, [location.pathname]);
 
   useEffect(() => {
