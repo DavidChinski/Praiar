@@ -108,6 +108,7 @@ function agregarFooterEstiloPraiar(doc, pageWidth, pageHeight, base64s) {
 
 function ReservasComponent() {
   const [reservas, setReservas] = useState([]);
+  const [reservasOriginales, setReservasOriginales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rangoFechas, setRangoFechas] = useState([
@@ -121,6 +122,7 @@ function ReservasComponent() {
   const [metodoReservaFiltro, setMetodoReservaFiltro] = useState("");
   const [balnearioFiltro, setBalnearioFiltro] = useState("");
   const [balnearios, setBalnearios] = useState([]);
+  const [metodosPago, setMetodosPago] = useState([]);
   const [iconosBase64, setIconosBase64] = useState({});
   const { id } = useParams();
   const idBalneario = Number.isNaN(parseInt(id)) ? null : parseInt(id);
@@ -142,31 +144,56 @@ function ReservasComponent() {
 
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  // Función para obtener balnearios para el filtro
-  const fetchBalnearios = async () => {
+  // Función para obtener métodos de pago dinámicamente desde el backend
+  const fetchMetodosPago = async () => {
     try {
-      // Obtener todas las ciudades primero
-      const ciudadesResponse = await fetch("http://localhost:3000/api/ciudades");
-      if (ciudadesResponse.ok) {
-        const ciudades = await ciudadesResponse.json();
-        let todosLosBalnearios = [];
-        
-        // Obtener balnearios de cada ciudad
-        for (const ciudad of ciudades) {
-          const response = await fetch(`http://localhost:3000/api/balnearios?ciudad_id=${ciudad.id_ciudad}`);
-          if (response.ok) {
-            const balnearios = await response.json();
-            todosLosBalnearios = [...todosLosBalnearios, ...balnearios];
-          }
-        }
-        
-        setBalnearios(todosLosBalnearios);
+      const response = await fetch("http://localhost:3000/api/metodos-pago");
+      if (response.ok) {
+        const data = await response.json();
+        setMetodosPago(data.metodos_pago || []);
+      } else {
+        setMetodosPago([
+          "mercado pago",
+          "debito",
+          "credito",
+          "efectivo",
+          "manual"
+        ]);
       }
     } catch (error) {
-      console.error("Error obteniendo balnearios:", error);
+      setMetodosPago([
+        "mercado pago",
+        "debito",
+        "credito",
+        "efectivo",
+        "manual"
+      ]);
     }
   };
 
+  // Nueva función: obtener balnearios para filtrar (según tipo de usuario y reservas)
+  const fetchBalneariosFiltrados = (reservasData = []) => {
+    if (usuario && usuario.esPropietario) {
+      fetch("http://localhost:3000/api/balnearios?propietario_id=" + usuario.auth_id)
+        .then(res => res.ok ? res.json() : [])
+        .then(balneariosPropios => setBalnearios(balneariosPropios))
+        .catch(() => setBalnearios([]));
+    } else {
+      // Cliente: solo balnearios con reserva
+      const balneariosSet = new Map();
+      reservasData.forEach(r => {
+        if (r.balneario_nombre && !balneariosSet.has(r.balneario_nombre)) {
+          balneariosSet.set(r.balneario_nombre, {
+            id_balneario: r.id_balneario,
+            nombre: r.balneario_nombre
+          });
+        }
+      });
+      setBalnearios(Array.from(balneariosSet.values()));
+    }
+  };
+
+  // --- FUNCION PRINCIPAL DE CARGA Y FILTRO DE RESERVAS ---
   const fetchReservas = async (filtrarPorFechas = false) => {
     setLoading(true);
     setError(null);
@@ -200,81 +227,100 @@ function ReservasComponent() {
       if (!response.ok) {
         setError(result.error || "Error cargando reservas.");
         setReservas([]);
+        setReservasOriginales([]);
+        setBalnearios([]);
       } else {
-        let reservasFiltradas = result.reservas || [];
-        
-        // Aplicar filtro por método de reserva si está seleccionado
+        let reservasAct = result.reservas || [];
+        setReservasOriginales(reservasAct);
+
+        // Actualizar balnearios para filtro según reservas actuales (solo para clientes)
+        if (!idBalneario) fetchBalneariosFiltrados(reservasAct);
+
+        // Filtrado dinámico
+        let reservasFiltradas = [...reservasAct];
         if (metodoReservaFiltro && metodoReservaFiltro !== "") {
-          reservasFiltradas = reservasFiltradas.filter(reserva => 
-            reserva.metodo_pago && reserva.metodo_pago.toLowerCase().includes(metodoReservaFiltro.toLowerCase())
+          reservasFiltradas = reservasFiltradas.filter(reserva =>
+            reserva.metodo_pago &&
+            reserva.metodo_pago.toLowerCase().includes(metodoReservaFiltro.toLowerCase())
           );
         }
-        
-        // Aplicar filtro por balneario si está seleccionado
         if (balnearioFiltro && balnearioFiltro !== "") {
-          reservasFiltradas = reservasFiltradas.filter(reserva => 
-            reserva.balneario_nombre && reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
+          reservasFiltradas = reservasFiltradas.filter(reserva =>
+            reserva.balneario_nombre &&
+            reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
           );
         }
-        
         setReservas(reservasFiltradas);
       }
     } catch (e) {
       setError("Error cargando reservas.");
       setReservas([]);
+      setReservasOriginales([]);
+      setBalnearios([]);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchReservas();
-    // Solo cargar balnearios si no es vista de propietario
-    if (!idBalneario) {
-      fetchBalnearios();
-    }
+    fetchMetodosPago();
     // eslint-disable-next-line
   }, []);
 
-  // Efecto para aplicar filtros cuando cambien
+  // --- FILTRO DINÁMICO: cada vez que cambian filtro, se re-filtra la lista localmente ---
   useEffect(() => {
-    if (metodoReservaFiltro !== "" || balnearioFiltro !== "") {
-      fetchReservas();
+    // Si los filtros están vacíos, mostramos todas las reservas originales
+    if ((metodoReservaFiltro === "" || metodoReservaFiltro == null) && (balnearioFiltro === "" || balnearioFiltro == null)) {
+      setReservas(reservasOriginales);
+      return;
     }
-  }, [metodoReservaFiltro, balnearioFiltro]);
+    // Si no hay reservas originales, no filtrar
+    if (!reservasOriginales || reservasOriginales.length === 0) {
+      setReservas([]);
+      return;
+    }
+    let filtradas = [...reservasOriginales];
+    if (metodoReservaFiltro && metodoReservaFiltro !== "") {
+      filtradas = filtradas.filter(reserva =>
+        reserva.metodo_pago &&
+        reserva.metodo_pago.toLowerCase().includes(metodoReservaFiltro.toLowerCase())
+      );
+    }
+    if (balnearioFiltro && balnearioFiltro !== "") {
+      filtradas = filtradas.filter(reserva =>
+        reserva.balneario_nombre &&
+        reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
+      );
+    }
+    setReservas(filtradas);
+  }, [metodoReservaFiltro, balnearioFiltro, reservasOriginales]);
 
+  // --- FILTRO DE FECHA SE EJECUTA DIRECTAMENTE SOBRE EL BACK Y ACTUALIZA TODO ---
   const handleBuscar = () => {
     fetchReservas(true);
   };
 
   // Helper para obtener todos los atributos de la reserva
   function getPDFReservaInfo(reserva) {
-    // Extraer información del cliente - manejar diferentes casos
     let clienteNombre = "";
     let clienteApellido = "";
     let clienteEmail = "";
     let clienteTelefono = "";
-    
-    // Si es vista de propietario (tiene cliente_nombre)
     if (reserva.cliente_nombre) {
       const nombreCompleto = reserva.cliente_nombre.split(" ");
       clienteNombre = nombreCompleto[0] || "";
       clienteApellido = nombreCompleto.slice(1).join(" ") || "";
       clienteEmail = reserva.email || "";
       clienteTelefono = reserva.telefono || "";
-    } 
-    // Si es vista de usuario (necesitamos obtener datos del usuario logueado)
-    else if (usuario) {
+    } else if (usuario) {
       clienteNombre = usuario.nombre || "";
       clienteApellido = usuario.apellido || "";
       clienteEmail = usuario.email || "";
       clienteTelefono = usuario.telefono || "";
     }
-    
-    // Extraer ubicaciones
     const ubicaciones = reserva.ubicaciones && reserva.ubicaciones.length > 0 
       ? reserva.ubicaciones.map(u => `Posición ${u.posicion || u.id_carpa}`).join(", ")
       : "Sin ubicaciones especificadas";
-
     return [
       ["ID Reserva", reserva.id_reserva || ""],
       ["Cliente", clienteNombre],
@@ -300,44 +346,31 @@ function ReservasComponent() {
     const info = getPDFReservaInfo(reserva);
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Header con fondo azul
     doc.setFillColor("#00405E");
     doc.rect(0, 0, pageWidth, 45, "F");
-    
-    // Logo en el header
     doc.addImage(iconosBase64.logo, "PNG", 20, 10, 25, 25);
-    
-    // Título principal
     doc.setFontSize(20);
     doc.setTextColor("#FFFFFF");
     doc.setFont("helvetica", "bold");
     doc.text("DETALLE DE RESERVA", pageWidth / 2, 25, { align: "center" });
-
-    // Fecha de generación
     doc.setFontSize(10);
     doc.setTextColor("#B8D4E3");
     doc.setFont("helvetica", "normal");
     doc.text(`Generado el ${format(new Date(), "dd/MM/yyyy HH:mm")}`, pageWidth - 20, 35, { align: "right" });
-
-    // Contenido principal
     let y = 65;
     const leftMargin = 25;
     const rightMargin = pageWidth - 25;
     const contentWidth = rightMargin - leftMargin;
-    const footerHeight = 90; // Altura del footer
-    const maxContentHeight = pageHeight - footerHeight - 20; // Espacio disponible para contenido
-
-    // Sección de información del cliente
+    const footerHeight = 90;
+    const maxContentHeight = pageHeight - footerHeight - 20;
     doc.setFillColor("#F0F8FF");
     doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
     doc.setFontSize(14);
     doc.setTextColor("#00405E");
     doc.setFont("helvetica", "bold");
     doc.text("INFORMACIÓN DEL CLIENTE", leftMargin + 10, y + 2);
-
     y += 20;
-    const clientInfo = info.slice(1, 5); // Cliente, Apellido, Email, Teléfono
+    const clientInfo = info.slice(1, 5);
     clientInfo.forEach(([label, value]) => {
       doc.setFontSize(11);
       doc.setTextColor("#333333");
@@ -347,19 +380,15 @@ function ReservasComponent() {
       doc.text(String(value || "No especificado"), leftMargin + 60, y);
       y += 8;
     });
-
     y += 10;
-
-    // Sección de información de la reserva
     doc.setFillColor("#F0F8FF");
     doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
     doc.setFontSize(14);
     doc.setTextColor("#00405E");
     doc.setFont("helvetica", "bold");
     doc.text("INFORMACIÓN DE LA RESERVA", leftMargin + 10, y + 2);
-
     y += 20;
-    const reservaInfo = info.slice(0, 1).concat(info.slice(5, 9)); // ID, Balneario, Ubicaciones, Fecha Entrada, Fecha Salida
+    const reservaInfo = info.slice(0, 1).concat(info.slice(5, 9));
     reservaInfo.forEach(([label, value]) => {
       doc.setFontSize(11);
       doc.setTextColor("#333333");
@@ -367,7 +396,6 @@ function ReservasComponent() {
       doc.text(label + ":", leftMargin, y);
       doc.setFont("helvetica", "normal");
       const displayValue = String(value || "No especificado");
-      // Si el texto es muy largo, lo dividimos en múltiples líneas
       if (displayValue.length > 50) {
         const lines = doc.splitTextToSize(displayValue, contentWidth - 60);
         doc.text(lines, leftMargin + 60, y);
@@ -377,32 +405,24 @@ function ReservasComponent() {
       }
       y += 8;
     });
-
     y += 10;
-
-    // Verificar si necesitamos una nueva página
     if (y > maxContentHeight - 50) {
       doc.addPage();
       y = 30;
     }
-
-    // Sección de información de facturación
     doc.setFillColor("#F0F8FF");
     doc.rect(leftMargin, y - 5, contentWidth, 15, "F");
     doc.setFontSize(14);
     doc.setTextColor("#00405E");
     doc.setFont("helvetica", "bold");
     doc.text("INFORMACIÓN DE FACTURACIÓN", leftMargin + 10, y + 2);
-
     y += 20;
-    const facturacionInfo = info.slice(9, 15); // Dirección, Ciudad, etc.
+    const facturacionInfo = info.slice(9, 15);
     facturacionInfo.forEach(([label, value]) => {
-      // Verificar si necesitamos una nueva página antes de cada línea
       if (y > maxContentHeight - 10) {
         doc.addPage();
         y = 30;
       }
-      
       doc.setFontSize(11);
       doc.setTextColor("#333333");
       doc.setFont("helvetica", "bold");
@@ -411,19 +431,13 @@ function ReservasComponent() {
       doc.text(String(value || "No especificado"), leftMargin + 60, y);
       y += 8;
     });
-
-    // Línea separadora antes del footer (solo si hay espacio)
     if (y < maxContentHeight - 20) {
       y += 15;
       doc.setDrawColor("#00405E");
       doc.setLineWidth(1);
       doc.line(leftMargin, y, rightMargin, y);
     }
-
-    // Agregar footer
     agregarFooterEstiloPraiar(doc, pageWidth, pageHeight, iconosBase64);
-
-    // Nombre del archivo
     const balneario = info.find(([l]) => l === "Balneario")?.[1] || "Reserva";
     const entrada = info.find(([l]) => l === "Fecha Entrada")?.[1] || "";
     const salida = info.find(([l]) => l === "Fecha Salida")?.[1] || "";
@@ -462,14 +476,13 @@ function ReservasComponent() {
                   months={2}
                   direction="horizontal"
                   rangeColors={["#005984"]}
-                  minDate={new Date()}
+                  // El calendario ahora NO restringe fechas anteriores
+                  // minDate={new Date()}
                 />
               </div>
             )}
           </div>
         </div>
-        
-        {/* Filtros adicionales - solo para usuarios (no propietarios) */}
         {!idBalneario && (
           <>
             <div className="input-group">
@@ -486,14 +499,14 @@ function ReservasComponent() {
                   onChange={(e) => setMetodoReservaFiltro(e.target.value)}
                 >
                   <option value="">Todos los métodos</option>
-                  <option value="efectivo">Efectivo</option>
-                  <option value="tarjeta">Tarjeta</option>
-                  <option value="transferencia">Transferencia</option>
-                  <option value="mercadopago">Mercado Pago</option>
+                  {metodosPago.map((metodo) => (
+                    <option key={metodo} value={metodo}>
+                      {metodo.charAt(0).toUpperCase() + metodo.slice(1)}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-            
             <div className="input-group">
               <FontAwesomeIcon
                 icon="fa-solid fa-building"
@@ -518,7 +531,6 @@ function ReservasComponent() {
             </div>
           </>
         )}
-        
         <button className="search-button" onClick={handleBuscar}>
           <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
         </button>
@@ -548,7 +560,6 @@ function ReservasComponent() {
                       : reserva.balneario_nombre}
                   </td>
                   <td>
-                    {/* Mostrar todas las ubicaciones asociadas separadas por coma */}
                     {(reserva.ubicaciones && reserva.ubicaciones.length > 0)
                       ? reserva.ubicaciones
                         .map(u => u.posicion || u.id_carpa)
