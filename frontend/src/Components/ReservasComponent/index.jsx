@@ -111,6 +111,7 @@ function ReservasComponent() {
   const [reservasOriginales, setReservasOriginales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1005);
   const [rangoFechas, setRangoFechas] = useState([
     {
       startDate: new Date(),
@@ -265,6 +266,16 @@ function ReservasComponent() {
     fetchReservas();
     fetchMetodosPago();
     // eslint-disable-next-line
+  }, []);
+
+  // Hook para detectar cambios en el tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1005);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // --- FILTRO DINÁMICO: cada vez que cambian filtro, se re-filtra la lista localmente ---
@@ -445,6 +456,12 @@ function ReservasComponent() {
     doc.save(fileName);
   };
 
+  // Helper para saber si es mobile en el render
+  function getLabelText(label) {
+    if (!isMobile) return label;
+    return label;
+  }
+
   return (
     <div className="tus-reservas">
       <h1 className="hero-title">{idBalneario ? "Reservas de Clientes" : "Tus Reservas"}</h1>
@@ -549,7 +566,7 @@ function ReservasComponent() {
               <th>Ubicación</th>
               <th>Entrada</th>
               <th>Salida</th>
-              <th></th>
+              <th>{isMobile ? "" : "Acción"}</th>
             </tr>
           </thead>
           <tbody>
@@ -557,12 +574,12 @@ function ReservasComponent() {
               .sort((a, b) => new Date(b.fecha_inicio + 'T00:00:00') - new Date(a.fecha_inicio + 'T00:00:00'))
               .map((reserva) => (
                 <tr key={reserva.id_reserva}>
-                  <td data-label={idBalneario ? "Cliente" : "Balneario"}>
+                  <td data-label={getLabelText(idBalneario ? "Cliente" : "Balneario")}>
                     {idBalneario
                       ? reserva.cliente_nombre
                       : reserva.balneario_nombre}
                   </td>
-                  <td data-label="Ubicación">
+                  <td data-label={getLabelText("Ubicación")}>
                     {(reserva.ubicaciones && reserva.ubicaciones.length > 0)
                       ? reserva.ubicaciones
                         .map(u => u.posicion || u.id_carpa)
@@ -570,15 +587,15 @@ function ReservasComponent() {
                         .join(", ")
                       : "-"}
                   </td>
-                  <td data-label="Entrada">{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                  <td data-label="Salida">{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                  <td data-label="Acción">
+                  <td data-label={getLabelText("Entrada")}>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td data-label={getLabelText("Salida")}>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
+                  <td data-label={isMobile ? "" : getLabelText("Acción")}>
                     <button
                       className="ver-button"
                       disabled={!iconosBase64.logonombre}
                       onClick={() => handleVerPDF(reserva)}
                     >
-                      Ver
+                      {isMobile ? "Descargar PDF" : "Ver"}
                     </button>
                   </td>
                 </tr>
