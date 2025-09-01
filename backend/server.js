@@ -230,7 +230,7 @@ app.post('/api/logout', async (req, res) => {
 app.get('/api/ciudades', async (req, res) => {
   const { data: ciudadesData, error: ciudadesError } = await supabase
     .from('ciudades')
-    .select('id_ciudad, nombre')
+    .select('id_ciudad, nombre, img')
     .order('nombre', { ascending: true });
 
   if (ciudadesError) return res.status(500).json({ error: ciudadesError.message });
