@@ -982,30 +982,31 @@ app.post('/api/reservas-balneario', async (req, res) => {
   }
 
   // 6. Armar respuesta enriquecida
-  const reservas = data.map(r => {
-    const usuario = usuarios.find(u => u.auth_id === r.id_usuario);
-    return {
-      id_reserva: r.id_reserva,
-      id_usuario: r.id_usuario,
-      cliente_nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : "Cliente desconocido",
-      email: usuario?.email || "",
-      telefono: usuario?.telefono || "",
-      ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
-        id_ubicacion: v.id_ubicacion,
-        posicion: v.ubicaciones?.posicion,
-        id_carpa: v.ubicaciones?.id_carpa
-      })),
-      balneario_nombre: r.balnearios?.nombre || "",
-      fecha_inicio: r.fecha_inicio,
-      fecha_salida: r.fecha_salida,
-      metodo_pago: r.metodo_pago,
-      direccion: r.direccion,
-      ciudad: r.ciudad,
-      codigo_postal: r.codigo_postal,
-      pais_region: r.pais_region,
-      precio_total: r.precio_total
-    };
-  });
+const reservas = data.map(r => {
+  const usuario = usuarios.find(u => u.auth_id === r.id_usuario);
+  return {
+    id_reserva: r.id_reserva,
+    id_usuario: r.id_usuario,
+    cliente_nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : "Cliente desconocido",
+    email: usuario?.email || "",
+    telefono: usuario?.telefono || "",
+    ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
+      id_ubicacion: v.id_ubicacion,
+      posicion: v.ubicaciones?.posicion,
+      id_carpa: v.ubicaciones?.id_carpa
+    })),
+    balneario_nombre: r.balnearios?.nombre || "",
+    fecha_inicio: r.fecha_inicio,
+    fecha_salida: r.fecha_salida,
+    metodo_pago: r.metodo_pago,
+    direccion: r.direccion,
+    ciudad: r.ciudad,
+    codigo_postal: r.codigo_postal,
+    pais_region: r.pais_region,
+    precio_total: r.precio_total,
+    estado: r.estado // <--- AGREGA ESTA LÍNEA
+  };
+});
 
   // 7. Devolver respuesta
   res.json({ reservas });
@@ -1050,23 +1051,24 @@ app.post('/api/reservas-usuario', async (req, res) => {
   }
 
   // Para cada reserva, devolver todas las ubicaciones asociadas
-  const reservas = (data || []).map(r => ({
-    id_reserva: r.id_reserva,
-    ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
-      id_ubicacion: v.id_ubicacion,
-      posicion: v.ubicaciones?.posicion,
-      id_carpa: v.ubicaciones?.id_carpa
-    })),
-    balneario_nombre: r.balnearios?.nombre,
-    fecha_inicio: r.fecha_inicio,
-    fecha_salida: r.fecha_salida,
-    metodo_pago: r.metodo_pago,
-    direccion: r.direccion,
-    ciudad: r.ciudad,
-    codigo_postal: r.codigo_postal,
-    pais_region: r.pais_region,
-    precio_total: r.precio_total
-  }));
+const reservas = (data || []).map(r => ({
+  id_reserva: r.id_reserva,
+  ubicaciones: (r.Reservas_Ubicaciones || []).map(v => ({
+    id_ubicacion: v.id_ubicacion,
+    posicion: v.ubicaciones?.posicion,
+    id_carpa: v.ubicaciones?.id_carpa
+  })),
+  balneario_nombre: r.balnearios?.nombre,
+  fecha_inicio: r.fecha_inicio,
+  fecha_salida: r.fecha_salida,
+  metodo_pago: r.metodo_pago,
+  direccion: r.direccion,
+  ciudad: r.ciudad,
+  codigo_postal: r.codigo_postal,
+  pais_region: r.pais_region,
+  precio_total: r.precio_total,
+  estado: r.estado // <--- AGREGA ESTA LÍNEA
+}));
 
   res.json({ reservas });
 });

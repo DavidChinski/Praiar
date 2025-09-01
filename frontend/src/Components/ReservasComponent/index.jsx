@@ -122,6 +122,7 @@ function ReservasComponent() {
   const [showCalendario, setShowCalendario] = useState(false);
   const [metodoReservaFiltro, setMetodoReservaFiltro] = useState("");
   const [balnearioFiltro, setBalnearioFiltro] = useState("");
+  const [clienteFiltro, setClienteFiltro] = useState("");
   const [balnearios, setBalnearios] = useState([]);
   const [metodosPago, setMetodosPago] = useState([]);
   const [iconosBase64, setIconosBase64] = useState({});
@@ -251,6 +252,12 @@ function ReservasComponent() {
             reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
           );
         }
+        if (clienteFiltro && clienteFiltro !== "" && idBalneario) {
+          reservasFiltradas = reservasFiltradas.filter(reserva =>
+            reserva.cliente_nombre &&
+            reserva.cliente_nombre.toLowerCase().includes(clienteFiltro.toLowerCase())
+          );
+        }
         setReservas(reservasFiltradas);
       }
     } catch (e) {
@@ -281,7 +288,7 @@ function ReservasComponent() {
   // --- FILTRO DINÁMICO: cada vez que cambian filtro, se re-filtra la lista localmente ---
   useEffect(() => {
     // Si los filtros están vacíos, mostramos todas las reservas originales
-    if ((metodoReservaFiltro === "" || metodoReservaFiltro == null) && (balnearioFiltro === "" || balnearioFiltro == null)) {
+    if ((metodoReservaFiltro === "" || metodoReservaFiltro == null) && (balnearioFiltro === "" || balnearioFiltro == null) && (clienteFiltro === "" || clienteFiltro == null)) {
       setReservas(reservasOriginales);
       return;
     }
@@ -303,8 +310,14 @@ function ReservasComponent() {
         reserva.balneario_nombre.toLowerCase().includes(balnearioFiltro.toLowerCase())
       );
     }
+    if (clienteFiltro && clienteFiltro !== "" && idBalneario) {
+      filtradas = filtradas.filter(reserva =>
+        reserva.cliente_nombre &&
+        reserva.cliente_nombre.toLowerCase().includes(clienteFiltro.toLowerCase())
+      );
+    }
     setReservas(filtradas);
-  }, [metodoReservaFiltro, balnearioFiltro, reservasOriginales]);
+  }, [metodoReservaFiltro, balnearioFiltro, clienteFiltro, reservasOriginales, idBalneario]);
 
   // --- FILTRO DE FECHA SE EJECUTA DIRECTAMENTE SOBRE EL BACK Y ACTUALIZA TODO ---
   const handleBuscar = () => {
@@ -462,6 +475,11 @@ function ReservasComponent() {
     return label;
   }
 
+  // FIX DEL CALENDARIO: overlay click cierra, click dentro NO cierra
+  function handleCalendarioContainerClick(e) {
+    e.stopPropagation();
+  }
+
   return (
     <div className="tus-reservas">
       <h1 className="hero-title">{idBalneario ? "Reservas de Clientes" : "Tus Reservas"}</h1>
@@ -485,8 +503,33 @@ function ReservasComponent() {
             </div>
             {showCalendario && (
               <>
-                <div className="calendario-overlay" onClick={() => setShowCalendario(false)}></div>
-                <div className="calendario-container">
+                <div
+                  className="calendario-overlay"
+                  onClick={() => setShowCalendario(false)}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(0,0,0,0.25)",
+                    zIndex: 998
+                  }}
+                ></div>
+                <div
+                  className="calendario-container"
+                  style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "#fff",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
+                    zIndex: 999,
+                  }}
+                  onClick={handleCalendarioContainerClick}
+                >
                   <DateRange
                     editableDateInputs={true}
                     onChange={(item) => setRangoFechas([item.selection])}
@@ -495,61 +538,79 @@ function ReservasComponent() {
                     months={2}
                     direction="horizontal"
                     rangeColors={["#005984"]}
-                    // El calendario ahora NO restringe fechas anteriores
-                    // minDate={new Date()}
                   />
                 </div>
               </>
             )}
           </div>
         </div>
+        {/* Filtro de método de pago para todos */}
+        <div className="input-group">
+          <FontAwesomeIcon
+            icon="fa-solid fa-credit-card"
+            className="iconFecha"
+            alt="Icono de método de pago"
+          />
+          <div className="input-wrapper">
+            <label className="subtitulo">Método de Pago</label>
+            <select
+              className="input-estandar"
+              value={metodoReservaFiltro}
+              onChange={(e) => setMetodoReservaFiltro(e.target.value)}
+            >
+              <option value="">Todos los métodos</option>
+              {metodosPago.map((metodo) => (
+                <option key={metodo} value={metodo}>
+                  {metodo.charAt(0).toUpperCase() + metodo.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {/* Filtro de balneario solo para clientes */}
         {!idBalneario && (
-          <>
-            <div className="input-group">
-              <FontAwesomeIcon
-                icon="fa-solid fa-credit-card"
-                className="iconFecha"
-                alt="Icono de método de pago"
-              />
-              <div className="input-wrapper">
-                <label className="subtitulo">Método de Pago</label>
-                <select
-                  className="input-estandar"
-                  value={metodoReservaFiltro}
-                  onChange={(e) => setMetodoReservaFiltro(e.target.value)}
-                >
-                  <option value="">Todos los métodos</option>
-                  {metodosPago.map((metodo) => (
-                    <option key={metodo} value={metodo}>
-                      {metodo.charAt(0).toUpperCase() + metodo.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="input-group">
+            <FontAwesomeIcon
+              icon="fa-solid fa-building"
+              className="iconFecha"
+              alt="Icono de balneario"
+            />
+            <div className="input-wrapper">
+              <label className="subtitulo">Balneario</label>
+              <select
+                className="input-estandar"
+                value={balnearioFiltro}
+                onChange={(e) => setBalnearioFiltro(e.target.value)}
+              >
+                <option value="">Todos los balnearios</option>
+                {balnearios.map((balneario) => (
+                  <option key={balneario.id_balneario} value={balneario.nombre}>
+                    {balneario.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="input-group">
-              <FontAwesomeIcon
-                icon="fa-solid fa-building"
-                className="iconFecha"
-                alt="Icono de balneario"
+          </div>
+        )}
+        {/* Input para buscar por cliente solo para dueños */}
+        {idBalneario && (
+          <div className="input-group">
+            <FontAwesomeIcon
+              icon="fa-solid fa-user"
+              className="iconFecha"
+              alt="Icono de cliente"
+            />
+            <div className="input-wrapper">
+              <label className="subtitulo">Buscar por Cliente</label>
+              <input
+                type="text"
+                className="input-estandar"
+                value={clienteFiltro}
+                onChange={(e) => setClienteFiltro(e.target.value)}
+                placeholder="Nombre del cliente"
               />
-              <div className="input-wrapper">
-                <label className="subtitulo">Balneario</label>
-                <select
-                  className="input-estandar"
-                  value={balnearioFiltro}
-                  onChange={(e) => setBalnearioFiltro(e.target.value)}
-                >
-                  <option value="">Todos los balnearios</option>
-                  {balnearios.map((balneario) => (
-                    <option key={balneario.id_balneario} value={balneario.nombre}>
-                      {balneario.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
-          </>
+          </div>
         )}
         <button className="search-button" onClick={handleBuscar}>
           <img src={BusquedaHomeSearch} className="search-icon" alt="Buscar" />
@@ -566,6 +627,7 @@ function ReservasComponent() {
               <th>Ubicación</th>
               <th>Entrada</th>
               <th>Salida</th>
+              <th>Estado</th>
               <th>{isMobile ? "" : "Acción"}</th>
             </tr>
           </thead>
@@ -589,7 +651,8 @@ function ReservasComponent() {
                   </td>
                   <td data-label={getLabelText("Entrada")}>{format(new Date(reserva.fecha_inicio + 'T00:00:00'), "dd/MM/yyyy")}</td>
                   <td data-label={getLabelText("Salida")}>{format(new Date(reserva.fecha_salida + 'T00:00:00'), "dd/MM/yyyy")}</td>
-                  <td data-label={isMobile ? "" : getLabelText("Acción")}>
+                  <td data-label={getLabelText("Estado")}>{reserva.estado ? reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1) : "-"}</td>
+                  <td data-label={isMobile ? "" : getLabelText("Acción")}> 
                     <button
                       className="ver-button"
                       disabled={!iconosBase64.logonombre}
