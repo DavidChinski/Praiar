@@ -38,7 +38,9 @@
   --radius-2xl: 1.5rem;
 }
 
-
+.secondary:hover{
+  background: none;
+}
 
 /* ---------- Contenedor principal ---------- */
 .estadisticas-container {
@@ -560,7 +562,7 @@
   font-size: 1.25rem;
   font-weight: 500;
   margin: 0 0 1.5rem 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .header-stats {

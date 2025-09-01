@@ -803,7 +803,7 @@ function CarpasDelBalneario(props) {
     <div className="carpas-del-balneario">
       <div className="balneario-header">
         <div className="balneario-header-main">
-          <h1 className="balneario-nombre">{balnearioInfo?.nombre || 'Balneario'}</h1>
+          <h1 className="balneario-nombre-mapa">{balnearioInfo?.nombre || 'Balneario'}</h1>
 
           <div className="header-badge">
             {esDuenio ? (

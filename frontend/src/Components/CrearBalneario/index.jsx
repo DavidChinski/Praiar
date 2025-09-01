@@ -6,7 +6,6 @@ function CrearBalneario() {
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [imagenUrl, setImagenUrl] = useState("");
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState("");
   const [ciudades, setCiudades] = useState([]);
   const [mensaje, setMensaje] = useState("");
@@ -29,6 +28,9 @@ function CrearBalneario() {
   const [tiposUbicacion, setTiposUbicacion] = useState([]);
   const [tandasCarpas, setTandasCarpas] = useState([]);
   const [preciosPorTipo, setPreciosPorTipo] = useState([]); // [{id_tipo_ubicacion, nombre, dia, semana, quincena, mes}]
+
+  // Imágenes seleccionadas
+  const [imagenes, setImagenes] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3000/api/ciudades")
@@ -91,6 +93,27 @@ function CrearBalneario() {
     setPreciosPorTipo(preciosPorTipo.filter(p => p.id_tipo_ubicacion !== tipoId));
   };
 
+  // Manejar selección de imágenes
+  const handleImagenesChange = (e) => {
+    setImagenes(Array.from(e.target.files));
+  };
+
+  // Subir imágenes al backend (las guarda en bucket y las registra en BD)
+  const subirImagenesABackend = async (balnearioId) => {
+    if (imagenes.length === 0) return;
+    const formData = new FormData();
+    formData.append("id_balneario", balnearioId);
+    imagenes.forEach((img) => {
+      formData.append("imagenes", img, img.webkitRelativePath || img.name);
+    });
+    const res = await fetch("http://localhost:3000/api/crear-imagenes-balneario", {
+      method: "POST",
+      body: formData
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || "Error al subir imágenes.");
+  };
+
   // Enviar todo al backend
   const handleFinalizar = async (e) => {
     e.preventDefault();
@@ -99,11 +122,9 @@ function CrearBalneario() {
     if (!usuario || !usuario.auth_id) return setMensaje("Sesión no válida.");
     if (!ciudadSeleccionada) return setMensaje("Debe seleccionar una ciudad.");
     if (tandasCarpas.length === 0) return setMensaje("Debe agregar al menos una tanda de carpas.");
-    // Validar que cada tanda tenga su precio
     if (tandasCarpas.some(tc => !preciosPorTipo.find(pt => pt.id_tipo_ubicacion === tc.id_tipo_ubicacion))) {
       return setMensaje("Debe ingresar los precios de todos los tipos agregados.");
     }
-    // Validar precios completos
     if (preciosPorTipo.some(
       p => p.dia === "" || p.semana === "" || p.quincena === "" || p.mes === ""
     )) {
@@ -114,7 +135,6 @@ function CrearBalneario() {
       nombre,
       direccion,
       telefono,
-      imagenUrl,
       ciudadSeleccionada,
       idUsuario: usuario.auth_id,
       tandasCarpas,
@@ -122,6 +142,7 @@ function CrearBalneario() {
     };
 
     try {
+      // 1. Crear el balneario (sin imágenes)
       const res = await fetch("http://localhost:3000/api/crear-balneario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,6 +153,13 @@ function CrearBalneario() {
         setMensaje(result.error || "Error al guardar. Intente nuevamente.");
         return;
       }
+      const balnearioId = result.id_balneario;
+
+      // 2. Subir imágenes si hay
+      if (imagenes.length > 0) {
+        await subirImagenesABackend(balnearioId);
+      }
+
       window.location.href = "/tusbalnearios";
     } catch (err) {
       setMensaje("Error al guardar. Intente nuevamente.");
@@ -151,7 +179,7 @@ function CrearBalneario() {
           <div className="form-section-card">
             <div className="section-header">
               <div className="section-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -160,8 +188,8 @@ function CrearBalneario() {
               <h3>Información del Balneario</h3>
               <p>Datos básicos del establecimiento</p>
             </div>
-            
-            <div className="form-grid">
+            {/* Distribuir en dos columnas horizontalmente */}
+            <div className="form-row-horizontal">
               <div className="form-group">
                 <label htmlFor="nombre">Nombre del Balneario *</label>
                 <input 
@@ -173,7 +201,6 @@ function CrearBalneario() {
                   placeholder="Ingrese el nombre del balneario"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="direccion">Dirección *</label>
                 <input 
@@ -185,7 +212,6 @@ function CrearBalneario() {
                   placeholder="Ingrese la dirección completa"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="telefono">Teléfono *</label>
                 <input 
@@ -197,7 +223,6 @@ function CrearBalneario() {
                   placeholder="Ingrese el número de teléfono"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="ciudad">Ciudad *</label>
                 <select 
@@ -213,16 +238,25 @@ function CrearBalneario() {
                   ))}
                 </select>
               </div>
-              
               <div className="form-group full-width">
-                <label htmlFor="imagenUrl">URL de Imagen</label>
+                <label htmlFor="imagenes">Imágenes del Balneario *</label>
                 <input 
-                  id="imagenUrl" 
-                  type="url" 
-                  value={imagenUrl} 
-                  onChange={(e) => setImagenUrl(e.target.value)} 
-                  placeholder="https://ejemplo.com/imagen.jpg"
+                  id="imagenes"
+                  type="file"
+                  multiple
+                  webkitdirectory="true"
+                  directory="true"
+                  onChange={handleImagenesChange}
+                  accept="image/*"
                 />
+                <p>Puedes subir una carpeta con varias imágenes.</p>
+                {imagenes.length > 0 &&
+                  <ul>
+                    {imagenes.map((img, idx) => (
+                      <li key={idx}>{img.webkitRelativePath || img.name}</li>
+                    ))}
+                  </ul>
+                }
               </div>
             </div>
           </div>
@@ -231,7 +265,7 @@ function CrearBalneario() {
           <div className="form-section-card">
             <div className="section-header">
               <div className="section-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M4 7L20 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M4 11L20 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M4 15L20 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -241,8 +275,8 @@ function CrearBalneario() {
               <h3>Configuración de Carpas</h3>
               <p>Defina los tipos y cantidades de ubicaciones disponibles</p>
             </div>
-            
-            <div className="form-grid">
+            {/* Distribución horizontal */}
+            <div className="form-row-horizontal">
               <div className="form-group">
                 <label htmlFor="tipoUbicacion">Tipo de Ubicación *</label>
                 <select 
@@ -259,7 +293,6 @@ function CrearBalneario() {
                   ))}
                 </select>
               </div>
-              
               <div className="form-group">
                 <label htmlFor="cantidadCarpas">Cantidad de Carpas *</label>
                 <input 
@@ -271,7 +304,6 @@ function CrearBalneario() {
                   placeholder="0"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="sillas">Cantidad de Sillas</label>
                 <input 
@@ -283,7 +315,6 @@ function CrearBalneario() {
                   placeholder="2"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="mesas">Cantidad de Mesas</label>
                 <input 
@@ -295,7 +326,6 @@ function CrearBalneario() {
                   placeholder="1"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="reposeras">Cantidad de Reposeras</label>
                 <input 
@@ -307,7 +337,6 @@ function CrearBalneario() {
                   placeholder="2"
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="capacidad">Capacidad por Carpa</label>
                 <input 
@@ -328,8 +357,7 @@ function CrearBalneario() {
                   <h4>Precios para {tiposUbicacion.find(t => t.id_tipo_ubicaciones == tipoUbicacion)?.nombre || ""}</h4>
                   <p>Configure los precios para diferentes períodos</p>
                 </div>
-                
-                <div className="precios-grid">
+                <div className="form-row-horizontal precios-horizontal">
                   <div className="form-group">
                     <label htmlFor="precioDia">Precio por Día *</label>
                     <div className="input-with-prefix">
@@ -345,7 +373,6 @@ function CrearBalneario() {
                       />
                     </div>
                   </div>
-                  
                   <div className="form-group">
                     <label htmlFor="precioSemana">Precio por Semana *</label>
                     <div className="input-with-prefix">
@@ -361,7 +388,6 @@ function CrearBalneario() {
                       />
                     </div>
                   </div>
-                  
                   <div className="form-group">
                     <label htmlFor="precioQuincena">Precio por Quincena *</label>
                     <div className="input-with-prefix">
@@ -377,7 +403,6 @@ function CrearBalneario() {
                       />
                     </div>
                   </div>
-                  
                   <div className="form-group">
                     <label htmlFor="precioMes">Precio por Mes *</label>
                     <div className="input-with-prefix">
@@ -394,9 +419,8 @@ function CrearBalneario() {
                     </div>
                   </div>
                 </div>
-                
                 <button type="button" onClick={handleAgregarTanda} className="add-tanda-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   Agregar Tanda y Precios
@@ -410,7 +434,7 @@ function CrearBalneario() {
             <div className="form-section-card">
               <div className="section-header">
                 <div className="section-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
                   </svg>
@@ -418,7 +442,6 @@ function CrearBalneario() {
                 <h3>Tandas Configuradas</h3>
                 <p>Resumen de las ubicaciones agregadas</p>
               </div>
-              
               <div className="tandas-grid">
                 {tandasCarpas.map((t, idx) => (
                   <div key={idx} className="tanda-card">
@@ -430,12 +453,11 @@ function CrearBalneario() {
                         className="remove-tanda-btn"
                         title="Eliminar tanda"
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                           <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </button>
                     </div>
-                    
                     <div className="tanda-details">
                       <div className="detail-item">
                         <span className="detail-label">Carpas:</span>
@@ -458,7 +480,6 @@ function CrearBalneario() {
                         <span className="detail-value">{t.capacidad} personas</span>
                       </div>
                     </div>
-                    
                     <div className="tanda-precios">
                       <h5>Precios</h5>
                       <div className="precios-list">
@@ -486,28 +507,30 @@ function CrearBalneario() {
             </div>
           )}
 
-          {/* Botón Finalizar */}
-          <div className="form-actions">
-            <button className="submit-btn" type="submit">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              Crear Balneario
-            </button>
+          <div>
+            {mensaje && (
+              <div className="mensaje-container">
+                <div className="mensaje-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <p className="mensaje-text">{mensaje}</p>
+              </div>
+            )}
+
+            {/* Botón Finalizar */}
+            <div className="form-actions">
+              <button className="submit-btn" type="submit">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Crear Balneario
+              </button>
+            </div>
           </div>
         </form>
-
-        {mensaje && (
-          <div className="mensaje-container">
-            <div className="mensaje-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
-              </svg>
-            </div>
-            <p className="mensaje-text">{mensaje}</p>
-          </div>
-        )}
       </div>
     </div>
   );

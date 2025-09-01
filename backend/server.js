@@ -353,13 +353,11 @@ app.get('/api/mis-balnearios', async (req, res) => {
   }
 });
 
-// POST /api/crear-balneario
 app.post('/api/crear-balneario', async (req, res) => {
   const {
     nombre,
     direccion,
     telefono,
-    imagenUrl,
     ciudadSeleccionada,
     idUsuario,
     tandasCarpas, // array de todas las tandas
@@ -390,7 +388,6 @@ app.post('/api/crear-balneario', async (req, res) => {
         nombre,
         direccion,
         telefono,
-        imagen: imagenUrl,
         id_usuario: idUsuario,
         id_ciudad: ciudadSeleccionada
       }])
@@ -456,10 +453,60 @@ app.post('/api/crear-balneario', async (req, res) => {
       return res.status(500).json({ error: "Balneario y precios creados, pero ocurrió un error al crear las carpas." });
     }
 
-    res.status(200).json({ mensaje: 'Balneario, precios y carpas creados correctamente.' });
+    // Devuelve ID para subir imágenes
+    res.status(200).json({ 
+      mensaje: 'Balneario, precios y carpas creados correctamente.',
+      id_balneario: nuevoBalnearioId
+    });
   } catch (err) {
     console.error("Error en /api/crear-balneario:", err);
     res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
+// Sube las imágenes y las registra en la tabla balneario_imagenes
+app.post('/api/crear-imagenes-balneario', upload.array('imagenes'), async (req, res) => {
+  const { id_balneario } = req.body;
+  const files = req.files;
+
+  if (!id_balneario || !files || files.length === 0) {
+    return res.status(400).json({ error: "Datos incompletos." });
+  }
+
+  try {
+    // Subir cada imagen al bucket balnearios
+    let urls = [];
+    for (const file of files) {
+      // Guardar en subcarpeta por balneario
+      const path = `balnearios/${id_balneario}/${file.originalname}`;
+      const { error: uploadError } = await supabase.storage
+        .from("balnearios")
+        .upload(path, file.buffer, { contentType: file.mimetype, upsert: false });
+      if (uploadError) {
+        return res.status(500).json({ error: "Error al subir imágenes." });
+      }
+      // Obtener URL pública
+      const { data } = supabase.storage.from("balnearios").getPublicUrl(path);
+      urls.push(data.publicUrl);
+    }
+
+    // Registrar las imágenes en la tabla balneario_imagenes
+    const registros = urls.map(url => ({
+      id_balneario,
+      url
+    }));
+    const { error: bdError } = await supabase
+      .from("balneario_imagenes")
+      .insert(registros);
+
+    if (bdError) {
+      return res.status(500).json({ error: "Error al registrar imágenes." });
+    }
+
+    res.status(200).json({ mensaje: "Imágenes registradas correctamente." });
+  } catch (err) {
+    console.error("Error en /api/crear-imagenes-balneario:", err);
+    res.status(500).json({ error: "Error interno al subir imágenes." });
   }
 });
 

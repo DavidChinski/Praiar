@@ -50,7 +50,7 @@
     gap: 0.8rem;
   }
   
-  .balneario-nombre {
+  .balneario-nombre-mapa {
     font-size: 1.3rem !important;
   }
 }
@@ -61,14 +61,14 @@
     margin-bottom: 1rem;
   }
   
-  .balneario-nombre {
+  .balneario-nombre-mapa {
     font-size: 1.2rem !important;
   }
 }
 
 /* eliminado del header; ahora se usa en el panel */
 
-.balneario-nombre {
+.balneario-nombre-mapa {
   margin: 0;
   font-size: 1.5rem !important;
   font-weight: 800;
@@ -2063,7 +2063,7 @@ button {
   background: #005984;
 }
 
-.balneario-nombre {
+.balneario-nombre-mapa {
   margin: 0;
   font-size: 2rem;
   font-weight: 800;
@@ -2072,7 +2072,7 @@ button {
   position: relative;
 }
 
-.balneario-nombre::after {
+.balneario-nombre-mapa::after {
   content: '';
   position: absolute;
   bottom: -5px;
@@ -2459,7 +2459,7 @@ button {
     border-radius: 16px;
   }
   
-  .balneario-nombre {
+  .balneario-nombre-mapa {
     font-size: 1.5rem;
   }
   
@@ -2527,7 +2527,7 @@ button {
     border-radius: 12px;
   }
   
-  .balneario-nombre {
+  .balneario-nombre-mapa {
     font-size: 1.3rem;
   }
   
@@ -2575,7 +2575,7 @@ button {
   background: #005984;
 }
 
-.balneario-nombre::after {
+.balneario-nombre-mapa::after {
   content: '';
   position: absolute;
   bottom: -5px;
