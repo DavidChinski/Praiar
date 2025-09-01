@@ -73,11 +73,16 @@ button {
 
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--secondary-500);
+  box-shadow: none !important;
+}
+
+.eye-toggle:hover{
+  border: none !important;
+  background-color: transparent !important;
 }
 
 .secondary:hover {
-  background-color: var(--secondary-200);
+  background-color: var(--secondary-200) !important;
 }
 
 .link-btn {
@@ -93,7 +98,9 @@ button:focus {
 }
 
 .link-btn:hover {
-  color: var(--secondary-600);
+  color: var(--primary-700);
+  background-color: transparent !important;
+  border: none;
 }
 
 .linea {

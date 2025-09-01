@@ -353,6 +353,7 @@ app.get('/api/mis-balnearios', async (req, res) => {
   }
 });
 
+// Crear balneario (modificado para aceptar campo imagen, aunque se setea después)
 app.post('/api/crear-balneario', async (req, res) => {
   const {
     nombre,
@@ -361,7 +362,8 @@ app.post('/api/crear-balneario', async (req, res) => {
     ciudadSeleccionada,
     idUsuario,
     tandasCarpas, // array de todas las tandas
-    precios       // objeto { dia, semana, quincena, mes }
+    precios,
+    imagen       // <-- nuevo campo, puede venir vacío inicialmente
   } = req.body;
 
   if (!idUsuario) {
@@ -389,7 +391,8 @@ app.post('/api/crear-balneario', async (req, res) => {
         direccion,
         telefono,
         id_usuario: idUsuario,
-        id_ciudad: ciudadSeleccionada
+        id_ciudad: ciudadSeleccionada,
+        imagen: imagen || null // campo imagen principal (puede ir null)
       }])
       .select()
       .single();
@@ -503,10 +506,31 @@ app.post('/api/crear-imagenes-balneario', upload.array('imagenes'), async (req, 
       return res.status(500).json({ error: "Error al registrar imágenes." });
     }
 
-    res.status(200).json({ mensaje: "Imágenes registradas correctamente." });
+    res.status(200).json({ mensaje: "Imágenes registradas correctamente.", urls });
   } catch (err) {
     console.error("Error en /api/crear-imagenes-balneario:", err);
     res.status(500).json({ error: "Error interno al subir imágenes." });
+  }
+});
+
+// NUEVO ENDPOINT: Actualiza el campo imagen principal en balnearios
+app.post('/api/actualizar-imagen-principal', async (req, res) => {
+  const { id_balneario, imagen } = req.body;
+  if (!id_balneario || !imagen) {
+    return res.status(400).json({ error: "Faltan datos." });
+  }
+  try {
+    const { error } = await supabase
+      .from("balnearios")
+      .update({ imagen })
+      .eq("id_balneario", id_balneario);
+    if (error) {
+      return res.status(500).json({ error: "Error al actualizar la imagen principal." });
+    }
+    res.status(200).json({ mensaje: "Imagen principal actualizada." });
+  } catch (err) {
+    console.error("Error en /api/actualizar-imagen-principal:", err);
+    res.status(500).json({ error: "Error interno." });
   }
 });
 
