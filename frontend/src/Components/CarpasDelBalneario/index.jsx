@@ -2,14 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
 import "./CarpasDelBalneario.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faList, faCog, faSearchPlus, faSearchMinus, faExpandArrowsAlt, faMapMarkerAlt, faChevronRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { DateRange } from "react-date-range";
-import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import BusquedaHomeSearch from "../../assets/BusquedaHome.png";
 
-// NUEVOS COMPONENTES
 import ElementoAutocomplete from "./ElementoAutocomplete";
 import CarpaItem from "./CarpaItem";
 import ElementoItem from "./ElementoItem";
@@ -25,8 +23,6 @@ const CARD_WIDTH = 340;
 const RESEÑAS_POR_VISTA = 2;
 const EXTEND_FACTOR = 100;
 
-
-
 function CarpasDelBalneario(props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,6 +33,10 @@ function CarpasDelBalneario(props) {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const defaultFin = tomorrow.toISOString().split('T')[0];
+
+  // Estado para imágenes
+  const [imagenesBalneario, setImagenesBalneario] = useState([]);
+  const [showGaleria, setShowGaleria] = useState(false);
 
   const [rangoFechas, setRangoFechas] = useState([
     {
@@ -50,13 +50,9 @@ function CarpasDelBalneario(props) {
   const [showCalendarioModal, setShowCalendarioModal] = useState(false);
   const [actualizandoDisponibilidad, setActualizandoDisponibilidad] = useState(false);
   const [rangoFechasDraft, setRangoFechasDraft] = useState(rangoFechas);
-
-  // Selección múltiple: si vienen props de selección, usarlas, sino estado interno
   const [seleccionadas, setSeleccionadas] = props.seleccionadas !== undefined
-  ? [props.seleccionadas, props.setSeleccionadas]
-  : useState([]);
-  
-
+    ? [props.seleccionadas, props.setSeleccionadas]
+    : useState([]);
   const containerRef = useRef(null);
   const modalContentRef = useRef(null);
   const [carpas, setCarpas] = useState([]);
@@ -83,123 +79,11 @@ function CarpasDelBalneario(props) {
   });
   const [precios, setPrecios] = useState([]);
   const [editandoPrecio, setEditandoPrecio] = useState(null);
-  const [precioEdit, setPrecioEdit] = useState({
-    dia: "",
-    semana: "",
-    quincena: "",
-    mes: "",
-  });
-
-  // ==== FUNCIONALIDAD DE ZOOM ====
+  const [precioEdit, setPrecioEdit] = useState({ dia: "", semana: "", quincena: "", mes: "" });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  // Función para hacer zoom in
-  const handleZoomIn = () => {
-    setZoom(prevZoom => Math.min(prevZoom * 1.2, 3));
-  };
-
-  // Función para hacer zoom out
-  const handleZoomOut = () => {
-    setZoom(prevZoom => Math.max(prevZoom / 1.2, 0.3));
-  };
-
-  // Función para resetear zoom
-  const handleResetZoom = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  // Función para manejar el inicio del arrastre del mapa (solo si no clickea sobre carpa/elemento)
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return;
-    const target = e.target;
-    if (target.closest && (target.closest('.carpa') || target.closest('.elemento'))) {
-      return; // no iniciar pan si está sobre un elemento interactivo
-    }
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - pan.x,
-      y: e.clientY - pan.y
-    });
-  };
-
-  // Función para manejar el movimiento del mouse durante el arrastre
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setPan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
-    }
-    if (dragging) {
-      // Delegar en la lógica de DnD si hay un elemento en drag
-      onMouseMove(e);
-    }
-  };
-
-  // Función para manejar el fin del arrastre
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    // Si se estaba moviendo una carpa/elemento, persistir
-    if (dragging) {
-      onMouseUp();
-    }
-  };
-
-  // Listeners globales para no quedar "pegado" fuera del contenedor
-  useEffect(() => {
-    const handleWindowMouseUp = () => {
-      if (isDragging) setIsDragging(false);
-      if (dragging) onMouseUp();
-    };
-    const handleWindowMouseMove = (e) => {
-      if (isDragging || dragging) handleMouseMove(e);
-    };
-    window.addEventListener('mouseup', handleWindowMouseUp);
-    window.addEventListener('mousemove', handleWindowMouseMove);
-    return () => {
-      window.removeEventListener('mouseup', handleWindowMouseUp);
-      window.removeEventListener('mousemove', handleWindowMouseMove);
-    };
-  }, [isDragging, dragging, dragStart, pan, zoom]);
-
-  // Función para manejar el scroll del mouse para zoom
-  const handleWheel = (e) => {
-    // Solo hacer zoom si mantiene Ctrl presionado; de lo contrario, dejar que la página haga scroll
-    if (!e.ctrlKey) return;
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.max(0.3, Math.min(3, zoom * delta));
-    const rect = containerRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const zoomRatio = newZoom / zoom;
-    setPan(prevPan => ({
-      x: mouseX - (mouseX - prevPan.x) * zoomRatio,
-      y: mouseY - (mouseY - prevPan.y) * zoomRatio
-    }));
-    setZoom(newZoom);
-  };
-
-  // Nota: ya no prevenimos el scroll por defecto; solo hacemos zoom con Ctrl + rueda.
-
-  // Cerrar modal con tecla ESC
-  useEffect(() => {
-    function onKeyDown(e) {
-      if (e.key === 'Escape') {
-        setShowCalendarioModal(false);
-      }
-    }
-    if (showCalendarioModal) {
-      window.addEventListener('keydown', onKeyDown);
-      return () => window.removeEventListener('keydown', onKeyDown);
-    }
-  }, [showCalendarioModal]);
-
-  // AUTOCOMPLETADO DE ELEMENTOS
   const [todosElementos] = useState([
     { nombre: "Pasillo", tipo: "pasillo" },
     { nombre: "Pileta", tipo: "pileta" },
@@ -209,29 +93,24 @@ function CarpasDelBalneario(props) {
   const [elementoMatches, setElementoMatches] = useState([]);
   const elementoInputRef = useRef(null);
   const elementoDropdownRef = useRef(null);
-
-  // ==== RESEÑAS ====
   const [resenias, setResenias] = useState([]);
   const [loadingResenias, setLoadingResenias] = useState(false);
   const [errorResenias, setErrorResenias] = useState(null);
   const [reseniaNueva, setReseniaNueva] = useState({ comentario: "", estrellas: 5, estrellasHover: undefined });
-  useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    setUsuarioLogueado(usuario || null);
-  }, []);
-  // Carrusel infinito
   const [indiceResenia, setIndiceResenia] = useState(0);
   const [animating, setAnimating] = useState(false);
-
-  // Carrusel infinito: arreglo extendido
-  const reseñasExtendidas = Array(EXTEND_FACTOR)
-    .fill(resenias)
-    .flat();
+  const reseñasExtendidas = Array(EXTEND_FACTOR).fill(resenias).flat();
   const baseIndex = resenias.length * Math.floor(EXTEND_FACTOR / 2);
-
-
   const [mostrarReservaManual, setMostrarReservaManual] = useState(false);
   const [carpaParaReservar, setCarpaParaReservar] = useState(null);
+
+  // ============== IMÁGENES BALNEARIO ==============
+  useEffect(() => {
+    if (!balnearioId) return;
+    fetch(`http://localhost:3000/api/balneario/${balnearioId}/imagenes`)
+      .then(res => res.json())
+      .then(data => setImagenesBalneario(data.imagenes || []));
+  }, [balnearioId]);
 
   function handleReservarManual(carpa) {
     setCarpaParaReservar(carpa);
@@ -241,9 +120,8 @@ function CarpasDelBalneario(props) {
   async function reservarManual(datosReserva, onComplete) {
     if (!balnearioId || !carpaParaReservar) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
-    // Armá el body como espera el backend:
     const body = {
-      id_usuario: usuario?.auth_id || usuario?.id_usuario || "", // soporte para ambos
+      id_usuario: usuario?.auth_id || usuario?.id_usuario || "",
       id_ubicaciones: [carpaParaReservar.id_carpa],
       id_balneario: balnearioId,
       fecha_inicio: datosReserva.fecha_inicio,
@@ -259,7 +137,6 @@ function CarpasDelBalneario(props) {
       pais: "",
       precio_total: 0
     };
-    // DEBUG: console.log(body);
     const res = await fetch(`http://localhost:3000/api/reserva`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -278,14 +155,8 @@ function CarpasDelBalneario(props) {
     }
   }
 
-  useEffect(() => {
-    if (resenias.length > 0) {
-      setIndiceResenia(baseIndex);
-    }
-    // eslint-disable-next-line
-  }, [resenias.length]);
+  useEffect(() => { if (resenias.length > 0) setIndiceResenia(baseIndex); }, [resenias.length]);
 
-  // Obtener usuario logueado y balneario info
   useEffect(() => {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -298,7 +169,6 @@ function CarpasDelBalneario(props) {
           setCiudad(info.ciudad || "");
           const userAuthId = usuario.auth_id;
           const userNumericId = usuario.id_usuario;
-          // Considerar múltiples formas de identificar al dueño
           if (
             usuario.esPropietario === true ||
             info.id_usuario === userAuthId ||
@@ -315,10 +185,7 @@ function CarpasDelBalneario(props) {
   }, [balnearioId]);
 
   useEffect(() => {
-    if (!elementoInput) {
-      setElementoMatches([]);
-      return;
-    }
+    if (!elementoInput) { setElementoMatches([]); return; }
     const normalizar = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const inputNorm = normalizar(elementoInput);
     const matches = todosElementos.filter(e =>
@@ -350,11 +217,9 @@ function CarpasDelBalneario(props) {
     setElementoMatches([]);
   }
 
-  // Cargar carpas, elementos, servicios, tipos de ubicacion
   useEffect(() => {
     if (!balnearioId) return;
     setLoading(true);
-
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
       .then(res => res.json())
       .then(data => {
@@ -364,23 +229,18 @@ function CarpasDelBalneario(props) {
           y: c.y ?? 0,
         })));
       });
-
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/elementos`)
       .then(res => res.json())
       .then(setElementos);
-
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/servicios-todos`)
       .then(res => res.json())
       .then(setTodosLosServicios);
-
     fetch("http://localhost:3000/api/tipos-ubicaciones")
       .then(res => res.json())
       .then(setTiposUbicacion);
-
     setLoading(false);
   }, [balnearioId]);
 
-  // Cargar reservas
   useEffect(() => {
     if (!fechaInicio || !fechaFin || !balnearioId) return;
     setActualizandoDisponibilidad(true);
@@ -390,7 +250,6 @@ function CarpasDelBalneario(props) {
       .finally(() => setActualizandoDisponibilidad(false));
   }, [balnearioId, fechaInicio, fechaFin]);
 
-  // Cargar precios del balneario
   useEffect(() => {
     if (!balnearioId) return;
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`)
@@ -398,7 +257,6 @@ function CarpasDelBalneario(props) {
       .then(setPrecios);
   }, [balnearioId]);
 
-  // ==== Cargar reseñas ====
   useEffect(() => {
     if (!balnearioId) return;
     setLoadingResenias(true);
@@ -408,7 +266,6 @@ function CarpasDelBalneario(props) {
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        console.log('Reseñas cargadas:', data.resenias);
         setResenias(data.resenias || []);
         setLoadingResenias(false);
       })
@@ -418,7 +275,6 @@ function CarpasDelBalneario(props) {
       });
   }, [balnearioId, usuarioLogueado]);
 
-  // Obtener el tipo de carpa por id_tipo_ubicacion
   const getTipoCarpa = (carpa) => {
     return tiposUbicacion.find(t => t.id_tipo_ubicaciones === carpa.id_tipo_ubicacion)?.nombre || "simple";
   };
@@ -427,7 +283,6 @@ function CarpasDelBalneario(props) {
     if (!fechaInicio || !fechaFin) return false;
     const inicio = new Date(fechaInicio + 'T00:00:00');
     const fin = new Date(fechaFin + 'T00:00:00');
-
     return reservas.some(res => {
       if (res.id_ubicacion !== idUbicacion) return false;
       const resInicio = new Date(res.fecha_inicio + 'T00:00:00');
@@ -436,7 +291,6 @@ function CarpasDelBalneario(props) {
     });
   };
 
-  // Servicios toggle
   async function toggleServicio(servicioId, tiene) {
     if (!balnearioId) return;
     if (tiene) {
@@ -450,13 +304,11 @@ function CarpasDelBalneario(props) {
         body: JSON.stringify({ id_servicio: servicioId }),
       });
     }
-
     fetch(`http://localhost:3000/api/balneario/${balnearioId}/info`)
       .then(res => res.json())
       .then(info => setBalnearioInfo(prev => ({ ...prev, servicios: info.servicios })));
   }
 
-  // ---- RESEÑAS: Agregar reseña ----
   async function agregarResenia() {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -484,7 +336,6 @@ function CarpasDelBalneario(props) {
     });
     if (res.ok) {
       setReseniaNueva({ comentario: "", estrellas: 5, estrellasHover: undefined });
-      // Refrescar lista
       fetch(`http://localhost:3000/api/balneario/${balnearioId}/resenias`)
         .then(r => r.json())
         .then(data => setResenias(data.resenias || []));
@@ -492,8 +343,6 @@ function CarpasDelBalneario(props) {
       alert("Error al enviar reseña");
     }
   }
-
-  // ---- RESEÑAS: Like reseña ----
 
   async function fetchResenias() {
     if (!balnearioId) return;
@@ -522,7 +371,6 @@ function CarpasDelBalneario(props) {
     fetchResenias();
   }
 
-  // Carrusel infinito handlers
   function handleAvanzarResenias() {
     if (animating) return;
     setAnimating(true);
@@ -543,13 +391,11 @@ function CarpasDelBalneario(props) {
     }
   }
 
-  // Drag & drop
   function onMouseMove(e) {
     if (!dragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    // Convertir a coordenadas del canvas (antes de transform: translate/scale)
     const x = (mouseX - pan.x) / zoom - 40 - (dragging.offsetX || 0);
     const y = (mouseY - pan.y) / zoom - 40 - (dragging.offsetY || 0);
 
@@ -570,14 +416,12 @@ function CarpasDelBalneario(props) {
 
   async function onMouseUp() {
     if (!dragging) return;
-
     try {
       if (dragging.tipo === "carpa") {
         const carpa = carpas.find((c) => c.id_carpa === dragging.id);
         if (carpa) {
           const finalX = Math.round(carpa.x);
           const finalY = Math.round(carpa.y);
-          // Persistir primero, luego refrescar con un leve retardo para evitar carreras
           const res = await fetch(`http://localhost:3000/api/balneario/carpas/${carpa.id_carpa}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -586,7 +430,6 @@ function CarpasDelBalneario(props) {
           if (!res.ok) {
             console.warn('No se pudo guardar posición de carpa', carpa.id_carpa);
           } else {
-            // Refrescar desde backend para asegurar persistencia
             fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`)
               .then(r => r.json())
               .then(data => setCarpas(data.map(c => ({ ...c }))));
@@ -656,7 +499,6 @@ function CarpasDelBalneario(props) {
           : el
       )
     );
-
     const el = elementos.find((e) => e.id_elemento === id_elemento);
     if (el) {
       fetch(`http://localhost:3000/api/balneario/elementos/${id_elemento}`, {
@@ -667,19 +509,14 @@ function CarpasDelBalneario(props) {
     }
   }
 
-  // AGREGAR CARPA/SOMBRILLA
   async function handleAgregarCarpa() {
     if (!balnearioId) return;
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!nuevaCarpa.id_tipo_ubicacion) return alert("Seleccione el tipo");
-  
-    // Parámetros de la grilla (ajusta si tus carpas son más grandes)
-    const STEP_X = 100; // ancho de una carpa
-    const STEP_Y = 100; // alto de una carpa
-    const MAX_X = 10; // columnas
-    const MAX_Y = 10; // filas
-  
-    // Juntar todas las posiciones ocupadas (carpas y elementos)
+    const STEP_X = 100;
+    const STEP_Y = 100;
+    const MAX_X = 10;
+    const MAX_Y = 10;
     const ocupadas = new Set();
     carpas.forEach(c => {
       const x = Number.isFinite(c.x) ? c.x : 0;
@@ -691,8 +528,6 @@ function CarpasDelBalneario(props) {
       const y = Number.isFinite(e.y) ? e.y : 0;
       ocupadas.add(`${x},${y}`);
     });
-  
-    // Buscar la primer celda libre en la grilla
     let libreX = null, libreY = null;
     outer: for (let y = 0; y < MAX_Y; y++) {
       for (let x = 0; x < MAX_X; x++) {
@@ -708,8 +543,6 @@ function CarpasDelBalneario(props) {
       alert("No hay espacio libre para agregar una nueva carpa/sombrilla.");
       return;
     }
-  
-    // Crear la carpa en la posición libre encontrada
     const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/carpas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -743,10 +576,8 @@ function CarpasDelBalneario(props) {
     }
   }
 
-  // --- NUEVO: alta de precio desde modal ---
   async function onAgregarPrecio(precioNuevo) {
     if (!balnearioId) return alert("Falta id de balneario");
-    // Si tu backend tiene endpoint POST /api/balneario/:id/precios, usalo:
     const res = await fetch(`http://localhost:3000/api/balneario/${balnearioId}/precios`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -764,7 +595,6 @@ function CarpasDelBalneario(props) {
     }
   }
 
-  // ---- NUEVO: edición de precios ----
   function abrirModalPrecio(p) {
     setEditandoPrecio(p);
     setPrecioEdit({
@@ -796,45 +626,139 @@ function CarpasDelBalneario(props) {
     }
   }
 
+  const handleZoomIn = () => { setZoom(prevZoom => Math.min(prevZoom * 1.2, 3)); };
+  const handleZoomOut = () => { setZoom(prevZoom => Math.max(prevZoom / 1.2, 0.3)); };
+  const handleResetZoom = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const target = e.target;
+    if (target.closest && (target.closest('.carpa') || target.closest('.elemento'))) return;
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - pan.x,
+      y: e.clientY - pan.y
+    });
+  };
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+    if (dragging) {
+      onMouseMove(e);
+    }
+  };
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    if (dragging) {
+      onMouseUp();
+    }
+  };
+
+  useEffect(() => {
+    const handleWindowMouseUp = () => {
+      if (isDragging) setIsDragging(false);
+      if (dragging) onMouseUp();
+    };
+    const handleWindowMouseMove = (e) => {
+      if (isDragging || dragging) handleMouseMove(e);
+    };
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    return () => {
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+    };
+  }, [isDragging, dragging, dragStart, pan, zoom]);
+
+  const handleWheel = (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.3, Math.min(3, zoom * delta));
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const zoomRatio = newZoom / zoom;
+    setPan(prevPan => ({
+      x: mouseX - (mouseX - prevPan.x) * zoomRatio,
+      y: mouseY - (mouseY - prevPan.y) * zoomRatio
+    }));
+    setZoom(newZoom);
+  };
+
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        setShowCalendarioModal(false);
+      }
+    }
+    if (showCalendarioModal) {
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
+    }
+  }, [showCalendarioModal]);
+
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
+  // Extraer imagen principal y secundarias
+  const imagenPrincipal = imagenesBalneario[0]?.url;
+  const imagenesSecundarias = imagenesBalneario.slice(1, 6).map(img => img.url);
+  const imagenesExtra = imagenesBalneario.slice(6);
+
   return (
     <div className="carpas-del-balneario">
-      <div className="balneario-header">
-        <div className="balneario-header-main">
-          <h1 className="balneario-nombre-mapa">{balnearioInfo?.nombre || 'Balneario'}</h1>
-
-          <div className="header-badge">
-            {esDuenio ? (
-              <span>TU BALNEARIO!</span>
-            ) : (
-              <span>RESERVA YA!</span>
+      {/* ===================== HEADER CON IMÁGENES ===================== */}
+      <div className="balneario-header-imgs">
+        <h1 className="balneario-nombre-mapa">{balnearioInfo?.nombre || 'Balneario'}</h1>
+        <div className="balneario-direccion-row">
+          <FontAwesomeIcon icon={faMapMarkerAlt} className="direccion-icon" />
+          <span>{balnearioInfo?.direccion || '-'}</span>
+          {Ciudad && <span>, {Ciudad}</span>}
+          {balnearioInfo?.direccion && (
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(balnearioInfo.direccion)}`} target="_blank" rel="noopener noreferrer" className="map-link">
+              Ver mapa
+            </a>
+          )}
+        </div>
+        <div className="balneario-imagenes-grid">
+          <div className="principal-img-wrapper">
+            {imagenPrincipal && (
+              <img src={imagenPrincipal} alt="Principal balneario" className="img-principal" />
+            )}
+          </div>
+          <div className="secundarias-img-wrapper">
+            {imagenesSecundarias.map((url, idx) => (
+              <img key={idx} src={url} alt={`Foto ${idx + 2} balneario`} className="img-secundaria" />
+            ))}
+            {imagenesExtra.length > 0 && (
+              <div className="img-mas-fotos" onClick={() => setShowGaleria(true)}>
+                <span>{imagenesExtra.length + imagenesSecundarias.length + 1} fotos más</span>
+                <FontAwesomeIcon icon={faChevronRight} />
+              </div>
             )}
           </div>
         </div>
-        {balnearioInfo && (
-          <div className="balneario-meta">
-            <div className="meta-item">
-              <span className="meta-label">Dirección</span>
-              <span className="meta-value">{balnearioInfo.direccion || '-'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Ciudad</span>
-              <span className="meta-value">{Ciudad || '-'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Teléfono</span>
-              <a className="meta-value meta-link" href={balnearioInfo.telefono ? `tel:${balnearioInfo.telefono}` : undefined}>{balnearioInfo.telefono || '-'}</a>
+      </div>
+      {showGaleria && (
+        <div className="modal-galeria" onClick={() => setShowGaleria(false)}>
+          <div className="modal-galeria-content" onClick={e => e.stopPropagation()}>
+            <button className="close-galeria-btn" onClick={() => setShowGaleria(false)}>✕</button>
+            <div className="galeria-imagenes">
+              {imagenesBalneario.map((img, idx) => (
+                <img key={img.id_imagen || idx} src={img.url} alt={`Imagen ${idx + 1}`} className="img-galeria" />
+              ))}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
+      {/* ================ PANEL IZQUIERDO Y MAPA ================= */}
       <div className="main-content-layout">
-        {/* Panel izquierdo con elementos de gestión */}
         <div className="management-panel">
-          {/* Indicador de estado del sistema */}
           <div className="system-status">
             <div className="status-indicator active"></div>
             {esDuenio ? (
@@ -843,10 +767,8 @@ function CarpasDelBalneario(props) {
               <span className="status-text">Edita la fecha!</span>
             )}
           </div>
-          
           {esDuenio ? (
             <>
-              {/* Sección de Gestión de Fechas */}
               <div className="panel-section">
                 <h3 className="panel-title">Gestión de Fechas</h3>
                 <div className="availability-row">
@@ -869,8 +791,6 @@ function CarpasDelBalneario(props) {
                   </div>
                 </div>
               </div>
-
-              {/* Sección de Gestión de Elementos */}
               <div className="panel-section">
                 <h3 className="panel-title">Gestión de Elementos</h3>
                 <div className="add-elements-container">
@@ -891,8 +811,6 @@ function CarpasDelBalneario(props) {
                   </button>
                 </div>
               </div>
-
-              {/* Sección de Acciones del Sistema */}
               <div className="panel-section">
                 <h3 className="panel-title">Acciones del Sistema</h3>
                 <div className="quick-actions">
@@ -930,8 +848,6 @@ function CarpasDelBalneario(props) {
             </div>
           )}
         </div>
-
-        {/* Contenedor del mapa a la derecha */}
         <div className="map-container-wrapper">
           {actualizandoDisponibilidad && (
             <div className="map-loading-overlay">
@@ -939,21 +855,18 @@ function CarpasDelBalneario(props) {
               <span>Actualizando disponibilidad…</span>
             </div>
           )}
-          {/* Leyenda del mapa */}
           <div className="map-legend">
             <div className="legend-item"><span className="legend-dot libre" /> Disponible</div>
             <div className="legend-item"><span className="legend-dot reservada" /> Reservado</div>
           </div>
-          {/* Controles de zoom (arriba a la derecha) */}
           <div className="zoom-controls">
             <div className="zoom-level-indicator">{Math.round(zoom * 100)}%</div>
             <button className="zoom-btn zoom-in" onClick={handleZoomIn}>+</button>
             <button className="zoom-btn zoom-out" onClick={handleZoomOut}>-</button>
             <button className="zoom-btn zoom-reset" onClick={handleResetZoom}>
-              <FontAwesomeIcon icon="fa-solid fa-rotate-left" />
+              <FontAwesomeIcon icon={faRotateLeft} />
             </button>
           </div>
-
           <div
             className="carpa-container"
             ref={containerRef}
@@ -1005,7 +918,6 @@ function CarpasDelBalneario(props) {
                 </div>
               );
             })}
-
             {elementos.map((el) => (
               <ElementoItem
                 key={el.id_elemento}
@@ -1019,14 +931,12 @@ function CarpasDelBalneario(props) {
           </div>
         </div>
       </div>
-
       {showCalendarioModal && (
         <div
           className="modal-fechas"
           role="dialog"
           aria-modal="true"
           onMouseDown={(e) => {
-            // cerrar si clickea fuera del contenido
             if (modalContentRef.current && !modalContentRef.current.contains(e.target)) {
               setShowCalendarioModal(false);
             }
@@ -1072,7 +982,6 @@ function CarpasDelBalneario(props) {
           </div>
         </div>
       )}
-
       <ServiciosSection
         balnearioInfo={balnearioInfo}
         esDuenio={esDuenio}
@@ -1081,7 +990,6 @@ function CarpasDelBalneario(props) {
         todosLosServicios={todosLosServicios}
         toggleServicio={toggleServicio}
       />
-
       <AgregarCarpaModal
         mostrarAgregarCarpa={mostrarAgregarCarpa}
         setMostrarAgregarCarpa={setMostrarAgregarCarpa}
@@ -1092,20 +1000,17 @@ function CarpasDelBalneario(props) {
         precios={precios}
         onAgregarPrecio={onAgregarPrecio}
       />
-
       <EditarCarpaModal
         carpaEditando={carpaEditando}
         handleInputChange={handleInputChange}
         guardarCambios={guardarCambios}
         setCarpaEditando={setCarpaEditando}
       />
-
       <PreciosBalnearioTabla
         precios={precios}
         esDuenio={esDuenio}
         abrirModalPrecio={abrirModalPrecio}
       />
-
       <EditarPrecioModal
         editandoPrecio={editandoPrecio}
         precioEdit={precioEdit}
@@ -1113,7 +1018,6 @@ function CarpasDelBalneario(props) {
         guardarPrecio={guardarPrecio}
         setEditandoPrecio={setEditandoPrecio}
       />
-
       <ReseniasSection
         loadingResenias={loadingResenias}
         handleRetrocederResenias={handleRetrocederResenias}

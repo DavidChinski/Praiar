@@ -534,6 +534,22 @@ app.post('/api/actualizar-imagen-principal', async (req, res) => {
   }
 });
 
+// Endpoint GET para traer las imágenes de un balneario
+app.get('/api/balneario/:id_balneario/imagenes', async (req, res) => {
+  const { id_balneario } = req.params;
+  // Usando Supabase para traer las imágenes
+  const { data, error } = await supabase
+    .from('balneario_imagenes')
+    .select('id_imagen,url')
+    .eq('id_balneario', id_balneario)
+    .order('id_imagen', { ascending: true });
+
+  if (error) {
+    return res.status(500).json({ error: 'Error al obtener imágenes del balneario' });
+  }
+  res.json({ imagenes: data });
+});
+
 // Nuevo endpoint sugerido para traer tipos de ubicaciones
 app.get('/api/tipos-ubicaciones', async (req, res) => {
   try {

@@ -12,7 +12,7 @@ function CrearBalneario() {
 
   // Tanda actual
   const [tipoUbicacion, setTipoUbicacion] = useState("");
-  const [cantidadCarpas, setCantidadCarpas] = useState(0);
+  const [cantidadCarpas, setCantidadCarpas] = useState(""); // Cambiado a string para poder dejar vacío
   const [cantSillas, setCantSillas] = useState(2);
   const [cantMesas, setCantMesas] = useState(1);
   const [cantReposeras, setCantReposeras] = useState(2);
@@ -48,7 +48,7 @@ function CrearBalneario() {
   const handleAgregarTanda = (e) => {
     e.preventDefault();
     if (!tipoUbicacion) return setMensaje("Debe seleccionar un tipo de carpa.");
-    if (cantidadCarpas <= 0) return setMensaje("Debe ingresar la cantidad de carpas.");
+    if (!cantidadCarpas || parseInt(cantidadCarpas) <= 0) return setMensaje("Debe ingresar la cantidad de carpas.");
     if (precioDia === "" || precioSemana === "" || precioQuincena === "" || precioMes === "") {
       return setMensaje("Debe ingresar todos los precios para este tipo.");
     }
@@ -59,7 +59,7 @@ function CrearBalneario() {
 
     setTandasCarpas([...tandasCarpas, {
       id_tipo_ubicacion: tipoUbicacion,
-      cantidadCarpas,
+      cantidadCarpas: parseInt(cantidadCarpas),
       cantSillas,
       cantMesas,
       cantReposeras,
@@ -75,7 +75,7 @@ function CrearBalneario() {
     }]);
     // Reset
     setTipoUbicacion("");
-    setCantidadCarpas(0);
+    setCantidadCarpas(""); // Ahora vacío
     setCantSillas(2);
     setCantMesas(1);
     setCantReposeras(2);
@@ -100,7 +100,7 @@ function CrearBalneario() {
 
   // Subir imágenes al backend (las guarda en bucket y las registra en BD)
   const subirImagenesABackend = async (balnearioId) => {
-    if (imagenes.length === 0) return;
+    if (imagenes.length === 0) return { urls: [] };
     const formData = new FormData();
     formData.append("id_balneario", balnearioId);
     imagenes.forEach((img) => {
@@ -112,6 +112,7 @@ function CrearBalneario() {
     });
     const result = await res.json();
     if (!res.ok) throw new Error(result.error || "Error al subir imágenes.");
+    return result;
   };
 
   // Enviar todo al backend
@@ -138,7 +139,8 @@ function CrearBalneario() {
       ciudadSeleccionada,
       idUsuario: usuario.auth_id,
       tandasCarpas,
-      precios: preciosPorTipo
+      precios: preciosPorTipo,
+      imagen: null  // Imagen principal se actualiza luego
     };
 
     try {
@@ -157,7 +159,16 @@ function CrearBalneario() {
 
       // 2. Subir imágenes si hay
       if (imagenes.length > 0) {
-        await subirImagenesABackend(balnearioId);
+        const { urls } = await subirImagenesABackend(balnearioId);
+
+        // 3. Actualizar imagen principal del balneario (la primera imagen)
+        if (urls && urls.length > 0) {
+          await fetch("http://localhost:3000/api/actualizar-imagen-principal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id_balneario: balnearioId, imagen: urls[0] })
+          });
+        }
       }
 
       window.location.href = "/tusbalnearios";
@@ -298,10 +309,10 @@ function CrearBalneario() {
                 <input 
                   id="cantidadCarpas" 
                   type="number" 
-                  value={cantidadCarpas} 
-                  onChange={e => setCantidadCarpas(parseInt(e.target.value) || 0)} 
+                  value={cantidadCarpas}
+                  onChange={e => setCantidadCarpas(e.target.value)} // Permite vacío
                   min="1"
-                  placeholder="0"
+                  placeholder="Ingrese cantidad"
                 />
               </div>
               <div className="form-group">
