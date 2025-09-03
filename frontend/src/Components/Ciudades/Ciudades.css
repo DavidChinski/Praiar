@@ -340,6 +340,9 @@ h2 {
   color: var(--primary-900);
 }
 
+.cerrar-mapa-btn:hover{
+  background-color: transparent;
+}
 
 .cerrar-mapa-btn:focus, .mirar-btn:focus {
   outline: none;

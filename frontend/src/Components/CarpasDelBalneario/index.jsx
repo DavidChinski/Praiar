@@ -34,9 +34,13 @@ function CarpasDelBalneario(props) {
   tomorrow.setDate(today.getDate() + 1);
   const defaultFin = tomorrow.toISOString().split('T')[0];
 
-  // Estado para imágenes
+  // Estado para imágenes y modal de mapa
   const [imagenesBalneario, setImagenesBalneario] = useState([]);
   const [showGaleria, setShowGaleria] = useState(false);
+  const [showMapa, setShowMapa] = useState(false);
+
+  // Carrusel de galería
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const [rangoFechas, setRangoFechas] = useState([
     {
@@ -111,6 +115,32 @@ function CarpasDelBalneario(props) {
       .then(res => res.json())
       .then(data => setImagenesBalneario(data.imagenes || []));
   }, [balnearioId]);
+
+  // Modal galería: cerrar con ESC y manejar flechas
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        setShowGaleria(false);
+        setShowMapa(false);
+      }
+      if (showGaleria && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        if (e.key === 'ArrowRight') {
+          setCarouselIndex(current => Math.min(current + 1, imagenesBalneario.length - 1));
+        } else if (e.key === 'ArrowLeft') {
+          setCarouselIndex(current => Math.max(current - 1, 0));
+        }
+      }
+    }
+    if (showGaleria || showMapa) {
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
+    }
+  }, [showGaleria, showMapa, imagenesBalneario.length]);
+
+  // Extraer imagen principal y secundarias (máximo 7)
+  const imagenPrincipal = imagenesBalneario[0]?.url;
+  const imagenesSecundarias = imagenesBalneario.slice(1, 6).map(img => img.url); // 6 secundarias
+  const imagenesExtra = imagenesBalneario.slice(7);
 
   function handleReservarManual(carpa) {
     setCarpaParaReservar(carpa);
@@ -693,21 +723,18 @@ function CarpasDelBalneario(props) {
     function onKeyDown(e) {
       if (e.key === 'Escape') {
         setShowCalendarioModal(false);
+        setShowMapa(false);
       }
     }
-    if (showCalendarioModal) {
+    if (showCalendarioModal || showMapa) {
       window.addEventListener('keydown', onKeyDown);
       return () => window.removeEventListener('keydown', onKeyDown);
     }
-  }, [showCalendarioModal]);
+  }, [showCalendarioModal, showMapa]);
 
   if (loading) return <p>Cargando carpas...</p>;
   if (error) return <p>{error}</p>;
 
-  // Extraer imagen principal y secundarias
-  const imagenPrincipal = imagenesBalneario[0]?.url;
-  const imagenesSecundarias = imagenesBalneario.slice(1, 6).map(img => img.url);
-  const imagenesExtra = imagenesBalneario.slice(6);
 
   return (
     <div className="carpas-del-balneario">
@@ -719,11 +746,16 @@ function CarpasDelBalneario(props) {
           <span>{balnearioInfo?.direccion || '-'}</span>
           {Ciudad && <span>, {Ciudad}</span>}
           {balnearioInfo?.direccion && (
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(balnearioInfo.direccion)}`} target="_blank" rel="noopener noreferrer" className="map-link">
+            <span
+              className="map-link"
+              style={{ cursor: 'pointer', color: '#0076c9', textDecoration: 'underline', marginLeft: 8 }}
+              onClick={() => setShowMapa(true)}
+            >
               Ver mapa
-            </a>
+            </span>
           )}
         </div>
+        {/* Galería de imágenes */}
         <div className="balneario-imagenes-grid">
           <div className="principal-img-wrapper">
             {imagenPrincipal && (
@@ -735,27 +767,70 @@ function CarpasDelBalneario(props) {
               <img key={idx} src={url} alt={`Foto ${idx + 2} balneario`} className="img-secundaria" />
             ))}
             {imagenesExtra.length > 0 && (
-              <div className="img-mas-fotos" onClick={() => setShowGaleria(true)}>
-                <span>{imagenesExtra.length + imagenesSecundarias.length + 1} fotos más</span>
+              <div className="img-mas-fotos" onClick={() => { setShowGaleria(true); setCarouselIndex(0); }}>
+                <span>{imagenesBalneario.length} fotos más</span>
                 <FontAwesomeIcon icon={faChevronRight} />
               </div>
             )}
           </div>
         </div>
       </div>
+      {/* Modal galería tipo carrusel */}
       {showGaleria && (
         <div className="modal-galeria" onClick={() => setShowGaleria(false)}>
           <div className="modal-galeria-content" onClick={e => e.stopPropagation()}>
             <button className="close-galeria-btn" onClick={() => setShowGaleria(false)}>✕</button>
-            <div className="galeria-imagenes">
+            <div className="galeria-carrusel">
+              <button
+                className="carrusel-nav-btn"
+                disabled={carouselIndex === 0}
+                onClick={() => setCarouselIndex(idx => Math.max(idx - 1, 0))}
+              >
+                ‹
+              </button>
+              <img
+                src={imagenesBalneario[carouselIndex]?.url}
+                alt={`Imagen ${carouselIndex + 1}`}
+                className="img-galeria-carrusel"
+              />
+              <button
+                className="carrusel-nav-btn"
+                disabled={carouselIndex === imagenesBalneario.length - 1}
+                onClick={() => setCarouselIndex(idx => Math.min(idx + 1, imagenesBalneario.length - 1))}
+              >
+                ›
+              </button>
+            </div>
+            <div className="carrusel-indicadores">
               {imagenesBalneario.map((img, idx) => (
-                <img key={img.id_imagen || idx} src={img.url} alt={`Imagen ${idx + 1}`} className="img-galeria" />
+                <span
+                  key={idx}
+                  className={`carrusel-dot${carouselIndex === idx ? ' active' : ''}`}
+                  onClick={() => setCarouselIndex(idx)}
+                />
               ))}
             </div>
           </div>
         </div>
       )}
-
+      {/* Modal Mapa tipo Ciudades */}
+      {showMapa && (
+        <div className="modal-mapa-overlay" onClick={() => setShowMapa(false)}>
+          <div className="modal-mapa-contenido" onClick={e => e.stopPropagation()}>
+            <button className="cerrar-mapa-btn" onClick={() => setShowMapa(false)}>✕</button>
+            <h3>{balnearioInfo?.nombre}</h3>
+            <iframe
+              title={`Mapa de ${balnearioInfo?.nombre}`}
+              width="100%"
+              height="400"
+              style={{ border: 0, borderRadius: '12px' }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://www.google.com/maps?q=${encodeURIComponent(balnearioInfo?.direccion || balnearioInfo?.nombre || '')}&output=embed`}
+            ></iframe>
+          </div>
+        </div>
+      )}
       {/* ================ PANEL IZQUIERDO Y MAPA ================= */}
       <div className="main-content-layout">
         <div className="management-panel">
