@@ -11,8 +11,8 @@ function ElegirPraiarHome() {
             <FontAwesomeIcon icon="fa-regular fa-clock" />
           </div>
           <p>
-            Ahorrá tiempo
-            con una reserva
+            Ahorrá tiempo<br />
+            con una reserva<br />
             rápida y segura
           </p>
         </div>
@@ -21,7 +21,7 @@ function ElegirPraiarHome() {
             <FontAwesomeIcon icon="fa-solid fa-tent" />
           </div>
           <p>
-            Elegí tu carpa
+            Elegí tu carpa<br />
             o sombrilla favorita<br />
             para <i><strong>Praiar</strong></i> en la playa
           </p>

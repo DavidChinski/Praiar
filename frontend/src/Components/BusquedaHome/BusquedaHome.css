@@ -225,6 +225,7 @@ input[type="text"]:focus,
 
 .flecha-abajo:hover {
   transform: scale(1.2);
+  background-color: transparent !important;
 }
 
 @keyframes bounce {

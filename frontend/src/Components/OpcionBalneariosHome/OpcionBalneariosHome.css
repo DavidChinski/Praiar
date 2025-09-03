@@ -20,23 +20,36 @@
   gap: 2rem;
   max-width: 1000px;
   margin: 0 auto;
+  /* Movilidad: animación suave al cambiar layout */
+  transition: flex-direction 0.3s ease;
 }
 
 .imagen {
   max-width: 300px !important;
   height: auto;
+  /* Movilidad extra: animación al aparecer */
+  transition: transform 0.4s cubic-bezier(.47,1.64,.41,.8), box-shadow 0.25s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.imagen:hover {
+  transform: scale(1.04) rotate(-2deg);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.16);
 }
 
 .linea-vertical {
   width: 1px;
   height: 200px;
   background-color: var(--secondary2-700);
+  transition: width 0.3s, height 0.3s;
 }
 
 .texto {
   max-width: 400px;
   text-align: left;
   line-height: 1.6;
+  font-family: "El Messiri";
+  color: var(--primary-800);
+  transition: text-align 0.3s;
 }
 
 /* Link */
@@ -44,28 +57,60 @@
   color: var(--primary-500);
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, text-decoration 0.2s;
 }
-
 .link-registrar:hover {
   color: var(--primary-700);
+  text-decoration: underline;
 }
 
-/* Responsive */
+/* Responsive: movilidad y animaciones */
 @media (max-width: 845px) {
   .contenido {
     flex-direction: column;
     align-items: center;
+    transition: flex-direction 0.3s ease;
   }
 
   .linea-vertical {
     width: 60%;
     height: 1px;
     background-color: var(--secondary2-700);
+    margin: 1.5rem 0;
   }
 
   .texto {
     text-align: center;
     margin: 0 auto; /* <-- este centrado es clave */
+    transition: text-align 0.3s;
   }
+}
+
+/* Extra movilidad para pantallas pequeñas */
+@media (max-width: 480px) {
+  .titulo {
+    font-size: 28px;
+  }
+  .imagen {
+    max-width: 200px !important;
+  }
+  .texto {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.opcion-container, .contenido, .imagen, .texto {
+  animation: fadeInUp 0.7s;
 }

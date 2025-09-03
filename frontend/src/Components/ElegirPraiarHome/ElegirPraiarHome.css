@@ -3,23 +3,28 @@
   max-width: 960px;
   margin: 0 auto;
   text-align: center;
+  animation: fadeInUp 0.7s;
 }
 
 .features {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-top: 1rem; /* Reducido de 2rem a 1rem */
+  margin-top: 1rem;
   flex-wrap: wrap;
+  transition: flex-direction 0.3s ease;
 }
 
 .feature {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 105px;
-  
+  max-width: 130px;
+  padding: 0.5rem 0;
+  transition: transform 0.3s cubic-bezier(.47,1.64,.41,.8);
+  animation: fadeInUp 0.9s;
 }
+
 .feature .ElegirPraiarIcon {
   display: flex;
   justify-content: center;
@@ -31,12 +36,14 @@
   background-color: var(--secondary-500);
   border-radius: 50%;
   color: var(--secondary2-50);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  transition: all 0.3s cubic-bezier(.47,1.64,.41,.8);
 }
 
 .feature:hover .ElegirPraiarIcon {
   background-color: var(--secondary-400);
-  transform: scale(1.05);
+  transform: scale(1.10) rotate(-2deg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.14);
 }
 
 .feature .ElegirPraiarIcon svg {
@@ -50,11 +57,60 @@
   margin: 0;
   word-wrap: break-word;
   color: var(--primary-700);
+  font-family: "El Messiri", sans-serif;
+  transition: font-size 0.2s;
 }
 
 h2 {
   font-family: "El Messiri", sans-serif;
-  margin-bottom: 0.5rem; /* Reduce espacio entre título y contenido */
+  margin-bottom: 0.5rem;
   font-size: 40px;
   color: var(--primary-800);
+  transition: font-size 0.3s;
+}
+
+/* Responsive: movilidad en columnas */
+@media (max-width: 700px) {
+  .features {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    transition: flex-direction 0.3s;
+  }
+  .feature {
+    max-width: 300px;
+    width: 100%;
+    transition: max-width 0.3s;
+  }
+}
+
+/* Responsive: movilidad para pantallas pequeñas */
+@media (max-width: 480px) {
+  .why-praiar {
+    padding: 0.5rem 2vw;
+  }
+  h2 {
+    font-size: 28px;
+  }
+  .feature .ElegirPraiarIcon {
+    width: 60px;
+    height: 60px;
+    font-size: 2.2rem;
+  }
+  .feature p {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

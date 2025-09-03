@@ -16,9 +16,9 @@ function OpcionBalneariosHome() {
   return (
     <div className="opcion-container">
       <h1 className="titulo">Opción para balnearios</h1>
-      <div className="contenido">
+      <div className="contenido" role="group">
         <img src={imagenBalnearioHome} alt="Gestión Balnearios" className="imagen" />
-        <div className="linea-vertical"></div>
+        <div className="linea-vertical" aria-hidden="true"></div>
         <div className="texto">
           {user && user.esPropietario ? (
             <p>
